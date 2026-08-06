@@ -5,7 +5,8 @@
 写给正在做 AI 交付的工程师与 PM。规程与检查表为主体，公开事故复盘与标注过的合成示例做证据。
 体裁是手册，不是回忆录：你应该能「遇到某个症状翻到某一节」，而不是从头读到尾。
 
-> 🚧 **写作中。** 本仓库目前公开的是目录与写作纪律，正文陆续发布。
+> 🚧 **写作中。** 已发布 12 个规程节（第 1 部全部、第 2 部 5 节、第 3 部 3 节）、
+> 附录 A 故障速查（5 条完整条目）与 `kit/` 可跑脚本；其余章节陆续发布。
 
 ---
 
@@ -124,9 +125,12 @@ AWS Well-Architected Framework、GitLab Handbook 与 GitLab 生产 runbook 的�
 | 部分 | 状态 |
 |---|---|
 | 架构与写作纪律 | 已定 |
-| `VER-02` 切换验证 | 首个成稿规程节 |
-| 附录 A（故障速查） | 首条条目成稿 |
-| 其余 | 写作中 |
+| 第 1 部（ROL-01 ~ ROL-04） | ✅ 已发布 |
+| 第 2 部 BLD-03 / BLD-04 / VER-02 / VER-03 / VER-04 | ✅ 已发布 |
+| 第 3 部 DIS-01 / DIS-02 / DIS-03 | ✅ 已发布 |
+| 附录 A（故障速查） | 5 条完整条目已发布，索引含待写位 |
+| `kit/` 可跑脚本 | 已发布（`bash kit/run-all-selftests.sh` 一键自检） |
+| ENG / SUR / DEP / HND 各阶段、第 0/4 部、附录 B–F | 写作中 |
 
 ---
 
@@ -163,6 +167,7 @@ PIDs, hashes, or log output.
 **Note**: the six-phase lifecycle in Part 2 is a construct of this handbook, not an industry standard.
 Palantir's public material defines the role but publishes no phased delivery lifecycle.
 
-🚧 Work in progress — the outline and writing discipline are public; chapters follow.
+🚧 Work in progress — 12 procedure sections (all of Part 1, five of Part 2, three of Part 3),
+Appendix A (fault lookup) and the runnable `kit/` scripts are published; more chapters follow.
 
 </details>

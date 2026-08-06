@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 372" width="1000" height="372" role="img" aria-label="用户真实路径六段，我的自测只覆盖其中一段，故障落在未覆盖的中间设备上">
+<title>第 3 章 · 自测覆盖了真实路径的哪一段</title>
+<style>
+  :root{ --paper:#ffffff; --ink:#17181a; --muted:#6b6f76; --faint:#b9b9b3; --danger:#a8321f; }
+  @media (prefers-color-scheme: dark){
+    :root{ --paper:#131416; --ink:#e9eaec; --muted:#979ba2; --faint:#4a4d53; --danger:#e0785e; }
+  }
+  text{ font-family:"PingFang SC","Noto Sans CJK SC","Hiragino Sans GB",system-ui,sans-serif }
+  .bg{ fill:var(--paper) }
+  .node{ fill:none; stroke:var(--ink); stroke-width:1.5 }
+  .node-key{ stroke-width:3 }
+  .lbl{ fill:var(--ink); font-size:14px; font-weight:600 }
+  .sub{ fill:var(--muted); font-size:11.5px }
+  .edge{ stroke:var(--ink); stroke-width:1.6; fill:none }
+  .edge-ghost{ stroke:var(--faint); stroke-width:1.4; fill:none; stroke-dasharray:6 5 }
+  .edge-thick{ stroke:var(--ink); stroke-width:5; fill:none }
+  .edge-thin{ stroke:var(--muted); stroke-width:1.2; fill:none }
+  .guide{ stroke:var(--faint); stroke-width:1; stroke-dasharray:3 4 }
+  .etxt{ fill:var(--muted); font-size:12px }
+  .etxt-ink{ fill:var(--ink); font-size:12px; font-weight:600 }
+  .lane{ fill:var(--muted); font-size:11px; letter-spacing:.18em }
+  .bad{ fill:var(--danger); font-size:12px; font-weight:600 }
+  .badstroke{ stroke:var(--danger); stroke-width:2; fill:none }
+  .ah{ fill:var(--ink) } .ahg{ fill:var(--faint) }
+</style>
+<defs>
+  <marker id="ah" viewBox="0 0 9 9" refX="8" refY="4.5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" class="ah"/></marker>
+  <marker id="ahg" viewBox="0 0 9 9" refX="8" refY="4.5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" class="ahg"/></marker>
+</defs>
+
+<rect class="bg" x="0" y="0" width="1000" height="372"/>
+
+<text x="15" y="20" class="lane">用户真实路径</text>
+
+<rect class="node" x="15"  y="38" width="130" height="58" rx="11"/>
+<text x="80"  y="63" text-anchor="middle" class="lbl">iPhone</text>
+<text x="80"  y="81" text-anchor="middle" class="sub">微信小程序</text>
+
+<rect class="node" x="180" y="38" width="130" height="58" rx="11"/>
+<text x="245" y="63" text-anchor="middle" class="lbl">移动网络</text>
+<text x="245" y="81" text-anchor="middle" class="sub">运营商接入</text>
+
+<rect class="node node-key" x="345" y="38" width="130" height="58" rx="11"/>
+<text x="410" y="63" text-anchor="middle" class="lbl">中间设备</text>
+<text x="410" y="81" text-anchor="middle" class="sub">读 ClientHello 的 SNI</text>
+
+<rect class="node" x="510" y="38" width="130" height="58" rx="11"/>
+<text x="575" y="63" text-anchor="middle" class="lbl">云网络</text>
+<text x="575" y="81" text-anchor="middle" class="sub">入口</text>
+
+<rect class="node" x="675" y="38" width="130" height="58" rx="11"/>
+<text x="740" y="63" text-anchor="middle" class="lbl">nginx</text>
+<text x="740" y="81" text-anchor="middle" class="sub">TLS 终结 · 证书</text>
+
+<rect class="node" x="840" y="38" width="130" height="58" rx="11"/>
+<text x="905" y="63" text-anchor="middle" class="lbl">后端</text>
+<text x="905" y="81" text-anchor="middle" class="sub">业务服务</text>
+
+<line class="edge" x1="145" y1="67" x2="172" y2="67" marker-end="url(#ah)"/>
+<line class="edge" x1="310" y1="67" x2="337" y2="67" marker-end="url(#ah)"/>
+<line class="edge-ghost" x1="475" y1="67" x2="502" y2="67" marker-end="url(#ahg)"/>
+<line class="edge-ghost" x1="640" y1="67" x2="667" y2="67" marker-end="url(#ahg)"/>
+<line class="edge-ghost" x1="805" y1="67" x2="832" y2="67" marker-end="url(#ahg)"/>
+
+<path class="badstroke" d="M481,60 L495,74 M495,60 L481,74"/>
+<text x="410" y="118" text-anchor="middle" class="bad">未备案 → 伪造 RST，握手中途掐断</text>
+
+<line class="edge-thin" x1="15" y1="150" x2="970" y2="150"/>
+<line class="edge-thin" x1="15" y1="144" x2="15" y2="156"/>
+<line class="edge-thin" x1="970" y1="144" x2="970" y2="156"/>
+<text x="492" y="172" text-anchor="middle" class="etxt">真实路径六段 · 故障落在我从未观测过的那一段</text>
+
+<line class="guide" x1="675" y1="96" x2="675" y2="243"/>
+<line class="guide" x1="805" y1="96" x2="805" y2="243"/>
+
+<text x="15" y="222" class="lane">我的自测路径</text>
+
+<rect class="node" x="675" y="243" width="130" height="58" rx="11"/>
+<text x="740" y="268" text-anchor="middle" class="lbl">服务器本机</text>
+<text x="740" y="286" text-anchor="middle" class="sub">openssl · curl</text>
+
+<path class="edge" d="M805,258 C 872,250 872,294 807,286" marker-end="url(#ah)"/>
+<text x="884" y="266" class="etxt-ink">hairpin</text>
+<text x="884" y="284" class="etxt">全绿 · TLS 1.3 · 200</text>
+
+<line class="edge-thick" x1="675" y1="330" x2="805" y2="330"/>
+<line class="edge-thin" x1="675" y1="322" x2="675" y2="338"/>
+<line class="edge-thin" x1="805" y1="322" x2="805" y2="338"/>
+<text x="640" y="335" text-anchor="end" class="etxt">自测真正覆盖的范围 →</text>
+<text x="740" y="360" text-anchor="middle" class="etxt">一段</text>
+</svg>
