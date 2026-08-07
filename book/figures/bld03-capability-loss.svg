@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 560" role="img" aria-label="链路迁移不是升级：老链路经中间环节 X，新链路去掉 X 直连；被去掉的 X 承载的一切能力都要逐类写进丢失能力清单（五列，代偿方案不许留空、验证方式不许写上线后观察），六项检查全过才输出 MIGRATION_READY 进入部署，任一项不过或清单零行即 NOT_READY">
+<style>
+  :root{ --paper:#ffffff; --ink:#17181a; --muted:#6b6f76; --faint:#b9b9b3; --danger:#a8321f; }
+  @media (prefers-color-scheme: dark){
+    :root{ --paper:#131416; --ink:#e9eaec; --muted:#979ba2; --faint:#4a4d53; --danger:#e0785e; }
+  }
+  text{ font-family:"PingFang SC","Noto Sans CJK SC","Hiragino Sans GB",system-ui,sans-serif }
+  .bg{ fill:var(--paper) }
+  .node{ fill:none; stroke:var(--ink); stroke-width:1.5 }
+  .node-key{ stroke-width:3 }
+  .node-ghost{ stroke:var(--faint); stroke-dasharray:5 4 }
+  .lbl{ fill:var(--ink); font-size:14px; font-weight:600 }
+  .sub{ fill:var(--muted); font-size:11.5px }
+  .edge{ stroke:var(--ink); stroke-width:1.6; fill:none }
+  .edge-ghost{ stroke:var(--faint); stroke-width:1.4; fill:none; stroke-dasharray:6 5 }
+  .guide{ stroke:var(--faint); stroke-width:1; stroke-dasharray:3 4 }
+  .etxt{ fill:var(--muted); font-size:12px }
+  .etxt-ink{ fill:var(--ink); font-size:12px; font-weight:600 }
+  .lane{ fill:var(--muted); font-size:11px; letter-spacing:.18em }
+  .ah{ fill:var(--ink) } .ahg{ fill:var(--faint) }
+</style>
+<defs>
+  <marker id="cl-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path class="ah" d="M0,0 L10,5 L0,10 z"/>
+  </marker>
+  <marker id="cl-ghost" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path class="ahg" d="M0,0 L10,5 L0,10 z"/>
+  </marker>
+</defs>
+<rect class="bg" x="0" y="0" width="1000" height="560"/>
+
+<!-- 老链路 -->
+<text class="lane" x="30" y="36">老链路</text>
+<rect class="node" x="30" y="56" width="140" height="62" rx="6"/>
+<text class="lbl" x="46" y="82">环节 A</text>
+<text class="sub" x="46" y="104">输入侧</text>
+
+<rect class="node" x="230" y="44" width="250" height="84" rx="6"/>
+<text class="lbl" x="246" y="70">中间环节 X</text>
+<text class="sub" x="246" y="92">结构化产物 · 工具调用 · 拦截点</text>
+<text class="sub" x="246" y="110">流程状态 · 可见性 · 计量 · 时序控制</text>
+
+<rect class="node" x="540" y="56" width="140" height="62" rx="6"/>
+<text class="lbl" x="556" y="82">环节 B</text>
+<text class="sub" x="556" y="104">产出侧</text>
+
+<path class="edge" d="M170,87 L224,87" marker-end="url(#cl-ink)"/>
+<path class="edge" d="M480,87 L534,87" marker-end="url(#cl-ink)"/>
+
+<!-- 新增清单（镜像，做决策用） -->
+<rect class="node node-ghost" x="720" y="44" width="250" height="84" rx="6"/>
+<text class="lbl" x="736" y="70">新增能力清单（镜像）</text>
+<text class="sub" x="736" y="92">回答「该不该换」· 做决策用</text>
+<text class="sub" x="736" y="110">只有它：正确的决定 · 错误的实施</text>
+
+<!-- 新链路 -->
+<text class="lane" x="30" y="178">新链路</text>
+<rect class="node" x="30" y="190" width="140" height="62" rx="6"/>
+<text class="lbl" x="46" y="216">环节 A</text>
+<text class="sub" x="46" y="238">不变</text>
+
+<rect class="node node-ghost" x="230" y="190" width="250" height="62" rx="6"/>
+<text class="lbl" x="246" y="216">X 已被去掉</text>
+<text class="sub" x="246" y="238">「不再需要 X」「省掉一步」</text>
+
+<rect class="node" x="540" y="190" width="140" height="62" rx="6"/>
+<text class="lbl" x="556" y="216">环节 B</text>
+<text class="sub" x="556" y="238">不变</text>
+
+<path class="edge" d="M100,186 C100,152 610,152 610,186" marker-end="url(#cl-ink)"/>
+<text class="etxt" x="240" y="146">直接由 A 到 B = 新方案的优势（端到端 · 直连 · 托管 · 单次）</text>
+
+<!-- X 的能力集合流入丢失清单 -->
+<path class="edge" d="M355,252 L355,324" marker-end="url(#cl-ink)"/>
+<text class="etxt-ink" x="370" y="282">BLD-03.1 判据：优势与代价同源 ——</text>
+<text class="etxt" x="370" y="300">被去掉的 X 承载的一切能力，都在丢失清单上</text>
+
+<!-- 丢失能力清单（主角） -->
+<rect class="node node-key" x="90" y="330" width="600" height="104" rx="6"/>
+<text class="lbl" x="108" y="356">丢失能力清单（BLD-03.2 · 写第一行迁移代码之前产出）</text>
+<text class="sub" x="108" y="378">能力 ｜ 老链路 ｜ 新链路 ｜ 代偿方案 ｜ 验证方式 —— 五列缺一即该行未完成</text>
+<text class="sub" x="108" y="396">代偿方案不许留空：无代偿的丢失项 = 一个排好队的线上故障</text>
+<text class="sub" x="108" y="414">验证方式不许写「上线后观察」：须是迁移完成前能跑、给出通过/不通过的动作</text>
+
+<!-- 判定 -->
+<rect class="node" x="790" y="330" width="185" height="62" rx="6"/>
+<text class="lbl" x="806" y="356">MIGRATION_READY</text>
+<text class="sub" x="806" y="378">才可进入 DEP-01 部署</text>
+<path class="edge" d="M690,360 L784,360" marker-end="url(#cl-ink)"/>
+<text class="etxt-ink" x="702" y="350">六项全过</text>
+
+<rect class="node" x="790" y="420" width="185" height="62" rx="6"/>
+<text class="lbl" x="806" y="446">NOT_READY</text>
+<text class="sub" x="806" y="468">不得进入 DEP-01</text>
+<path class="edge" d="M690,414 C740,414 758,449 784,451" marker-end="url(#cl-ink)"/>
+<text class="etxt" x="694" y="404">任一项不过／0 行</text>
+
+<!-- 底注 -->
+<line class="guide" x1="30" y1="466" x2="970" y2="466"/>
+<text class="sub" x="30" y="494">六项检查：.1 判定是否去中间环节 · .2 产出清单 · .3 共用件适用范围 · .4 静默故障埋点 · .5 覆盖层边界 · .6 存量老链路回归</text>
+<text class="sub" x="30" y="514">保守缺省：某能力在新链路是否存在无法确认时，一律按「不存在」记入清单并要求代偿。</text>
+</svg>

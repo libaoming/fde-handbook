@@ -1,0 +1,114 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 580" role="img" aria-label="故障定位七步流：对症状先建立一条能变红的观测，再在边界加一对互斥的分辨率观测量，这条线之前不得提出任何原因解释；然后每个假设配可证伪预测，用事先声明的独立观测量判定而不是看症状变化；被证伪则换假设，同方向连续两次被证伪回退质疑前提，未复现先跑阳性对照怀疑判据；预测兑现后留下防复发痕迹才输出 LOCATED、允许动手修复；症状自行消失按 NOT_LOCATED 进事故台账，并先回滚没有证据支撑的修复">
+<style>
+  :root{ --paper:#ffffff; --ink:#17181a; --muted:#6b6f76; --faint:#b9b9b3; --danger:#a8321f; }
+  @media (prefers-color-scheme: dark){
+    :root{ --paper:#131416; --ink:#e9eaec; --muted:#979ba2; --faint:#4a4d53; --danger:#e0785e; }
+  }
+  text{ font-family:"PingFang SC","Noto Sans CJK SC","Hiragino Sans GB",system-ui,sans-serif }
+  .bg{ fill:var(--paper) }
+  .node{ fill:none; stroke:var(--ink); stroke-width:1.5 }
+  .node-key{ stroke-width:3 }
+  .node-ghost{ stroke:var(--faint); stroke-dasharray:5 4 }
+  .lbl{ fill:var(--ink); font-size:14px; font-weight:600 }
+  .sub{ fill:var(--muted); font-size:11.5px }
+  .edge{ stroke:var(--ink); stroke-width:1.6; fill:none }
+  .edge-ghost{ stroke:var(--faint); stroke-width:1.4; fill:none; stroke-dasharray:6 5 }
+  .guide{ stroke:var(--faint); stroke-width:1; stroke-dasharray:3 4 }
+  .etxt{ fill:var(--muted); font-size:12px }
+  .etxt-ink{ fill:var(--ink); font-size:12px; font-weight:600 }
+  .ah{ fill:var(--ink) } .ahg{ fill:var(--faint) }
+</style>
+<defs>
+  <marker id="lo-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path class="ah" d="M0,0 L10,5 L0,10 z"/>
+  </marker>
+  <marker id="lo-ghost" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path class="ahg" d="M0,0 L10,5 L0,10 z"/>
+  </marker>
+</defs>
+<rect class="bg" x="0" y="0" width="1000" height="580"/>
+
+<!-- 观测区 -->
+<rect class="node" x="30" y="60" width="160" height="70" rx="6"/>
+<text class="lbl" x="46" y="88">故障症状</text>
+<text class="sub" x="46" y="110">谁 · 条件 · 观察到什么</text>
+
+<rect class="node" x="240" y="60" width="230" height="70" rx="6"/>
+<text class="lbl" x="256" y="88">先建立能变红的观测</text>
+<text class="sub" x="256" y="110">VER-04.1 · 一条跑过、会变红的命令</text>
+
+<rect class="node" x="520" y="60" width="230" height="70" rx="6"/>
+<text class="lbl" x="536" y="88">加分辨率观测量</text>
+<text class="sub" x="536" y="110">VER-04.2 · 边界处打一对互斥量</text>
+
+<path class="edge" d="M190,95 L234,95" marker-end="url(#lo-ink)"/>
+<path class="edge" d="M470,95 L514,95" marker-end="url(#lo-ink)"/>
+
+<text class="etxt" x="762" y="84">一个数只能被解释，</text>
+<text class="etxt" x="762" y="102">一对数才能被分辨</text>
+
+<!-- 观测/解释分界 -->
+<line class="guide" x1="30" y1="166" x2="970" y2="166"/>
+<text class="etxt-ink" x="30" y="156">第 1 项完成之前，不得提出任何关于原因的解释 —— 上为观测，下为解释</text>
+
+<!-- 解释区 -->
+<path class="edge" d="M600,130 C560,168 330,164 262,196" marker-end="url(#lo-ink)"/>
+<text class="etxt" x="300" y="188">提出假设</text>
+
+<rect class="node" x="120" y="200" width="260" height="70" rx="6"/>
+<text class="lbl" x="136" y="228">假设＋可证伪预测</text>
+<text class="sub" x="136" y="250">VER-04.3 · 若观测到__则被推翻</text>
+
+<rect class="node" x="460" y="200" width="250" height="70" rx="6"/>
+<text class="lbl" x="476" y="228">用独立观测量判定</text>
+<text class="sub" x="476" y="250">VER-04.4 · 症状变了 ≠ 方向对了</text>
+
+<rect class="node" x="770" y="200" width="205" height="88" rx="6"/>
+<text class="lbl" x="786" y="226">留防复发痕迹</text>
+<text class="sub" x="786" y="248">VER-04.7 · 理由写在代码旁</text>
+<text class="sub" x="786" y="266">观测量留日志 · 判据成脚本</text>
+
+<path class="edge" d="M380,235 L454,235" marker-end="url(#lo-ink)"/>
+<text class="etxt-ink" x="392" y="226">跑测法</text>
+<path class="edge" d="M710,235 L764,235" marker-end="url(#lo-ink)"/>
+<text class="etxt-ink" x="712" y="226">预测兑现</text>
+
+<!-- 循环：被证伪换假设 -->
+<path class="edge" d="M460,260 C430,288 414,288 384,262" marker-end="url(#lo-ink)"/>
+<text class="etxt" x="390" y="304">被证伪 → 换下一个假设</text>
+
+<!-- 两次证伪 → 质疑前提 -->
+<path class="edge" d="M250,270 L250,334" marker-end="url(#lo-ink)"/>
+<text class="etxt-ink" x="258" y="290">同方向连续两次</text>
+<text class="etxt-ink" x="258" y="306">被证伪 → 停止细化</text>
+
+<rect class="node" x="100" y="340" width="320" height="88" rx="6"/>
+<text class="lbl" x="116" y="366">回退质疑前提</text>
+<text class="sub" x="116" y="388">VER-04.5 · 逐条列出这条方向依赖的前提</text>
+<text class="sub" x="116" y="406">每条配一个验证方法（前提不会自己举手）</text>
+
+<!-- 未复现 → 阳性对照 -->
+<path class="edge" d="M585,270 L585,334" marker-end="url(#lo-ink)"/>
+<text class="etxt-ink" x="595" y="300">「未复现／未观测到」</text>
+
+<rect class="node" x="520" y="340" width="230" height="88" rx="6"/>
+<text class="lbl" x="536" y="366">阳性对照：先怀疑判据</text>
+<text class="sub" x="536" y="388">VER-04.6 · 已知会触发的输入</text>
+<text class="sub" x="536" y="406">不变红 = 观测坏了 → 回 .1</text>
+
+<!-- 收口 -->
+<rect class="node node-key" x="770" y="352" width="205" height="62" rx="6"/>
+<text class="lbl" x="786" y="378">LOCATED</text>
+<text class="sub" x="786" y="400">动手改代码的前置</text>
+<path class="edge" d="M872,288 L872,346" marker-end="url(#lo-ink)"/>
+
+<!-- fail-closed 泳道 -->
+<line class="guide" x1="30" y1="462" x2="970" y2="462"/>
+<path class="edge-ghost" d="M430,432 L430,480" marker-end="url(#lo-ghost)"/>
+<text class="etxt" x="442" y="456">保守缺省 · 没定位就不算解决</text>
+
+<rect class="node node-ghost" x="120" y="486" width="740" height="80" rx="6"/>
+<text class="lbl" x="138" y="512">NOT_LOCATED</text>
+<text class="sub" x="138" y="534">机理未定位而症状消失 → 记 NOT_LOCATED 进事故台账（DIS-04），并列出未排除假设与各自测法</text>
+<text class="sub" x="138" y="552">手上同时有「一个修复」和「一个没被解释的症状」→ 先回滚那个修复</text>
+</svg>

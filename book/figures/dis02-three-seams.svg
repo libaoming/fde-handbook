@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 470" role="img" aria-label="三道焊缝在验证链路上的位置：目标到读取命令之间是焊缝一回读（靠自觉，管跑不跑），命令到完成声明之间是焊缝二判定标量（靠设计，管怎么读），声明到放行下一步之间是焊缝三闸门（靠系统，不需要人）；强度递增，按漏掉一次的代价选档">
+<style>
+  :root{ --paper:#ffffff; --ink:#17181a; --muted:#6b6f76; --faint:#b9b9b3; --danger:#a8321f; }
+  @media (prefers-color-scheme: dark){
+    :root{ --paper:#131416; --ink:#e9eaec; --muted:#979ba2; --faint:#4a4d53; --danger:#e0785e; }
+  }
+  text{ font-family:"PingFang SC","Noto Sans CJK SC","Hiragino Sans GB",system-ui,sans-serif }
+  .bg{ fill:var(--paper) } .node{ fill:none; stroke:var(--ink); stroke-width:1.5 }
+  .node-key{ stroke-width:3 } .node-ghost{ stroke:var(--faint); stroke-dasharray:5 4 }
+  .lbl{ fill:var(--ink); font-size:14px; font-weight:600 } .sub{ fill:var(--muted); font-size:11.5px }
+  .edge{ stroke:var(--ink); stroke-width:1.6; fill:none }
+  .edge-ghost{ stroke:var(--faint); stroke-width:1.4; fill:none; stroke-dasharray:6 5 }
+  .guide{ stroke:var(--faint); stroke-width:1; stroke-dasharray:3 4 }
+  .etxt{ fill:var(--muted); font-size:12px } .etxt-ink{ fill:var(--ink); font-size:12px; font-weight:600 }
+  .ah{ fill:var(--ink) } .ahg{ fill:var(--faint) }
+</style>
+<defs>
+  <marker id="d2-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0,0 L10,5 L0,10 z"/></marker>
+</defs>
+<rect class="bg" width="1000" height="470"/>
+
+<!-- 验证链路 -->
+<rect class="node" x="30" y="60" width="190" height="70" rx="6"/>
+<text class="lbl" x="46" y="88">被验证的目标</text>
+<text class="sub" x="46" y="110">服务 · 文件 · 配置 · 产物</text>
+
+<rect class="node" x="300" y="60" width="220" height="70" rx="6"/>
+<text class="lbl" x="316" y="88">读取 / 验证命令</text>
+<text class="sub" x="316" y="110">对目标取证 · 不是写入回显</text>
+
+<rect class="node" x="590" y="60" width="170" height="70" rx="6"/>
+<text class="lbl" x="606" y="88">完成声明</text>
+<text class="sub" x="606" y="110">「已部署」「已生效」</text>
+
+<rect class="node" x="830" y="60" width="140" height="70" rx="6"/>
+<text class="lbl" x="846" y="88">放行下一步</text>
+<text class="sub" x="846" y="110">验收 · 合并 · 发布</text>
+
+<path class="edge" d="M220,95 L294,95" marker-end="url(#d2-ink)"/>
+<text class="etxt-ink" x="228" y="85">① 跑不跑</text>
+<path class="edge" d="M520,95 L584,95" marker-end="url(#d2-ink)"/>
+<text class="etxt-ink" x="526" y="85">② 怎么读</text>
+<path class="edge" d="M760,95 L824,95" marker-end="url(#d2-ink)"/>
+<text class="etxt-ink" x="766" y="85">③ 放行</text>
+
+<!-- 三道焊缝 -->
+<line class="guide" x1="172" y1="210" x2="257" y2="102"/>
+<line class="guide" x1="499" y1="210" x2="552" y2="102"/>
+<line class="guide" x1="834" y1="210" x2="792" y2="102"/>
+
+<rect class="node" x="30" y="210" width="285" height="116" rx="6"/>
+<text class="lbl" x="46" y="238">焊缝① 回读 —— 靠自觉</text>
+<text class="sub" x="46" y="262">完成声明前，先对目标跑一条读取命令</text>
+<text class="sub" x="46" y="282">声明里每个值都来自命令输出，不凭记忆</text>
+<text class="sub" x="46" y="302">失效：赶时间就跳过 · 换个人就没了</text>
+
+<rect class="node" x="357" y="210" width="285" height="116" rx="6"/>
+<text class="lbl" x="373" y="238">焊缝② 判定标量 —— 靠设计</text>
+<text class="sub" x="373" y="262">命令自己吐 VERDICT=SWITCHED</text>
+<text class="sub" x="373" y="282">判不出时显式 UNKNOWN，绝不默认通过</text>
+<text class="sub" x="373" y="302">失效：没人看那一行 · 判据本身写错</text>
+
+<rect class="node node-key" x="699" y="210" width="271" height="116" rx="6"/>
+<text class="lbl" x="715" y="238">焊缝③ 闸门 —— 靠系统</text>
+<text class="sub" x="715" y="262">hook · CI 必过项 · 流水线关卡，绕不开</text>
+<text class="sub" x="715" y="282">必答：拦什么 · 拦不住什么 · 怎么自验</text>
+<text class="sub" x="715" y="302">失效：闸门自己有 bug 却静默通过</text>
+
+<text class="etxt-ink" x="30" y="362">强度递增：一档靠人记得 · 二档靠人看见 · 三档不需要人</text>
+
+<line class="guide" x1="30" y1="386" x2="970" y2="386"/>
+<text class="sub" x="30" y="410">按代价选档（DIS-02.5）：漏掉一次只是自己返工 → 一档｜会误导他人、写进对外交付物 → 二档</text>
+<text class="sub" x="30" y="430">影响客户生产 · 涉数据 / 资金 / 权限 · 同一个错误已犯过第二次 → 三档（升档，不是提醒自己下次注意）</text>
+<text class="sub" x="30" y="452">写进文档的要求再严厉也是一档 —— 措辞强度不改变机制强度。</text>
+</svg>

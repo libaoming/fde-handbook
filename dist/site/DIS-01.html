@@ -7,6 +7,7 @@
 <a class="home" href="index.html">《FDE 手册》</a><span class="crumb">第 3 部 · 验证纪律</span>
 </header>
 <main><h1 id="dis-01-证据分级什么算证据什么只是信号">DIS-01 · 证据分级：什么算证据，什么只是信号</h1>
+<p>2017 年 GitLab 需要恢复数据库时才发现：备份程序一直在静默失败，失败通知走的通道会被静默丢弃，备份产物一直是空的（案例 PM-09）。「任务在跑」「没收到告警」这类现象让人想签收，却都不唯一指向结论——本节给出一张分级表，把「什么够格当证据、什么只是信号」变成可判定的事。</p>
 <p><strong>目的</strong>　在签收任何一项工作之前，判断你手里拿到的东西<strong>够不够格当证据</strong>。本节给出一张分级表和一条可执行的升级路径：当手里只有低级别信号时，下一步该去取什么。</p>
 <p><strong>前置条件</strong></p>
 <ul>
@@ -15,6 +16,79 @@
 </ul>
 <hr />
 <h2 id="规程">规程</h2>
+<figure class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500" role="img" aria-label="证据分级阶梯：直接证据在签收分界线上方，可据此签收；间接信号、转述、推断在线下。间接信号经排除测验穷尽第二种解释才升为直接证据；缺证据时按升级路径去取新观测；拿不准按更低级别记，只有新观测才允许上调">
+<style>
+  :root{ --paper:#ffffff; --ink:#17181a; --muted:#6b6f76; --faint:#b9b9b3; --danger:#a8321f; }
+  @media (prefers-color-scheme: dark){
+    :root{ --paper:#131416; --ink:#e9eaec; --muted:#979ba2; --faint:#4a4d53; --danger:#e0785e; }
+  }
+  text{ font-family:"PingFang SC","Noto Sans CJK SC","Hiragino Sans GB",system-ui,sans-serif }
+  .bg{ fill:var(--paper) } .node{ fill:none; stroke:var(--ink); stroke-width:1.5 }
+  .node-key{ stroke-width:3 } .node-ghost{ stroke:var(--faint); stroke-dasharray:5 4 }
+  .lbl{ fill:var(--ink); font-size:14px; font-weight:600 } .sub{ fill:var(--muted); font-size:11.5px }
+  .edge{ stroke:var(--ink); stroke-width:1.6; fill:none }
+  .edge-ghost{ stroke:var(--faint); stroke-width:1.4; fill:none; stroke-dasharray:6 5 }
+  .guide{ stroke:var(--faint); stroke-width:1; stroke-dasharray:3 4 }
+  .etxt{ fill:var(--muted); font-size:12px } .etxt-ink{ fill:var(--ink); font-size:12px; font-weight:600 }
+  .ah{ fill:var(--ink) } .ahg{ fill:var(--faint) }
+</style>
+<defs>
+  <marker id="d1-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0,0 L10,5 L0,10 z"/></marker>
+  <marker id="d1-ghost" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ahg" d="M0,0 L10,5 L0,10 z"/></marker>
+</defs>
+<rect class="bg" width="1000" height="500"/>
+
+<!-- 阶梯：四级 -->
+<rect class="node node-key" x="50" y="50" width="330" height="68" rx="6"/>
+<text class="lbl" x="66" y="78">直接证据 —— 可据此签收</text>
+<text class="sub" x="66" y="100">对象自己产生 · 当场可复现 · 运行时回读</text>
+
+<line class="guide" x1="30" y1="142" x2="500" y2="142"/>
+<text class="etxt-ink" x="50" y="136">签收分界 —— 线下只能用于排除或标注</text>
+
+<rect class="node" x="50" y="162" width="330" height="64" rx="6"/>
+<text class="lbl" x="66" y="190">间接信号 —— 只能排除，不能确认</text>
+<text class="sub" x="66" y="212">功能能用 · 页面能开 · 进程存在 · 没有告警</text>
+
+<rect class="node" x="50" y="248" width="330" height="64" rx="6"/>
+<text class="lbl" x="66" y="276">转述 —— 一律降级为待验证</text>
+<text class="sub" x="66" y="298">「我部署完了」—— 没附原始命令输出</text>
+
+<rect class="node" x="50" y="334" width="330" height="64" rx="6"/>
+<text class="lbl" x="66" y="362">推断 —— 显式标注，不当已确认</text>
+<text class="sub" x="66" y="384">从其他事实推导，没有独立观测</text>
+
+<!-- 排除测验 -->
+<rect class="node" x="560" y="150" width="400" height="92" rx="6"/>
+<text class="lbl" x="576" y="178">排除测验（DIS-01.3）</text>
+<text class="sub" x="576" y="200">「除了我希望的原因，还有什么能产生同样的现象？」</text>
+<text class="sub" x="576" y="220">旧版本还在服务 · 缓存未过期 · LB 发给旧实例</text>
+
+<!-- 升级取证 -->
+<rect class="node" x="560" y="300" width="400" height="116" rx="6"/>
+<text class="lbl" x="576" y="328">缺证据时去取（DIS-01.4）</text>
+<text class="sub" x="576" y="352">功能能用 → 版本标识（构建号 / 镜像摘要）</text>
+<text class="sub" x="576" y="372">配置文件正确 → 运行时回读该配置</text>
+<text class="sub" x="576" y="392">别人说做完了 → 要命令与原始输出</text>
+
+<!-- 升级路径 -->
+<path class="edge" d="M380,194 L554,194" marker-end="url(#d1-ink)"/>
+<text class="etxt-ink" x="398" y="184">① 逐条问第二种解释</text>
+
+<path class="edge" d="M700,300 L700,248" marker-end="url(#d1-ink)"/>
+<text class="etxt-ink" x="712" y="280">② 拿到新观测再测</text>
+
+<path class="edge" d="M760,150 C760,84 560,84 386,84" marker-end="url(#d1-ink)"/>
+<text class="etxt-ink" x="560" y="72">③ 第二种解释 = none → 升为直接证据</text>
+
+<path class="edge-ghost" d="M576,242 C520,278 420,262 372,228" marker-end="url(#d1-ghost)"/>
+<text class="etxt" x="404" y="292">列得出第二种 → 仍在线下</text>
+
+<line class="guide" x1="30" y1="440" x2="970" y2="440"/>
+<text class="sub" x="30" y="466">保守缺省：LEVEL 拿不准按更低级别记；证据等级只在拿到新观测后才允许上调，不因「应该没问题」上调。</text>
+<text class="sub" x="30" y="488">取不到直接证据时，把等级如实标注后交出去（DIS-01.5）——不得把间接信号写成结论。</text>
+</svg>
+<figcaption>证据分级阶梯：直接证据在签收分界线上方可据此签收，间接信号、转述、推断在线下；间接信号要经排除测验穷尽第二种解释才升为直接证据，缺证据按升级路径去取新观测，拿不准按更低级别记</figcaption></figure>
 <h3 id="dis-01.1-把断言和证据分开写">DIS-01.1　把断言和证据分开写</h3>
 <p>先把要确认的事写成一句可判真假的话，再在它旁边写你<strong>实际拿到了什么</strong>。两者写在一起，绝大多数「证据不足」当场就现形。</p>
 <table>

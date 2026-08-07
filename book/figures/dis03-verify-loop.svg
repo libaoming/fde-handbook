@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 520" role="img" aria-label="助手产出验证闭环：完成报告先拆成产物断言与过程断言两栏，产物走独立通道回读、过程翻本轮调用记录逐项判定，全对才 EXECUTION_CONFIRMED 进 VER-05 验收；任一项不过或记录不可得按未执行处理，重跑那一条再走同一闭环；会话收尾另有 Stop hook 出口闸门作网底，缺口已列明">
+<style>
+  :root{ --paper:#ffffff; --ink:#17181a; --muted:#6b6f76; --faint:#b9b9b3; --danger:#a8321f; }
+  @media (prefers-color-scheme: dark){
+    :root{ --paper:#131416; --ink:#e9eaec; --muted:#979ba2; --faint:#4a4d53; --danger:#e0785e; }
+  }
+  text{ font-family:"PingFang SC","Noto Sans CJK SC","Hiragino Sans GB",system-ui,sans-serif }
+  .bg{ fill:var(--paper) } .node{ fill:none; stroke:var(--ink); stroke-width:1.5 }
+  .node-key{ stroke-width:3 } .node-ghost{ stroke:var(--faint); stroke-dasharray:5 4 }
+  .lbl{ fill:var(--ink); font-size:14px; font-weight:600 } .sub{ fill:var(--muted); font-size:11.5px }
+  .edge{ stroke:var(--ink); stroke-width:1.6; fill:none }
+  .edge-ghost{ stroke:var(--faint); stroke-width:1.4; fill:none; stroke-dasharray:6 5 }
+  .guide{ stroke:var(--faint); stroke-width:1; stroke-dasharray:3 4 }
+  .etxt{ fill:var(--muted); font-size:12px } .etxt-ink{ fill:var(--ink); font-size:12px; font-weight:600 }
+  .ah{ fill:var(--ink) } .ahg{ fill:var(--faint) }
+</style>
+<defs>
+  <marker id="d3-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0,0 L10,5 L0,10 z"/></marker>
+  <marker id="d3-ghost" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ahg" d="M0,0 L10,5 L0,10 z"/></marker>
+</defs>
+<rect class="bg" width="1000" height="520"/>
+
+<rect class="node" x="30" y="60" width="200" height="74" rx="6"/>
+<text class="lbl" x="46" y="88">助手报告完成</text>
+<text class="sub" x="46" y="110">「已写入 · 已执行 · rc=0」</text>
+
+<rect class="node" x="300" y="60" width="180" height="74" rx="6"/>
+<text class="lbl" x="316" y="88">拆成两栏</text>
+<text class="sub" x="316" y="110">DIS-03.1 产物 / 过程</text>
+<path class="edge" d="M230,97 L294,97" marker-end="url(#d3-ink)"/>
+<text class="etxt-ink" x="238" y="87">① 分栏</text>
+
+<rect class="node" x="540" y="28" width="255" height="74" rx="6"/>
+<text class="lbl" x="556" y="56">产物断言 → 独立回读</text>
+<text class="sub" x="556" y="78">03.2 / 03.4 · 自己跑，校验和自己重算</text>
+
+<rect class="node" x="540" y="132" width="255" height="74" rx="6"/>
+<text class="lbl" x="556" y="160">过程断言 → 翻调用记录</text>
+<text class="sub" x="556" y="182">03.3 · 本轮 · 同类型工具调用</text>
+
+<path class="edge" d="M480,80 C505,74 512,68 534,62 " marker-end="url(#d3-ink)"/>
+<text class="etxt-ink" x="492" y="56">②</text>
+<path class="edge" d="M480,114 C508,126 512,150 534,164" marker-end="url(#d3-ink)"/>
+<text class="etxt-ink" x="492" y="152">③</text>
+
+<!-- 判定（主角） -->
+<rect class="node node-key" x="810" y="80" width="160" height="110" rx="6"/>
+<text class="lbl" x="826" y="108">逐项判定</text>
+<text class="sub" x="826" y="132">全对 → CONFIRMED</text>
+<text class="sub" x="826" y="154">才可进 VER-05 验收</text>
+<text class="sub" x="826" y="176">让脚本吐，不让它汇报</text>
+<path class="edge" d="M795,65 C806,72 806,88 810,102" marker-end="url(#d3-ink)"/>
+<path class="edge" d="M795,169 C806,164 806,150 810,140" marker-end="url(#d3-ink)"/>
+
+<!-- 不过 → 重跑 -->
+<path class="edge" d="M890,190 C890,252 856,288 799,308" marker-end="url(#d3-ink)"/>
+<text class="etxt" x="690" y="238">任一项不过，或记录不可得、</text>
+<text class="etxt" x="690" y="256">声明模糊 → UNCONFIRMED</text>
+
+<rect class="node" x="540" y="272" width="255" height="80" rx="6"/>
+<text class="lbl" x="556" y="300">重跑那一条（按未执行处理）</text>
+<text class="sub" x="556" y="322">不是追问助手 —— 追问只再生成文本</text>
+<text class="sub" x="556" y="342">同一个过程无法为自己作证</text>
+
+<path class="edge" d="M534,320 C350,368 140,330 130,140" marker-end="url(#d3-ink)"/>
+<text class="etxt-ink" x="255" y="310">④ 重新执行后，走同一闭环再验</text>
+
+<!-- 出口闸门网底 -->
+<line class="guide" x1="30" y1="372" x2="970" y2="372"/>
+<rect class="node" x="30" y="392" width="400" height="118" rx="6"/>
+<text class="lbl" x="46" y="420">出口闸门 03.8（Stop hook · 网底）</text>
+<text class="sub" x="46" y="444">闸A 产物：称「已写 / 已生成」→ 逐个 test -f</text>
+<text class="sub" x="46" y="464">闸B 过程：rc= / EXIT: 而本轮零 shell 调用 → 拦</text>
+<text class="sub" x="46" y="484">缺口：只拦最后一句 · 换措辞可绕 · 不比对读数</text>
+
+<rect class="node node-ghost" x="470" y="392" width="500" height="118" rx="6"/>
+<text class="lbl" x="486" y="420">循环里的三条守则（03.5–03.7）</text>
+<text class="sub" x="486" y="444">故障声明先取证：拿不出异常输出原文 ＝ 想象，按伪报处理</text>
+<text class="sub" x="486" y="464">单条异常就地重跑那一条，不外推成「工具链失效」</text>
+<text class="sub" x="486" y="484">中断 / 催促后的第一条消息按未完成开局，先跑一条回读</text>
+</svg>

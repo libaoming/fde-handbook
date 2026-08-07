@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500" role="img" aria-label="五档约束阶梯：第 0 档措辞、第 1 档上下文形状、第 2 档数据形状、第 3 档输出格式约束、第 4 档模型之外的闸门；第 0 到 2 档全部是建议，在模型内与训练先验竞争、无确定性；第 3 到 4 档才是约束且只有第 4 档确定；不可失败类要求（金额、承诺、对外发布、不可逆动作）必须落到第 4 档，落在第 2 档及以下判 ADVISORY_ONLY，不得进入部署">
+<style>
+  :root{ --paper:#ffffff; --ink:#17181a; --muted:#6b6f76; --faint:#b9b9b3; --danger:#a8321f; }
+  @media (prefers-color-scheme: dark){
+    :root{ --paper:#131416; --ink:#e9eaec; --muted:#979ba2; --faint:#4a4d53; --danger:#e0785e; }
+  }
+  text{ font-family:"PingFang SC","Noto Sans CJK SC","Hiragino Sans GB",system-ui,sans-serif }
+  .bg{ fill:var(--paper) }
+  .node{ fill:none; stroke:var(--ink); stroke-width:1.5 }
+  .node-key{ stroke-width:3 }
+  .node-ghost{ stroke:var(--faint); stroke-dasharray:5 4 }
+  .lbl{ fill:var(--ink); font-size:14px; font-weight:600 }
+  .sub{ fill:var(--muted); font-size:11.5px }
+  .edge{ stroke:var(--ink); stroke-width:1.6; fill:none }
+  .edge-ghost{ stroke:var(--faint); stroke-width:1.4; fill:none; stroke-dasharray:6 5 }
+  .edge-thick{ stroke:var(--ink); stroke-width:5; fill:none }
+  .guide{ stroke:var(--faint); stroke-width:1; stroke-dasharray:3 4 }
+  .etxt{ fill:var(--muted); font-size:12px }
+  .etxt-ink{ fill:var(--ink); font-size:12px; font-weight:600 }
+  .bad{ fill:var(--danger); font-size:12px; font-weight:600 }
+  .ah{ fill:var(--ink) } .ahg{ fill:var(--faint) }
+</style>
+<defs>
+  <marker id="tl-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path class="ah" d="M0,0 L10,5 L0,10 z"/>
+  </marker>
+  <marker id="tl-ghost" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path class="ahg" d="M0,0 L10,5 L0,10 z"/>
+  </marker>
+</defs>
+<rect class="bg" x="0" y="0" width="1000" height="500"/>
+
+<text class="etxt-ink" x="30" y="40">判据：写进提示词的每条「必须」只是较强倾向，要与训练先验竞争；最终落在第几档，决定它是约束还是建议</text>
+
+<!-- 不可失败类要求 -->
+<rect class="node" x="20" y="64" width="270" height="62" rx="6"/>
+<text class="lbl" x="36" y="90">不可失败类要求</text>
+<text class="sub" x="36" y="112">金额 · 承诺 · 对外发布 · 不可逆动作</text>
+<path class="edge" d="M290,95 C500,95 680,102 814,118" marker-end="url(#tl-ink)"/>
+<text class="etxt-ink" x="430" y="86">必须落到第 4 档</text>
+<text class="bad" x="20" y="160">✕ 落在第 0–2 档 → VERDICT=ADVISORY_ONLY，不得进入 DEP-01</text>
+
+<!-- 阶梯：五档 -->
+<rect class="node" x="20" y="330" width="176" height="84" rx="6"/>
+<text class="lbl" x="34" y="356">第 0 档 · 措辞</text>
+<text class="sub" x="34" y="378">「必须」「禁止」· 加粗</text>
+<text class="sub" x="34" y="396">确定性：无，只调高权重</text>
+
+<rect class="node" x="220" y="270" width="176" height="84" rx="6"/>
+<text class="lbl" x="234" y="296">第 1 档 · 上下文形状</text>
+<text class="sub" x="234" y="318">给什么 · 不给什么 · 放哪</text>
+<text class="sub" x="234" y="336">无，但改变竞争条件</text>
+
+<rect class="node" x="420" y="210" width="176" height="84" rx="6"/>
+<text class="lbl" x="434" y="236">第 2 档 · 数据形状</text>
+<text class="sub" x="434" y="258">让错事在语法上不成立</text>
+<text class="sub" x="434" y="276">无，但与先验同向不对抗</text>
+
+<rect class="node" x="620" y="150" width="176" height="84" rx="6"/>
+<text class="lbl" x="634" y="176">第 3 档 · 输出格式约束</text>
+<text class="sub" x="634" y="198">枚举 · schema · 受限解码</text>
+<text class="sub" x="634" y="216">较高，看服务端是否强制</text>
+
+<rect class="node node-key" x="820" y="88" width="176" height="84" rx="6"/>
+<text class="lbl" x="834" y="114">第 4 档 · 模型外闸门</text>
+<text class="sub" x="834" y="136">程序校验 · hook · 拒绝重试</text>
+<text class="sub" x="834" y="154">唯一有确定性的一档</text>
+
+<path class="edge" d="M196,342 L214,342" marker-end="url(#tl-ink)"/>
+<path class="edge" d="M396,282 L414,282" marker-end="url(#tl-ink)"/>
+<path class="edge" d="M596,222 L614,222" marker-end="url(#tl-ink)"/>
+<path class="edge" d="M796,162 L814,162" marker-end="url(#tl-ink)"/>
+
+<!-- 训练先验 -->
+<rect class="node node-ghost" x="220" y="368" width="190" height="56" rx="6"/>
+<text class="lbl" x="234" y="392">训练先验（prior）</text>
+<text class="sub" x="234" y="412">训练数据里学到的默认倾向</text>
+<path class="edge-ghost" d="M220,396 L202,396" marker-end="url(#tl-ghost)"/>
+<text class="etxt" x="424" y="392">措辞与它硬碰硬 · 胜负看哪边信号强</text>
+
+<!-- 覆盖范围标注 -->
+<path class="edge-thick" d="M20,452 L596,452"/>
+<text class="etxt-ink" x="20" y="478">第 0–2 档 = 全部是建议：模型内 · 与先验竞争 · 无确定性</text>
+<path class="edge-thick" d="M620,452 L996,452"/>
+<text class="etxt-ink" x="620" y="478">第 3–4 档 = 约束（只有第 4 档确定）</text>
+</svg>
