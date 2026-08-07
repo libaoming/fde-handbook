@@ -8,7 +8,10 @@
 </header>
 <main><h1 id="ver-01-验证前提先确认你的验证手段可信">VER-01 · 验证前提：先确认你的验证手段可信</h1>
 <p><strong>目的</strong>　在相信任何绿灯之前，先审计绿灯本身。三个问题：你的观测手段与被观测系统<strong>共不共享依赖</strong>；你的探针测的<strong>是不是你以为的东西</strong>；「一切安静」到底是证据还是盲区。验证手段不可信时，后续所有验证（<a class="xref" href="VER-02.html">VER-02</a>~05）的结论都是空转。</p>
-<p><strong>前置条件</strong> - 知道本次交付用什么看系统：监控、告警、日志、健康检查各在哪、走什么链路（<a class="xref" href="SUR-01.html">SUR-01</a>.1 的产出）</p>
+<p><strong>前置条件</strong></p>
+<ul>
+<li>知道本次交付用什么看系统：监控、告警、日志、健康检查各在哪、走什么链路（<a class="xref" href="SUR-01.html">SUR-01</a>.1 的产出）</li>
+</ul>
 <hr />
 <h2 id="规程">规程</h2>
 <figure class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" role="img" aria-label="被验证系统与验证链路共享依赖时，共享节点故障会让验证手段和故障一起消失——安静不是绿灯；告警链路要有心跳信号">

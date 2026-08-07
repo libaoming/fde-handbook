@@ -8,7 +8,13 @@
 </header>
 <main><h1 id="ver-05-验收与签收判据表的执行日">VER-05 · 验收与签收：判据表的执行日</h1>
 <p><strong>目的</strong>　把 <a class="xref" href="ENG-02.html">ENG-02</a> 冻结的判据表逐条执行、留档、签字。验收不是一场会议，是一次<strong>可复现的批量验证</strong>——它的全部悬念都应该在这天之前就被消化掉：判据是冻结的、执行方式是写好的、前置检查是绿的。验收日只剩执行。</p>
-<p><strong>前置条件</strong>（任何一条不满足，验收日不开场） - <code>VERDICT=SWITCHED</code>（<a class="xref" href="VER-02.html">VER-02</a>）：接活的确实是要验收的那个版本 - 可达性已从用户网络位置验证（<a class="xref" href="VER-03.html">VER-03</a>） - 交付过程使用了 AI 助手的部分已取得 <code>EXECUTION_CONFIRMED</code>（<a class="xref" href="DIS-03.html">DIS-03</a>） - 判据表处于冻结态且双方签过字（<a class="xref" href="ENG-02.html">ENG-02</a>.4），变更记录在手</p>
+<p><strong>前置条件</strong>（任何一条不满足，验收日不开场）</p>
+<ul>
+<li><code>VERDICT=SWITCHED</code>（<a class="xref" href="VER-02.html">VER-02</a>）：接活的确实是要验收的那个版本</li>
+<li>可达性已从用户网络位置验证（<a class="xref" href="VER-03.html">VER-03</a>）</li>
+<li>交付过程使用了 AI 助手的部分已取得 <code>EXECUTION_CONFIRMED</code>（<a class="xref" href="DIS-03.html">DIS-03</a>）</li>
+<li>判据表处于冻结态且双方签过字（<a class="xref" href="ENG-02.html">ENG-02</a>.4），变更记录在手</li>
+</ul>
 <hr />
 <h2 id="规程">规程</h2>
 <figure class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" role="img" aria-label="验收日流程：四项前置全绿才开场，只对冻结判据表逐条执行并四字段留档，三态判定且测不出算不通过；不通过走回边重跑，全过签字归档，验收不等于移交">

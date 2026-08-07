@@ -8,7 +8,12 @@
 </header>
 <main><h1 id="dep-01-部署与切换影响清单回退与渐进">DEP-01 · 部署与切换：影响清单、回退与渐进</h1>
 <p><strong>目的</strong>　把「执行变更」这个动作本身管起来：动手前知道<strong>实际会碰到什么</strong>，出事时有<strong>演练过的</strong>退路，推进时每一步都隔着观测窗口。本节管动作，动作完成后的验证归 <a class="xref" href="VER-02.html">VER-02</a>——<strong>跑完 <a class="xref" href="VER-02.html">VER-02</a> 并拿到 <code>SWITCHED</code>，DEP 才算出关。</strong></p>
-<p><strong>前置条件</strong> - BLD 关口已过：链路在客户环境跑通，丢失能力清单已确认（<a class="xref" href="BLD-03.html">BLD-03</a>） - 本次变更有唯一版本标识（<a class="xref" href="VER-02.html">VER-02</a> 前置条件的上游） - 变更窗口与干系人已知会（<a class="xref" href="ROL-02.html">ROL-02</a> 登记表）</p>
+<p><strong>前置条件</strong></p>
+<ul>
+<li>BLD 关口已过：链路在客户环境跑通，丢失能力清单已确认（<a class="xref" href="BLD-03.html">BLD-03</a>）</li>
+<li>本次变更有唯一版本标识（<a class="xref" href="VER-02.html">VER-02</a> 前置条件的上游）</li>
+<li>变更窗口与干系人已知会（<a class="xref" href="ROL-02.html">ROL-02</a> 登记表）</li>
+</ul>
 <hr />
 <h2 id="规程">规程</h2>
 <figure class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" role="img" aria-label="部署时间线：先打印影响清单并核对，再分批推进，批次之间隔至少一个下发周期的观测窗口，异常即停走演练过的回退；最后跑 <a class="xref" href="VER-02.html">VER-02</a> 拿到 SWITCHED 才出关">
