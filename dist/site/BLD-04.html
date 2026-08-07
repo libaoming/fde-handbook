@@ -7,14 +7,17 @@
 <a class="home" href="index.html">《FDE 手册》</a><span class="crumb">第 2 部 · BLD 搭建</span>
 </header>
 <main><h1 id="bld-04-模型行为约束把要求落成结构与闸门">BLD-04 · 模型行为约束：把要求落成结构与闸门</h1>
-<p><strong>目的</strong>　搭建阶段，当一条要求的形态是「模型必须做 X」或「模型禁止做 Y」时，判断这条要求该写进提示词、该改成数据与格式的形状、还是该做成模型之外的闸门；并在进入上线阶段前，检出提示词里「写的是约束、读到的是建议」的那些写法。</p>
+<p><strong>目的</strong>　搭建阶段，当一条要求的形态是「模型必须做 X」或「模型禁止做 Y」时，判断这条要求该写进提示词、该改成数据与格式的形状、还是该做成模型之外的闸门。另在进入上线阶段前，检出提示词里「写的是约束、读到的是建议」的那些写法。</p>
 <blockquote>
 <p><strong>判据：写进提示词的每一条「必须」，到了模型那里都是一个较强的倾向，不是一道闸门。</strong>它要和模型在训练中形成的先验（prior，即训练数据里学到的默认倾向）竞争。冲突时胜负取决于哪一边信号更强，<strong>不取决于措辞多重</strong>。</p>
 </blockquote>
-<p><strong>前置条件</strong> - 已有成功标准的清晰定义，以及针对该标准做实证测试的手段（否则本节的判定无处落地，见下方引文） - 已知目标链路的模型形态（端到端语音 / 文本对话 / 工具调用），因为同一句话在不同形态下竞争的先验不同 - 提示词全文可读且纳入版本控制——未入版本控制的提示词无法做 BLD-04.4 的逐项审查 - 若本次是链路迁移：旧链路的提示词及其<strong>运行形态</strong>（谁在消费它的输出）可获取，见 <a class="xref" href="BLD-03.html">BLD-03</a></p>
-<blockquote>
-<p>“This guide assumes that you have: 1. A clear definition of the success criteria for your use case, 2. Some ways to empirically test against those criteria… If not, spend time establishing that first.” ——Anthropic, <em>Claude Docs</em> · Prompt engineering overview ｜https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/overview ｜不可外推：这是官方把「可实证测试」列为 prompt 工程的<strong>前置条件</strong>，不是对效果的承诺。</p>
-</blockquote>
+<p><strong>前置条件</strong></p>
+<ul>
+<li>已有成功标准的清晰定义，以及针对该标准做实证测试的手段（否则本节的判定无处落地；官方口径见案例证据的 Anthropic 引证框）</li>
+<li>已知目标链路的模型形态（端到端语音 / 文本对话 / 工具调用），因为同一句话在不同形态下竞争的先验不同</li>
+<li>提示词全文可读且纳入版本控制——未入版本控制的提示词无法做 BLD-04.4 的逐项审查</li>
+<li>若本次是链路迁移：旧链路的提示词及其<strong>运行形态</strong>（谁在消费它的输出）可获取，见 <a class="xref" href="BLD-03.html">BLD-03</a></li>
+</ul>
 <hr />
 <h2 id="规程">规程</h2>
 <p>五项检查全部通过，本节才算完成。<strong>任何一项不通过，该约束按「未生效」处理，不得进入 <a class="xref" href="DEP-01.html">DEP-01</a>。</strong></p>
@@ -58,9 +61,7 @@
 </ol>
 <p><strong>判据：模型编造的直接成因，通常是「猜一个」的成本低于「承认不知道」。要做的是把后者的成本降下来，而不是禁止前者。</strong></p>
 <p>反向检查同样重要，且优先级更高：<strong>全文不得出现堵死出路的指令</strong>—— 「不要反问」「必须给出一个答案」「猜一个最接近的」「不准说不知道」。这类句子比「没写出路」严重，因为它是在主动命令模型编造。</p>
-<blockquote>
-<p>“…producing plausible yet incorrect statements instead of admitting uncertainty”； “language models hallucinate because the training and evaluation procedures reward guessing over acknowledging uncertainty.” ——Kalai, Nachum, Vempala, Zhang, “Why Language Models Hallucinate”, arXiv:2509.04664 ｜https://arxiv.org/abs/2509.04664 ｜类型：<code>third-party-claim</code>（理论论证，非产品实测）。｜不可外推：这篇论文论证的是训练与评估机制层面的成因，<strong>不构成对任一具体模型幻觉率的量化预测</strong>，也不保证「写了出路就不编造」——它只说明了为什么「承认不确定」这条路默认更贵。</p>
-</blockquote>
+<p>本项判据的机理与出处，见案例证据的「Why Language Models Hallucinate」引证框。</p>
 <h3 id="bld-04.3-约束优先用结构性手段措辞排在最后一档">BLD-04.3　约束优先用结构性手段，措辞排在最后一档</h3>
 <p>模型不听话时，<strong>加强措辞通常是最低效的修法</strong>。先问一句：它现在的行为，是不是某种训练先验的自然结果？如果是，要找的是能压过那个先验的结构性手段。</p>
 <table>
@@ -112,14 +113,8 @@
 </tbody>
 </table>
 <p><strong>判据：一条要求最终落在第几档，决定了它是约束还是建议。第 0–2 档全部是建议。</strong></p>
-<p><strong>真正确定性的约束来自模型之外的闸门，而不是提示词本身。</strong> 这一点有官方口径：</p>
-<blockquote>
-<p>“Unlike CLAUDE.md instructions which are advisory, hooks are deterministic and guarantee the action happens.” ——Anthropic, <em>Claude Code Docs</em> · Best practices｜https://code.claude.com/docs/en/best-practices ｜不可外推：原文描述的是 Claude Code 的 hook 机制；外推到其他 LLM 应用时，只能说「同类机制」（输出后的程序化校验与拒绝），不能宣称任一具体产品也有等价保证。可引用的核心是官方对提示词性质的定性：<strong>给模型的指令是 advisory（劝导性的）</strong>。</p>
-</blockquote>
-<p>对第 0 档的补充：措辞不仅弱，而且<strong>加得越多越弱</strong>——</p>
-<blockquote>
-<p>“Bloated CLAUDE.md files cause Claude to ignore your actual instructions!”（同上出处）</p>
-</blockquote>
+<p><strong>真正确定性的约束来自模型之外的闸门，而不是提示词本身。</strong> 这一点有官方口径—— 原文与出处见常见误判「措辞已经写得很重了，它不可能不听」。</p>
+<p>对第 0 档的补充：措辞不仅弱，而且<strong>加得越多越弱</strong>—— 臃肿会稀释指令的官方原句，见常见误判「加粗、全大写、多写几遍，遵守率会上去」。</p>
 <h3 id="bld-04.4-迁移链路时逐项审隐性约定不只审文档">BLD-04.4　迁移链路时逐项审隐性约定，不只审文档</h3>
 <p><strong>判据：为老链路建立的约定——标点、格式、空行、顺序、字段名——从来没被当作「规则」写下来过，所以不会出现在任何一份迁移检查清单上；而它们在新链路里的含义可能完全相反。</strong></p>
 <p>审查方法不是通读提示词（读一遍发现不了，因为标点看起来根本不像一条规则），而是<strong>按消费者列表</strong>：对每一类隐性约定，问「老链路里这个信号被谁消费？新链路里同一个信号被谁消费？」</p>
@@ -201,8 +196,14 @@
 <p>不登记的后果不是某一条规则失效，而是<strong>没人说得清哪条规则在管哪件事</strong>—— 到那时，改一句话导致另一处坏掉将成为常态，且无法定位。</p>
 <hr />
 <h2 id="常见误判">常见误判</h2>
-<p><strong>「措辞已经写得很重了，它不可能不听」</strong>措辞的重量不是约束的强度。「必须」和「建议」在模型那里的差别是权重差别，不是「可违背 / 不可违背」的差别。官方对提示词的定性就是 advisory（见 BLD-04.3 引文）。</p>
+<p><strong>「措辞已经写得很重了，它不可能不听」</strong>措辞的重量不是约束的强度。「必须」和「建议」在模型那里的差别是权重差别，不是「可违背 / 不可违背」的差别。官方对提示词的定性就是 advisory：</p>
+<blockquote>
+<p>“Unlike CLAUDE.md instructions which are advisory, hooks are deterministic and guarantee the action happens.” ——Anthropic, <em>Claude Code Docs</em> · Best practices｜https://code.claude.com/docs/en/best-practices ｜不可外推：原文描述的是 Claude Code 的 hook 机制；外推到其他 LLM 应用时，只能说「同类机制」（输出后的程序化校验与拒绝），不能宣称任一具体产品也有等价保证。可引用的核心是官方对提示词性质的定性：<strong>给模型的指令是 advisory（劝导性的）</strong>。</p>
+</blockquote>
 <p><strong>「加粗、全大写、多写几遍，遵守率会上去」</strong>这些手段停留在第 0 档，且与上一条同类：把一个不确定的机制反复加码，换不来确定性，只换来更长的提示词——而臃肿本身会稀释真正的指令。</p>
+<blockquote>
+<p>“Bloated CLAUDE.md files cause Claude to ignore your actual instructions!”（同上出处）</p>
+</blockquote>
 <p><strong>「多给几个例子总没坏处」</strong>上下文里的每一份例子既是线索也是原料。判据仍是 BLD-04.1：先问「模型把它原样吐出来算不算编造」，答案是「算」就不该给。</p>
 <p><strong>「这次它照做了，说明规则生效了」</strong>单次通过是一次采样的结果，不是约束的证据。先验竞争的胜负是概率性的，<strong>验证必须重复采样</strong>；只跑一次的绿灯没有证明力。</p>
 <p><strong>「老提示词在旧链路稳定跑了很久，直接搬过来」</strong>稳定运行证明的是它与<strong>老消费者</strong>的配合正确，对新消费者没有任何证明力。迁移必须走 BLD-04.4 的消费者列表，逐项重问。</p>
@@ -221,7 +222,7 @@ SELF_TEST_PASS=15
 SELF_TEST_FAIL=0
 VERDICT=SELF_TEST_OK</code></pre>
 <blockquote>
-<p>⚠️ 该 linter 的 <code>TURN_END_RISK</code> 一类噪声较高（会把写给人看的说明文字报出来），源码内已标注。保留它而不是删掉，是因为<strong>一个不知道自己会漏什么的检查器，比没有检查器更危险——它提供的是安全感</strong>。它的输出是线索，不能替代 BLD-04.1–.5 的人工判定。</p>
+<p>⚠️ 该 linter 的 <code>TURN_END_RISK</code> 一类噪声较高（会把写给人看的说明文字报出来），源码内已标注。噪声类型必须这样标明在源码里才能保留它：<strong>一个不知道自己会漏什么的检查器，比没有检查器更危险——它提供的只是安全感</strong>。标明盲区之后，它的输出是线索，不能替代 BLD-04.1–.5 的人工判定。</p>
 </blockquote>
 <blockquote>
 <p><strong>保守缺省</strong>：一条要求若<strong>无法在模型之外验证它被遵守</strong>（拿不到输出、无法程序化判定、没有可重复的测试），一律按<strong>未被约束</strong>处理：下游按最坏情况设计（人工复核、拒绝该输出、或降级到固定话术），不按已生效处理。</p>
@@ -245,6 +246,14 @@ VERDICT=SELF_TEST_OK</code></pre>
 <p>迁移到端到端语音模型之后，同一个句号不再被合成器消费，而是被<strong>模型本身</strong>消费—— 而模型在对话数据上学到的模式是「一句话说完，通常该把话轮交给对方」。于是一条为老链路写的<strong>节奏控制规则</strong>，在新链路里变成了<strong>话轮结束信号</strong>：模型念完第一项就停下来等待，而指令明明要求它连续念完三项。</p>
 <p><strong>它说明 BLD-04.4 为什么要按「谁消费这条规则」逐项审</strong>：这条规则通不过任何一次「把提示词读一遍」的检查，因为<strong>句号看起来根本不像一条规则</strong>。冲突不在句子层面，在标点层面。</p>
 <p>⚠️ <strong>本例为本手册构造的教学场景，不是真实事故记录</strong>，不含任何真实读数。另请注意边界：「端到端语音模型在句末标点后倾向结束话轮」是一个<strong>未经受控实验验证的机理假设</strong> ——要证实它需要同内容的句号版与连接词版各跑 N 次统计中断率。本例用于说明「隐性约定会随链路改变含义」这条通则，<strong>不构成对该类模型的一般性论断</strong>。</p>
+</blockquote>
+<blockquote>
+<h3 id="引证-第三方声明anthropic成功标准与实证测试是前置条件">引证 · 第三方声明｜Anthropic：成功标准与实证测试是前置条件</h3>
+<p>本节前置条件所引： “This guide assumes that you have: 1. A clear definition of the success criteria for your use case, 2. Some ways to empirically test against those criteria… If not, spend time establishing that first.” ——Anthropic, <em>Claude Docs</em> · Prompt engineering overview ｜https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/overview ｜不可外推：这是官方把「可实证测试」列为 prompt 工程的<strong>前置条件</strong>，不是对效果的承诺。</p>
+</blockquote>
+<blockquote>
+<h3 id="引证-第三方声明why-language-models-hallucinate编造为何默认更便宜">引证 · 第三方声明｜“Why Language Models Hallucinate”：编造为何默认更便宜</h3>
+<p>BLD-04.2 判据的机理出处： “…producing plausible yet incorrect statements instead of admitting uncertainty”； “language models hallucinate because the training and evaluation procedures reward guessing over acknowledging uncertainty.” ——Kalai, Nachum, Vempala, Zhang, “Why Language Models Hallucinate”, arXiv:2509.04664 ｜https://arxiv.org/abs/2509.04664 ｜类型：<code>third-party-claim</code>（理论论证，非产品实测）。｜不可外推：这篇论文论证的是训练与评估机制层面的成因，<strong>不构成对任一具体模型幻觉率的量化预测</strong>，也不保证「写了出路就不编造」——它只说明了为什么「承认不确定」这条路默认更贵。</p>
 </blockquote>
 <hr />
 <h2 id="相关小节">相关小节</h2>

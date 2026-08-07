@@ -86,22 +86,10 @@ VER-02 回答「谁在接活」，本节回答「活派得进来吗」——两�
 **TCP 能连上、TLS 握手却断在中途，指向中间设备，而不是证书或协议协商。**
 连接已经建立，说明路由与端口都是通的；握手在完成之前被打断，说明有第三方在这两个动作之间介入。
 
-机理在于 SNI（Server Name Indication，客户端在握手第一个包里声明「我要连哪个域名」）是**明文**的：
-
-> IETF RFC 8744 原文："The SNI extension is carried in cleartext in the TLS 'ClientHello' message."
-> ／「SNI 扩展在 TLS ClientHello 消息中以明文携带。」
-> 出处：https://www.rfc-editor.org/rfc/rfc8744.html
-> ｜不可外推：这描述的是 ECH（Encrypted Client Hello）普及之前的现状，ECH 正在改变这一点。
-
-> Cloudflare 的通俗补充："The problem is that SNI leaks to the network the identity of the origin
-> server the client wants to connect to… it is the clearest signal of which server a given client is
-> communicating with." ／「SNI 向网络泄漏了客户端想连接的源服务器身份……它是『客户端在与哪台服务器
-> 通信』最清晰的信号。」
-> 出处：https://blog.cloudflare.com/encrypted-client-hello/
-> ｜不可外推：厂商博客，立场是推广 ECH；可用于说明 SNI 的可见性，不可据此论断任何具体网络的拦截策略。
-
-两条合起来给出一个操作性结论：**任何在链路中间的设备，都能在证书出场之前就知道这条连接要去哪个域名，
+机理在于 SNI（Server Name Indication，客户端在握手第一个包里声明「我要连哪个域名」）是**明文**的
+——**任何在链路中间的设备，都能在证书出场之前就知道这条连接要去哪个域名，
 并据此单独掐掉它。** 因此「握手失败」这个报错所在的层，与根因所在的层可以完全无关。
+（SNI 明文的出处引文见常见误判「报错说 TLS 握手失败，所以问题在证书或协议协商」。）
 
 > ⚠️ 测 TLS 时必须显式带 `-servername`。不带 SNI 的握手与带 SNI 的握手可能被区别对待，
 > 省掉这个参数等于测了一条用户不走的路。
@@ -152,6 +140,19 @@ Google SRE 把两类监控明确分开：黑盒是「以用户所见的方式测
 **「报错说 TLS 握手失败，所以问题在证书或协议协商」**
 报错出现的层，与根因所在的层，是两回事。更麻烦的是：握手层恰好是你有工具、有权限、
 能立刻动手的一层。**熟悉的层会吸走注意力**——你会因为「这一层查得动」而误以为「问题在这一层」。
+SNI 明文机理（VER-03.3）的出处：
+
+> IETF RFC 8744 原文："The SNI extension is carried in cleartext in the TLS 'ClientHello' message."
+> ／「SNI 扩展在 TLS ClientHello 消息中以明文携带。」
+> 出处：https://www.rfc-editor.org/rfc/rfc8744.html
+> ｜不可外推：这描述的是 ECH（Encrypted Client Hello）普及之前的现状，ECH 正在改变这一点。
+
+> Cloudflare 的通俗补充："The problem is that SNI leaks to the network the identity of the origin
+> server the client wants to connect to… it is the clearest signal of which server a given client is
+> communicating with." ／「SNI 向网络泄漏了客户端想连接的源服务器身份……它是『客户端在与哪台服务器
+> 通信』最清晰的信号。」
+> 出处：https://blog.cloudflare.com/encrypted-client-hello/
+> ｜不可外推：厂商博客，立场是推广 ECH；可用于说明 SNI 的可见性，不可据此论断任何具体网络的拦截策略。
 
 **「上一个假设被证伪了，那就试下一个假设」**
 在同一个方向上换假设，不会走出这个方向。
@@ -201,7 +202,8 @@ VERDICT=REACHABLE
 | `INDETERMINATE_NO_DATA` | 采集层没拿到数据 | 不通过 |
 | `INDETERMINATE_VANTAGE_UNREACHABLE` | 第二观测点连不上，该段未覆盖 | 不通过 |
 
-**`PATH_COVERAGE` 那一行才是本节的重点。** 它强制你在看到 `ok` 的同时，看清这个 `ok` 是单点还是多点得出的——**具体覆盖到第几段，仍需你按 VER-03.1 的分段表自行标注**，脚本只区分「本机」与「有无第二观测点」；
+**`PATH_COVERAGE` 那一行才是本节的重点。** 它强制你在看到 `ok` 的同时，看清这个 `ok` 是单点还是多点得出的。
+脚本只区分「本机」与「有无第二观测点」——**具体覆盖到第几段，仍需你按 VER-03.1 的分段表自行标注**；
 `REMOTE_TCP=skipped` 时它只会打印单点覆盖，不会替你把没测过的路算成通过。
 
 参考实现：`kit/reach-probe.sh`（含 20 条自测用例，覆盖判定逻辑、输入校验与 fail-closed 行为）：
@@ -270,7 +272,7 @@ VERDICT=SELF_TEST_OK
 > 而这恰恰是工程师最难做出的动作：**什么都不做。**
 >
 > ⚠️ **本例为本手册构造的教学场景，不是真实事故记录**，不含任何真实读数、时间戳或日志原文。
-> SNI 明文这一机理的出处见 VER-03.3 引用的 RFC 8744 与 Cloudflare 说明；
+> SNI 明文这一机理的出处见常见误判引用的 RFC 8744 与 Cloudflare 说明；
 > 具体网络的拦截策略因地区、运营商与时间而异，本例不对任何具体网络做论断。
 
 ---

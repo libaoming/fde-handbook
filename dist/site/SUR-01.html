@@ -8,7 +8,11 @@
 </header>
 <main><h1 id="sur-01-环境与语义勘察把客户说的换成验证过的">SUR-01 · 环境与语义勘察：把「客户说的」换成「验证过的」</h1>
 <p><strong>目的</strong>　在动手搭建之前，把客户环境的<strong>事实</strong>（不是客户的描述）和数据的<strong>口径</strong>（不是字段的名字）摸清并落成清单。勘察阶段省下的每一个小时，都会在 BLD 阶段以「怎么和说好的不一样」的形式加倍偿还。</p>
-<p><strong>前置条件</strong> - ENG 关口已过（承接判定与成功标准草案在手——勘察是去验证赌注的前提，不是去闲逛） - 已拿到进入环境的最小权限（拿不到 → 先回 <a class="xref" href="ROL-02.html">ROL-02</a>.4 登记为阻塞项，别用「先远程问答」凑合）</p>
+<p><strong>前置条件</strong></p>
+<ul>
+<li>ENG 关口已过（承接判定与成功标准草案在手——勘察是去验证赌注的前提，不是去闲逛）</li>
+<li>已拿到进入环境的最小权限（拿不到 → 先回 <a class="xref" href="ROL-02.html">ROL-02</a>.4 登记为阻塞项，别用「先远程问答」凑合）</li>
+</ul>
 <hr />
 <h2 id="规程">规程</h2>
 <figure class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" role="img" aria-label="声明层（schema、文档、命名、canonical 标记）与实现层（生成代码、运行时状态、真实口径）长期漂移且漂移无告警；勘察必须打到实现层">
@@ -61,7 +65,7 @@
 </svg>
 <figcaption>声明层与实现层长期漂移且无告警；勘察必须打到实现层，口头描述一律标未验证</figcaption></figure>
 <h3 id="sur-01.1-环境清单每项都要验证过标记">SUR-01.1　环境清单：每项都要「验证过」标记</h3>
-<p>逐项摸清并记录，<strong>每项标注「验证方式」</strong>——跑过的命令、看过的界面、拿到的输出。只有客户口头描述的项，标 <code>⚠️ 未验证</code>——它们不算已勘察的事实，须按本节判定标准的保守缺省处理（显式标注 + 在 BLD 设计里补防御）：</p>
+<p>逐项摸清并记录，<strong>每项标注「验证方式」</strong>——跑过的命令、看过的界面、拿到的输出。只有客户口头描述的项，标 <code>⚠️ 未验证</code>——它们不算已勘察的事实。未验证项须按本节判定标准的保守缺省处理：显式标注，并在 BLD 设计里补防御。</p>
 <table>
 <colgroup>
 <col style="width: 33%" />
@@ -176,7 +180,7 @@
 <h2 id="案例证据">案例证据</h2>
 <blockquote>
 <h3 id="引证-第三方声明openai-meta声明与实现的漂移自然沉淀资产">引证 · 第三方声明｜OpenAI / Meta：声明与实现的漂移、自然沉淀资产</h3>
-<p>SUR-01.2/.3 引句出自 OpenAI “Inside OpenAI’s in-house data agent” （https://openai.com/index/inside-our-in-house-data-agent/ ，全文存档 <code>cases/raw-openai-data-agent-20260806.md</code>，引句在存档第 142、20 行）； SUR-01.4 引句出自 Analytics at Meta（2026-08-07 逐句核实实存，URL 见 <a class="xref" href="ENG-01.html">ENG-01</a> 案例框）。</p>
+<p>SUR-01.2/.3 引句出自 OpenAI “Inside OpenAI’s in-house data agent” （https://openai.com/index/inside-our-in-house-data-agent/ ）； SUR-01.4 引句出自 Analytics at Meta（URL 见 <a class="xref" href="ENG-01.html">ENG-01</a> 案例框）。</p>
 <p><strong>不可外推边界</strong>：两家均为 in-house 场景，代码库、查询平台的访问权是默认的；在客户现场这些恰恰是要谈的权限项——本节把他们的「默认拥有」翻译成了你的「勘察清单条目」。</p>
 </blockquote>
 <hr />

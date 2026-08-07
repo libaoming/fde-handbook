@@ -8,7 +8,11 @@
 </header>
 <main><h1 id="dis-02-三道焊缝把验证从自觉变成系统">DIS-02 · 三道焊缝：把验证从自觉变成系统</h1>
 <p><strong>目的</strong>　选择用哪一档手段来保证一项验证<strong>真的会被执行</strong>。本节给出三档强度递增的机制、各自的失效方式，以及一条选择判据：<strong>这项验证漏掉一次的代价有多大，就用第几档。</strong></p>
-<p><strong>前置条件</strong> - 你已经知道这项验证要取什么证据（见 <a class="xref" href="DIS-01.html">DIS-01</a>） - 你能判断这项验证<strong>漏掉一次</strong>的后果：自己多花半小时，还是客户侧发生事故</p>
+<p><strong>前置条件</strong></p>
+<ul>
+<li>你已经知道这项验证要取什么证据（见 <a class="xref" href="DIS-01.html">DIS-01</a>）</li>
+<li>你能判断这项验证<strong>漏掉一次</strong>的后果：自己多花半小时，还是客户侧发生事故</li>
+</ul>
 <hr />
 <h2 id="规程">规程</h2>
 <h3 id="dis-02.1-认清三档的强度差">DIS-02.1　认清三档的强度差</h3>
@@ -49,12 +53,8 @@
 </tbody>
 </table>
 <p><strong>判据：一档靠人记得，二档靠人看见，三档不需要人。</strong></p>
-<p>这个强度差在工具侧有一个现成的例子——Anthropic 的 Claude Code 文档把它说得很直接：</p>
-<blockquote>
-<p>「Unlike CLAUDE.md instructions which are advisory, hooks are deterministic and guarantee the action happens.」（写进指令的是劝导，hook 才是确定性的） ——https://code.claude.com/docs/en/best-practices</p>
-<p>边界：该表述描述的是<strong>给模型的指令</strong>在 Claude Code 语境下的约束力，外推到其他工具时应表述为「同类机制」。<strong>它本身并不涉及组织流程。</strong></p>
-</blockquote>
-<p><strong>而写给人的流程要求同样只有第一档强度——这是本手册的判断，不是上述引文的结论。</strong>理由不依赖任何厂商口径：一条要求只有在「不执行就走不下去」时才具备确定性，而写在文档里的要求永远可以被跳过。</p>
+<p>这个强度差在工具侧有一个现成的例子（引文与出处见常见误判「我们已经写进规范了」）。</p>
+<p><strong>而写给人的流程要求同样只有第一档强度——这是本手册的判断，不是该引文的结论。</strong>理由不依赖任何厂商口径：一条要求只有在「不执行就走不下去」时才具备确定性，而写在文档里的要求永远可以被跳过。</p>
 <h3 id="dis-02.2-第一档回读怎么算数">DIS-02.2　第一档：回读怎么算数</h3>
 <p>回读的最小形态：<strong>做出完成声明的同一轮里，必须有一条真跑过、其输出能支撑这句声明的读取命令。</strong></p>
 <p>三条落地要求： 1. 读的是<strong>目标本身</strong>，不是你刚才写它的那个动作的回显—— 写入操作的回显只证明「这次调用写了盘」，不证明终态如你所想； 2. 声明里出现的每一个具体值（路径、行数、条数、是否存在），都必须来自命令输出，不许凭记忆或推断填； 3. 回读结果与预期矛盾时，<strong>先改自己的记录，不要先怀疑环境</strong>（理由见 <a class="xref" href="DIS-03.html">DIS-03</a>）。</p>
@@ -64,7 +64,7 @@
 VERSION_MATCH=yes
 STALE_INSTANCES=0
 VERDICT=SWITCHED</code></pre>
-<p>这样做的收益有两层：人不必解读，因此不会解读错；<strong>更重要的是，一个明确的标量很难被含糊转述</strong>——「看起来是好的」可以糊弄过去，<code>VERDICT=NOT_SWITCHED</code> 不行。</p>
+<p>这样做的收益有两层。第一层，人不必解读，因此不会解读错。<strong>更重要的是第二层，一个明确的标量很难被含糊转述</strong>：「看起来是好的」可以糊弄过去，<code>VERDICT=NOT_SWITCHED</code> 不行。</p>
 <p>设计要求： - 判定标量必须是<strong>穷尽的</strong>——每种输入都能落到一个确定值，不能有「没输出」的情况； - 无法判定时输出显式的 <code>UNKNOWN</code> 或 <code>SKIPPED</code>，<strong>不要默认输出通过</strong>（fail-closed）； - 每个标量旁边给出它<strong>排除了什么</strong>，否则读者会高估它的覆盖面。</p>
 <h3 id="dis-02.4-第三档闸门以及它一定有的缺口">DIS-02.4　第三档：闸门，以及它一定有的缺口</h3>
 <p>闸门是唯一不依赖任何人配合的档位。常见形态：提交前钩子、CI 必过检查、会话收尾钩子、发布流水线的强制关卡、自动评测。</p>
@@ -101,7 +101,11 @@ VERDICT=SWITCHED</code></pre>
 <p>最后半句是关键：<strong>同一个错误犯第二次，说明它不适合靠自觉。</strong>把它升到闸门，而不是提醒自己下次注意。</p>
 <hr />
 <h2 id="常见误判">常见误判</h2>
-<p><strong>「我们已经写进规范了」</strong>写进文档的是第一档，不管文档写得多严厉。措辞强度不改变机制强度。</p>
+<p><strong>「我们已经写进规范了」</strong>写进文档的是第一档，不管文档写得多严厉。措辞强度不改变机制强度。 Anthropic 的 Claude Code 文档把这个强度差（指令 vs hook）说得很直接：</p>
+<blockquote>
+<p>「Unlike CLAUDE.md instructions which are advisory, hooks are deterministic and guarantee the action happens.」（写进指令的是劝导，hook 才是确定性的） ——https://code.claude.com/docs/en/best-practices</p>
+<p>边界：该表述描述的是<strong>给模型的指令</strong>在 Claude Code 语境下的约束力，外推到其他工具时应表述为「同类机制」。<strong>它本身并不涉及组织流程。</strong></p>
+</blockquote>
 <p><strong>「加了检查，所以不会再漏」</strong>检查存在 ≠ 检查被执行。CI 里存在一个测试文件，和它在这次提交里真的跑过并通过，是两件事——<strong>验收锚点是那一次的执行输出，不是那个文件的存在</strong>。</p>
 <p><strong>「闸门通过了，所以没问题」</strong>闸门只证明它检查的那部分没问题。把闸门的通过读成整体的通过，是把局部覆盖当成了全覆盖——同 <a class="xref" href="VER-03.html">VER-03</a> 里「本机自测通过」的错误结构。</p>
 <p><strong>「先靠自觉，出问题再加自动化」</strong>这个顺序本身不错，但它有个前提常被忽略：<strong>你得真的记录下每次「靠自觉」的失败</strong>，否则永远等不到那个「出问题」的信号（见 <a class="xref" href="DIS-04.html">DIS-04</a> 事故台账）。</p>

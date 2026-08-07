@@ -8,7 +8,11 @@
 </header>
 <main><h1 id="rol-02-相邻角色边界一件事归谁">ROL-02 · 相邻角色边界：一件事归谁</h1>
 <p><strong>目的</strong>　把你周围每个角色「默认拥有什么、你依赖他们什么」写成登记表，让一件事卡住时你能在一分钟内回答：<strong>这归谁，找谁，等多久。</strong>交付现场最隐蔽的一类停摆不是技术故障，是「双方都以为对方在办」——它不产生任何告警。</p>
-<p><strong>前置条件</strong> - 已明确本次交付的合同结构与干系人名单（<a class="xref" href="ENG-01.html">ENG-01</a>.4 的产出） - 没有这份名单时，<strong>本节的登记表就是你要补的第一件事</strong>，别等 ENG 补完再做</p>
+<p><strong>前置条件</strong></p>
+<ul>
+<li>已明确本次交付的合同结构与干系人名单（<a class="xref" href="ENG-01.html">ENG-01</a>.4 的产出）</li>
+<li>没有这份名单时，<strong>本节的登记表就是你要补的第一件事</strong>，别等 ENG 补完再做</li>
+</ul>
 <hr />
 <h2 id="规程">规程</h2>
 <figure class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 380" role="img" aria-label="归属判定三问：谁有权限改、谁背验收、谁维护；三答一致指向唯一 owner，不一致即高危项单独登记">
@@ -136,7 +140,7 @@
 <td>改不动，属客户 IT 与数据团队辖区</td>
 </tr>
 <tr>
-<td>纠错走 review 流程、接受「故意慢」（「有 review 带宽」系据此的推断）</td>
+<td>纠错走 review 流程、接受「故意慢」</td>
 <td>Replit：“It’s slower on purpose: what becomes canonical is deliberate and inspectable”</td>
 <td>客户团队通常最忙、且不愿为你的产出背书</td>
 </tr>
@@ -152,6 +156,7 @@
 </tr>
 </tbody>
 </table>
+<p>注：第二行的「有 review 带宽」，系据此行依据栏的 Replit 原句推断。</p>
 <p><strong>用法</strong>：客户拿内部平台团队的做法（或厂商博客）来要求你照搬时，用这张表逐项对照——差的不是技术选型，是这四项前置条件。</p>
 <h3 id="rol-02.3-归属判定三问">ROL-02.3　归属判定三问</h3>
 <p>任何一件交付物或阻塞项，归属用三问判定：</p>
@@ -177,7 +182,7 @@
 <hr />
 <h2 id="判定标准">判定标准</h2>
 <div class="checklist"><ul><li><span class="box">☐</span>五类接口角色的「你依赖他们什么」均已实填（不是模板原文）</li><li><span class="box">☐</span>每项交付物与阻塞项有唯一 owner（一个名字，不是一个部门）</li><li><span class="box">☐</span>三问答案不一致的高危项已单独标出并显式分配</li><li><span class="box">☐</span>非工程域阻塞项（备案/审批/合同/合规）已登记，且各有预计时长与升级路径</li><li><span class="box">☐</span>登记表放在双方都能看到的位置，而不是你的本地笔记</li></ul></div>
-<p>任何一条不满足，视作「存在无主事项」——按本节开头那句话的定价来理解它的风险。</p>
+<p>任何一条不满足，视作「存在无主事项」——无主事项造成的停摆不产生任何告警，是交付现场最隐蔽的一类。</p>
 <hr />
 <h2 id="案例证据">案例证据</h2>
 <blockquote>
@@ -188,7 +193,7 @@
 </blockquote>
 <blockquote>
 <h3 id="引证-第三方声明openai-meta-replit-内部-agent-自述">引证 · 第三方声明｜OpenAI / Meta / Replit 内部 agent 自述</h3>
-<p>ROL-02.2 出处（Meta / Replit 引句 2026-08-06 逐句核实实存；OpenAI 篇同日重抓，全文落盘 <code>cases/raw-openai-data-agent-20260806.md</code>）： - OpenAI, “Inside OpenAI’s in-house data agent”： https://openai.com/index/inside-our-in-house-data-agent/ （其自述原文： “a custom internal-only tool (not an external offering), built specifically around OpenAI’s data, permissions, and workflows”——「自建自用」前提的直接出处） - Replit, “AI adoption starts with truth”：https://replit.com/blog/ai-adoption - Analytics at Meta, “Inside Meta’s Home Grown AI Analytics Agent”： https://medium.com/<span class="citation" data-cites="AnalyticsAtMeta/inside-metas-home-grown-ai-analytics-agent-4ea6779acfb3">@AnalyticsAtMeta/inside-metas-home-grown-ai-analytics-agent-4ea6779acfb3</span></p>
+<p>ROL-02.2 出处： - OpenAI, “Inside OpenAI’s in-house data agent”： https://openai.com/index/inside-our-in-house-data-agent/ （其自述原文： “a custom internal-only tool (not an external offering), built specifically around OpenAI’s data, permissions, and workflows”——「自建自用」前提的直接出处） - Replit, “AI adoption starts with truth”：https://replit.com/blog/ai-adoption - Analytics at Meta, “Inside Meta’s Home Grown AI Analytics Agent”： https://medium.com/<span class="citation" data-cites="AnalyticsAtMeta/inside-metas-home-grown-ai-analytics-agent-4ea6779acfb3">@AnalyticsAtMeta/inside-metas-home-grown-ai-analytics-agent-4ea6779acfb3</span></p>
 <p><strong>不可外推边界</strong>：三家均为 in-house 自建自用、厂商自报、无第三方审计；对照表右列（「你在现场」一列）是本手册的判断，<strong>不是</strong>原文声明——两列证据等级不同。</p>
 </blockquote>
 <hr />

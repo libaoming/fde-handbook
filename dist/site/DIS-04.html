@@ -8,7 +8,10 @@
 </header>
 <main><h1 id="dis-04-事故台账失败怎么进流程才算被吸取">DIS-04 · 事故台账：失败怎么进流程才算被吸取</h1>
 <p><strong>目的</strong>　给「吸取教训」一个可判定的定义：失败被吸取 = 它的证伪过程被<strong>当时</strong>记下，且行动项<strong>变成了某个检查表条目或闸门</strong>。达不到这两条的复盘，无论会开得多深刻，留下的只是情绪记录。</p>
-<p><strong>前置条件</strong> - 无。本节从第一次失败开始适用——而第一次失败通常在勘察阶段就会到来。</p>
+<p><strong>前置条件</strong></p>
+<ul>
+<li>无。本节从第一次失败开始适用——而第一次失败通常在勘察阶段就会到来。</li>
+</ul>
 <hr />
 <h2 id="规程">规程</h2>
 <figure class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" role="img" aria-label="事故台账闭环：事故当轮写条目（误判链是主体），行动项只有两个合法终态——闸门化进检查表或显式关闭；闸门反过来拦住下一次同类事故">
@@ -73,11 +76,11 @@
 </svg>
 <figcaption>事故台账闭环：当轮写条目，行动项只有闸门化或显式关闭两个合法终态，闸门反过来拦住下一次同类事故</figcaption></figure>
 <h3 id="dis-04.1-记什么书面结构化有根因">DIS-04.1　记什么：书面、结构化、有根因</h3>
-<p>行业对这个体裁有成熟定义，Google SRE：“A postmortem is a written record of an incident, its impact, the actions taken to mitigate or resolve it, the root cause(s), and the follow-up actions to prevent the incident from recurring.” ——五要素：事故、影响、处置、根因、防复发行动。<strong>少了最后一项的记录是新闻，不是台账。</strong></p>
+<p>事故台账是对每次失败的书面结构化记录，一条合格的条目写全五要素：事故、影响、处置、根因、防复发行动。<strong>少了最后一项的记录是新闻，不是台账。</strong>这个体裁行业里叫 postmortem，Google SRE 书对它的定义与五要素逐项对应： “A postmortem is a written record of an incident, its impact, the actions taken to mitigate or resolve it, the root cause(s), and the follow-up actions to prevent the incident from recurring.”</p>
 <h3 id="dis-04.2-何时记当轮不指望事后对账">DIS-04.2　何时记：当轮，不指望事后对账</h3>
-<p>证据在事发当时最全，之后单调衰减：session 日志会灭失、运维动作不产生 commit、聊天记录会被淹没。<strong>台账条目在事发当轮写下</strong>，至迟当天—— 记不清的字段标 <code>⚠️ 待复核</code>，禁止事后补脑（溯源律在台账上的形态）。</p>
+<p>证据在事发当时最全，之后单调衰减：session 日志会灭失、运维动作不产生 commit、聊天记录会被淹没。<strong>台账条目在事发当轮写下</strong>，至迟当天。记不清的字段标 <code>⚠️ 待复核</code>，禁止事后补脑。</p>
 <h3 id="dis-04.3-条目模板误判链是主体">DIS-04.3　条目模板：误判链是主体</h3>
-<p>台账条目六段，其中<strong>误判链是主体</strong>——你先以为是什么、为什么那条路错了，这正是翻车律要求写全的部分，也是条目对下一个读者的全部价值：</p>
+<p>台账条目六段，其中<strong>误判链是主体</strong>——你先以为是什么、为什么那条路错了，这是条目对下一个读者的全部价值：</p>
 <div class="checklist"><ul><li><span class="box">☐</span>现象：观察到了什么（可粘贴的输出，不是转述）</li><li><span class="box">☐</span>误判链：先怀疑了什么 → 什么证据证伪了它（逐跳记录）</li><li><span class="box">☐</span>根因：最终确认的机理，附确认它的那条证据</li><li><span class="box">☐</span>处置：当场做了什么，哪些改动事后要回退（FX-NET-01 的教训）</li><li><span class="box">☐</span>行动项：防复发动作，每项有 owner 与期限</li><li><span class="box">☐</span>闸门化：行动项落到了哪条检查表/哪个脚本/哪道闸门（见 DIS-04.4）</li></ul></div>
 <h3 id="dis-04.4-闭环判据行动项要么闸门化要么显式关闭">DIS-04.4　闭环判据：行动项要么闸门化，要么显式关闭</h3>
 <p>行动项只有两个合法终态：</p>
@@ -86,9 +89,9 @@
 <li><strong>显式关闭</strong>——写明为什么不做（成本、不再适用），签名留档。</li>
 </ol>
 <p>合法的中间态只有一种：<strong>期限内在办</strong>（条目模板里 owner 与期限俱在）。「挂着」指<strong>逾期仍未达终态</strong>的行动项——它与没有行动项，对下一次事故等效。</p>
-<p>闸门化时还有一条配套要求：<strong>闸门自身要被验证过</strong>（<a class="xref" href="DIS-02.html">DIS-02</a>.4）。公开案例 PM-09（GitLab 2017）展示了缺这一环的代价：备份失败本有告警邮件，但通知走的通道从未被验证（DMARC 拒收、无人知晓）——防线存在与防线有效之间隔着验证，写成行动项的闸门同样如此。</p>
+<p>闸门化时还有一条配套要求：<strong>闸门自身要被验证过</strong>（<a class="xref" href="DIS-02.html">DIS-02</a>.4）。公开案例 PM-09（GitLab 2017）展示了缺这一环的代价：备份失败本有告警邮件，但通知走的通道从未被验证（DMARC 拒收、无人知晓）。防线存在与防线有效之间隔着验证，写成行动项的闸门同样如此。</p>
 <h3 id="dis-04.5-无责边界">DIS-04.5　无责边界</h3>
-<p>“Blameless postmortems are a tenet of SRE culture.”——台账记录机理与证伪过程，不记录追责。但注意语境边界：<strong>无责是组织内文化，不豁免交付方对客户的合同责任</strong>；对客户的事故通报是另一份文档，口径由 <a class="xref" href="ROL-02.html">ROL-02</a> 的商务接口把关，两者不要混写。</p>
+<p>台账记录机理与证伪过程，不记录追责。这条无责原则在 SRE 文化里是信条级的，用其原文的话说，“Blameless postmortems are a tenet of SRE culture.” 但注意语境边界：<strong>无责是组织内文化，不豁免交付方对客户的合同责任</strong>；对客户的事故通报是另一份文档，口径由 <a class="xref" href="ROL-02.html">ROL-02</a> 的商务接口把关，两者不要混写。</p>
 <hr />
 <h2 id="常见误判">常见误判</h2>
 <p><strong>「复盘会开过了，教训吸取了」</strong>会议产生共识，不产生闸门。散会时如果没有 DIS-04.3 的条目和 DIS-04.4 的终态计划，这次失败的下一次出现只是时间问题。</p>
@@ -103,11 +106,11 @@
 <h2 id="案例证据">案例证据</h2>
 <blockquote>
 <h3 id="引证-google-srepostmortem-的定义与无责信条">引证 · Google SRE｜postmortem 的定义与无责信条</h3>
-<p>DIS-04.1/.5 引句出自 <em>Site Reliability Engineering</em>, Ch.15 “Postmortem Culture”： https://sre.google/sre-book/postmortem-culture/ （2026-08-07 逐句核实实存）。｜不可外推：「无责」针对组织内部追责语境，不能引申为对客户无合同责任。</p>
+<p>DIS-04.1/.5 引句出自 <em>Site Reliability Engineering</em>, Ch.15 “Postmortem Culture”： https://sre.google/sre-book/postmortem-culture/ 。｜不可外推：「无责」针对组织内部追责语境，不能引申为对客户无合同责任。</p>
 </blockquote>
 <blockquote>
 <h3 id="引证-第三方声明replit闸门的内容来自事故">引证 · 第三方声明｜Replit：闸门的内容来自事故</h3>
-<p>DIS-04.4 引句出自 Replit “AI adoption starts with truth”： https://replit.com/blog/ai-adoption （2026-08-07 逐句核实实存）。｜不可外推：厂商对自建系统的自述，未公布检查项清单与覆盖率；引用的是「事故 → 闸门」的机制，不是其效果数据。</p>
+<p>DIS-04.4 引句出自 Replit “AI adoption starts with truth”： https://replit.com/blog/ai-adoption 。｜不可外推：厂商对自建系统的自述，未公布检查项清单与覆盖率；引用的是「事故 → 闸门」的机制，不是其效果数据。</p>
 </blockquote>
 <hr />
 <h2 id="相关小节">相关小节</h2>

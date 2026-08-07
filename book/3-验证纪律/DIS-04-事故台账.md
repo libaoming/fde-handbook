@@ -16,21 +16,23 @@
 
 ### DIS-04.1　记什么：书面、结构化、有根因
 
-行业对这个体裁有成熟定义，Google SRE："A postmortem is a written record of an
-incident, its impact, the actions taken to mitigate or resolve it, the root cause(s),
-and the follow-up actions to prevent the incident from recurring."
-——五要素：事故、影响、处置、根因、防复发行动。**少了最后一项的记录是新闻，不是台账。**
+事故台账是对每次失败的书面结构化记录，一条合格的条目写全五要素：
+事故、影响、处置、根因、防复发行动。**少了最后一项的记录是新闻，不是台账。**
+这个体裁行业里叫 postmortem，Google SRE 书对它的定义与五要素逐项对应：
+"A postmortem is a written record of an incident, its impact, the actions taken to
+mitigate or resolve it, the root cause(s), and the follow-up actions to prevent the
+incident from recurring."
 
 ### DIS-04.2　何时记：当轮，不指望事后对账
 
 证据在事发当时最全，之后单调衰减：session 日志会灭失、运维动作不产生 commit、
-聊天记录会被淹没。**台账条目在事发当轮写下**，至迟当天——
-记不清的字段标 `⚠️ 待复核`，禁止事后补脑（溯源律在台账上的形态）。
+聊天记录会被淹没。**台账条目在事发当轮写下**，至迟当天。
+记不清的字段标 `⚠️ 待复核`，禁止事后补脑。
 
 ### DIS-04.3　条目模板：误判链是主体
 
 台账条目六段，其中**误判链是主体**——你先以为是什么、为什么那条路错了，
-这正是翻车律要求写全的部分，也是条目对下一个读者的全部价值：
+这是条目对下一个读者的全部价值：
 
 ```checklist
 [ ] 现象：观察到了什么（可粘贴的输出，不是转述）
@@ -57,13 +59,14 @@ and the follow-up actions to prevent the incident from recurring."
 
 闸门化时还有一条配套要求：**闸门自身要被验证过**（DIS-02.4）。
 公开案例 PM-09（GitLab 2017）展示了缺这一环的代价：备份失败本有告警邮件，
-但通知走的通道从未被验证（DMARC 拒收、无人知晓）——防线存在与防线有效之间
+但通知走的通道从未被验证（DMARC 拒收、无人知晓）。防线存在与防线有效之间
 隔着验证，写成行动项的闸门同样如此。
 
 ### DIS-04.5　无责边界
 
-"Blameless postmortems are a tenet of SRE culture."——台账记录机理与证伪过程，
-不记录追责。但注意语境边界：**无责是组织内文化，不豁免交付方对客户的合同责任**；
+台账记录机理与证伪过程，不记录追责。这条无责原则在 SRE 文化里是信条级的，
+用其原文的话说，"Blameless postmortems are a tenet of SRE culture."
+但注意语境边界：**无责是组织内文化，不豁免交付方对客户的合同责任**；
 对客户的事故通报是另一份文档，口径由 ROL-02 的商务接口把关，两者不要混写。
 
 ---
@@ -107,13 +110,13 @@ and the follow-up actions to prevent the incident from recurring."
 > ### 引证 · Google SRE｜postmortem 的定义与无责信条
 >
 > DIS-04.1/.5 引句出自 *Site Reliability Engineering*, Ch.15 "Postmortem Culture"：
-> https://sre.google/sre-book/postmortem-culture/ （2026-08-07 逐句核实实存）。
+> https://sre.google/sre-book/postmortem-culture/ 。
 > ｜不可外推：「无责」针对组织内部追责语境，不能引申为对客户无合同责任。
 
 > ### 引证 · 第三方声明｜Replit：闸门的内容来自事故
 >
 > DIS-04.4 引句出自 Replit "AI adoption starts with truth"：
-> https://replit.com/blog/ai-adoption （2026-08-07 逐句核实实存）。
+> https://replit.com/blog/ai-adoption 。
 > ｜不可外推：厂商对自建系统的自述，未公布检查项清单与覆盖率；
 > 引用的是「事故 → 闸门」的机制，不是其效果数据。
 

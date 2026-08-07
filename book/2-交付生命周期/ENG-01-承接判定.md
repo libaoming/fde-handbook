@@ -24,11 +24,7 @@
 | 不可证伪的愿景 | 「AI 应该能帮上客服团队」 | 永远吵不完，也永远无法验收 |
 | 可证伪的赌注 | 「该团队 80% 的工单集中在 12 类问题上，其中 9 类有标准处理路径，agent 应能自主处理这 9 类」（示意数字） | 数字错了当场就能证伪；数字对了，验收标准已经在里面了 |
 
-参照系是 Meta 内部 agent 的立项方式（他们的自述）："We had a specific hypothesis that,
-given 88% of queries by Data Scientists on any given day rely solely on tables queried
-in the preceding 90 days, an AI agent could perform these routine data analysis tasks
-autonomously." ——并明确对比了两种形态："This wasn't a vague "AI could help with
-analytics" pitch, it was a specific, measurable hypothesis based on data."
+参照系是 Meta 内部 agent 的立项方式（他们的自述）——原文与出处见案例证据的 Meta 引证框。
 
 **动作**：把客户的诉求改写成一句「因为数据 X，所以 agent 应能做到 Y」。
 写不出 X → 先去做 ENG-01.2；写出来了 → 它就是 ENG-02 成功标准的母句。
@@ -121,7 +117,14 @@ demo 证明的是「最顺利路径在演示环境能走通」，与「该问题
 >
 > 本节引句出自 Analytics at Meta, "Inside Meta's Home Grown AI Analytics Agent"：
 > https://medium.com/@AnalyticsAtMeta/inside-metas-home-grown-ai-analytics-agent-4ea6779acfb3
-> （2026-08-07 逐句核实实存）。其复盘对这条方法的总结：
+>
+> ENG-01.1 的参照系（他们的自述）："We had a specific hypothesis that,
+> given 88% of queries by Data Scientists on any given day rely solely on tables queried
+> in the preceding 90 days, an AI agent could perform these routine data analysis tasks
+> autonomously." ——并明确对比了两种形态："This wasn't a vague "AI could help with
+> analytics" pitch, it was a specific, measurable hypothesis based on data."
+>
+> 其复盘对这条方法的总结：
 > "The lesson: don't start with a solution looking for a problem. Start with data that
 > proves the problem is tractable."
 >

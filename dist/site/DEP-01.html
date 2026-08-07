@@ -8,7 +8,12 @@
 </header>
 <main><h1 id="dep-01-部署与切换影响清单回退与渐进">DEP-01 · 部署与切换：影响清单、回退与渐进</h1>
 <p><strong>目的</strong>　把「执行变更」这个动作本身管起来：动手前知道<strong>实际会碰到什么</strong>，出事时有<strong>演练过的</strong>退路，推进时每一步都隔着观测窗口。本节管动作，动作完成后的验证归 <a class="xref" href="VER-02.html">VER-02</a>——<strong>跑完 <a class="xref" href="VER-02.html">VER-02</a> 并拿到 <code>SWITCHED</code>，DEP 才算出关。</strong></p>
-<p><strong>前置条件</strong> - BLD 关口已过：链路在客户环境跑通，丢失能力清单已确认（<a class="xref" href="BLD-03.html">BLD-03</a>） - 本次变更有唯一版本标识（<a class="xref" href="VER-02.html">VER-02</a> 前置条件的上游） - 变更窗口与干系人已知会（<a class="xref" href="ROL-02.html">ROL-02</a> 登记表）</p>
+<p><strong>前置条件</strong></p>
+<ul>
+<li>BLD 关口已过：链路在客户环境跑通，丢失能力清单已确认（<a class="xref" href="BLD-03.html">BLD-03</a>）</li>
+<li>本次变更有唯一版本标识（<a class="xref" href="VER-02.html">VER-02</a> 前置条件的上游）</li>
+<li>变更窗口与干系人已知会（<a class="xref" href="ROL-02.html">ROL-02</a> 登记表）</li>
+</ul>
 <hr />
 <h2 id="规程">规程</h2>
 <figure class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" role="img" aria-label="部署时间线：先打印影响清单并核对，再分批推进，批次之间隔至少一个下发周期的观测窗口，异常即停走演练过的回退；最后跑 <a class="xref" href="VER-02.html">VER-02</a> 拿到 SWITCHED 才出关">
@@ -75,7 +80,7 @@
 </svg>
 <figcaption>部署时间线：影响清单先行，分批推进隔观测窗口，异常即停走演练过的回退，SWITCHED 才出关</figcaption></figure>
 <h3 id="dep-01.1-影响清单先行让工具把实际会碰谁打印出来">DEP-01.1　影响清单先行：让工具把「实际会碰谁」打印出来</h3>
-<p>执行任何变更前，让工具<strong>打印实际将被影响的对象清单</strong>并人工核对—— 不是你以为的范围，是工具解析出来的范围。两者的差距是一类著名事故的根源： Google Cloud 2019 年的全网降级，起点是一次「本地」维护—— “The automation software created a list of jobs to deschedule in that physical location, which included the logical clusters running network control jobs. Those logical clusters also included network control jobs in other physical locations.” ——<strong>作用域在逻辑层与物理层不一致，操作者看到的范围与实际生效范围不是同一个东西。</strong></p>
+<p>执行任何变更前，让工具<strong>打印实际将被影响的对象清单</strong>并人工核对—— 不是你以为的范围，是工具解析出来的范围。两者的差距是一类著名事故的根源（Google Cloud 2019 年的全网降级，起点是一次「本地」维护，引文见案例证据 PM-06）：<strong>作用域在逻辑层与物理层不一致，操作者看到的范围与实际生效范围不是同一个东西。</strong></p>
 <p><strong>判据</strong>：影响清单已打印、逐项核对过、且清单里没有你解释不了的条目。「解释不了的条目」不是噪音，是这次变更理解不完整的直接证据——先解释，再执行。</p>
 <h3 id="dep-01.2-回退预案没演练过的路径不计入可用能力">DEP-01.2　回退预案：没演练过的路径不计入可用能力</h3>
 <p>回退预案三问：</p>
@@ -84,7 +89,7 @@
 <li><strong>演过吗</strong>——在等价环境真实执行过，含「最不敢演的那一种」；</li>
 <li><strong>演的是这一种吗</strong>——演练矩阵覆盖没覆盖这次变更实际依赖的路径。</li>
 </ol>
-<p>第三问是 Cloudflare 2023 控制面故障的教训：他们演练过高可用集群—— “We had performed testing of our high availability cluster by taking each (and both) of the other two data center facilities entirely offline… However, we had never tested fully taking the entire PDX-04 facility offline.”——结果一批本应高可用的服务 “had dependencies on services exclusively running in PDX-04.” <strong>「演练过」背书的只是演练矩阵里的那几格；没演过的那一格才是账单。</strong></p>
+<p>第三问是 Cloudflare 2023 控制面故障的教训（引文见案例证据 PM-08）：<strong>「演练过」背书的只是演练矩阵里的那几格；没演过的那一格才是账单。</strong></p>
 <p><strong>判据</strong>：本次变更的回退路径在演练记录里能找到对应条目。找不到 → 回退能力按「未知」计，变更方案按无退路的标准重审（更小的批次、更长的观测窗口）。</p>
 <h3 id="dep-01.3-渐进推进批次之间隔观测窗口">DEP-01.3　渐进推进：批次之间隔观测窗口</h3>
 <ul>
@@ -108,11 +113,15 @@
 <h2 id="案例证据">案例证据</h2>
 <blockquote>
 <h3 id="案例-pm-06-公开事故复盘google-cloud2019">案例 PM-06 · 公开事故复盘｜Google Cloud，2019</h3>
-<p>一次区域维护的自动化软件，把「该物理位置的任务清单」算成了包含<strong>其他物理位置</strong>网络控制任务的逻辑集群清单，随后诊断工具与故障流量挤在同一条拥塞网络上一起失效。引句见 DEP-01.1 与常见误判（出处：https://status.cloud.google.com/incident/cloud-networking/19009 ， 2026-08-07 逐句核实）。｜不可外推：Google 内部集群管理软件的特定 bug，不能推出「自动化维护普遍会跨区扩散」。</p>
+<p>一次区域维护的自动化软件，把「该物理位置的任务清单」算成了包含<strong>其他物理位置</strong>网络控制任务的逻辑集群清单，随后诊断工具与故障流量挤在同一条拥塞网络上一起失效。</p>
+<p>官方复盘原文：“The automation software created a list of jobs to deschedule in that physical location, which included the logical clusters running network control jobs. Those logical clusters also included network control jobs in other physical locations.” 诊断工具失效一句见常见误判「诊断工具肯定能用」。</p>
+<p>出处：https://status.cloud.google.com/incident/cloud-networking/19009 ｜不可外推：Google 内部集群管理软件的特定 bug，不能推出「自动化维护普遍会跨区扩散」。</p>
 </blockquote>
 <blockquote>
 <h3 id="案例-pm-08-公开事故复盘cloudflare2023">案例 PM-08 · 公开事故复盘｜Cloudflare，2023</h3>
-<p>高可用集群演练做过多次，唯独没演过整个 PDX-04 设施下线——而一批服务的独占依赖恰好全在那里。引句见 DEP-01.2（出处： https://blog.cloudflare.com/post-mortem-on-cloudflare-control-plane-and-analytics-outage/ ， 2026-08-07 逐句核实）。｜不可外推：三设施拓扑属特例，不能推出「所有多活架构都存在隐藏单点」。</p>
+<p>高可用集群演练做过多次，唯独没演过整个 PDX-04 设施下线——而一批服务的独占依赖恰好全在那里。</p>
+<p>官方复盘原文：“We had performed testing of our high availability cluster by taking each (and both) of the other two data center facilities entirely offline… However, we had never tested fully taking the entire PDX-04 facility offline.”——结果一批本应高可用的服务 “had dependencies on services exclusively running in PDX-04.”</p>
+<p>出处：https://blog.cloudflare.com/post-mortem-on-cloudflare-control-plane-and-analytics-outage/ ｜不可外推：三设施拓扑属特例，不能推出「所有多活架构都存在隐藏单点」。</p>
 </blockquote>
 <hr />
 <h2 id="相关小节">相关小节</h2>

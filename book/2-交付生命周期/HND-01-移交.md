@@ -37,11 +37,8 @@
 
 ### HND-01.3　知识资产的载体：可 diff、可回滚、可归因
 
-移交的知识（口径、规则、纠错记录）装进什么载体，决定了它交接后还能不能被审计。
-参照 Replit 对自家实践的描述："A correction isn't a saved memory; it's a reviewed
-pull request. The failing case, the fix, and the rationale are committed together;
-the result is diffable, revertible, and attributable months later."
-以及其对载体选择的论证："Truth in a repo isn't just versioned; it's traversable."
+移交的知识（口径、规则、纠错记录）装进什么载体，决定了它交接后还能不能被审计
+（Replit 对自家实践的描述，引文见案例证据引证框）。
 
 **判据**：知识资产的载体至少满足三性——改动可对比（diff）、可回退、可归因到人与时间。
 
@@ -110,8 +107,14 @@ not an auto-save prompt."——进入正典的东西要经过一道人工审查�
 
 > ### 引证 · 第三方声明｜Replit：纠错即评审、载体即能力
 >
-> HND-01.3/.4 引句出自 Replit "AI adoption starts with truth"：
-> https://replit.com/blog/ai-adoption （2026-08-07 逐句核实实存）。
+> HND-01.3/.4 引句出自 Replit "AI adoption starts with truth"。
+>
+> HND-01.3 所引原文："A correction isn't a saved memory; it's a reviewed
+> pull request. The failing case, the fix, and the rationale are committed together;
+> the result is diffable, revertible, and attributable months later."
+> 以及其对载体选择的论证："Truth in a repo isn't just versioned; it's traversable."
+>
+> 出处：https://replit.com/blog/ai-adoption
 >
 > **不可外推边界**：Replit 为软件公司自建自用——全员会 git、有 review 带宽、
 > 无合同期限；本节的「变形方案」正是为这三个前提在客户现场不成立而写。

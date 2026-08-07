@@ -19,12 +19,9 @@
 ### DEP-01.1　影响清单先行：让工具把「实际会碰谁」打印出来
 
 执行任何变更前，让工具**打印实际将被影响的对象清单**并人工核对——
-不是你以为的范围，是工具解析出来的范围。两者的差距是一类著名事故的根源：
-Google Cloud 2019 年的全网降级，起点是一次「本地」维护——
-"The automation software created a list of jobs to deschedule in that physical
-location, which included the logical clusters running network control jobs.
-Those logical clusters also included network control jobs in other physical locations."
-——**作用域在逻辑层与物理层不一致，操作者看到的范围与实际生效范围不是同一个东西。**
+不是你以为的范围，是工具解析出来的范围。两者的差距是一类著名事故的根源
+（Google Cloud 2019 年的全网降级，起点是一次「本地」维护，引文见案例证据 PM-06）：
+**作用域在逻辑层与物理层不一致，操作者看到的范围与实际生效范围不是同一个东西。**
 
 **判据**：影响清单已打印、逐项核对过、且清单里没有你解释不了的条目。
 「解释不了的条目」不是噪音，是这次变更理解不完整的直接证据——先解释，再执行。
@@ -37,11 +34,7 @@ Those logical clusters also included network control jobs in other physical loca
 2. **演过吗**——在等价环境真实执行过，含「最不敢演的那一种」；
 3. **演的是这一种吗**——演练矩阵覆盖没覆盖这次变更实际依赖的路径。
 
-第三问是 Cloudflare 2023 控制面故障的教训：他们演练过高可用集群——
-"We had performed testing of our high availability cluster by taking each (and both)
-of the other two data center facilities entirely offline... However, we had never
-tested fully taking the entire PDX-04 facility offline."——结果一批本应高可用的服务
-"had dependencies on services exclusively running in PDX-04."
+第三问是 Cloudflare 2023 控制面故障的教训（引文见案例证据 PM-08）：
 **「演练过」背书的只是演练矩阵里的那几格；没演过的那一格才是账单。**
 
 **判据**：本次变更的回退路径在演练记录里能找到对应条目。找不到 → 回退能力按「未知」
@@ -103,16 +96,26 @@ tools competing over use of the now-congested network."——诊断工具与故�
 >
 > 一次区域维护的自动化软件，把「该物理位置的任务清单」算成了包含**其他物理位置**
 > 网络控制任务的逻辑集群清单，随后诊断工具与故障流量挤在同一条拥塞网络上一起失效。
-> 引句见 DEP-01.1 与常见误判（出处：https://status.cloud.google.com/incident/cloud-networking/19009 ，
-> 2026-08-07 逐句核实）。
+>
+> 官方复盘原文："The automation software created a list of jobs to deschedule in that physical
+> location, which included the logical clusters running network control jobs.
+> Those logical clusters also included network control jobs in other physical locations."
+> 诊断工具失效一句见常见误判「诊断工具肯定能用」。
+>
+> 出处：https://status.cloud.google.com/incident/cloud-networking/19009
 > ｜不可外推：Google 内部集群管理软件的特定 bug，不能推出「自动化维护普遍会跨区扩散」。
 
 > ### 案例 PM-08 · 公开事故复盘｜Cloudflare，2023
 >
 > 高可用集群演练做过多次，唯独没演过整个 PDX-04 设施下线——而一批服务的独占依赖
-> 恰好全在那里。引句见 DEP-01.2（出处：
-> https://blog.cloudflare.com/post-mortem-on-cloudflare-control-plane-and-analytics-outage/ ，
-> 2026-08-07 逐句核实）。
+> 恰好全在那里。
+>
+> 官方复盘原文："We had performed testing of our high availability cluster by taking each (and both)
+> of the other two data center facilities entirely offline... However, we had never
+> tested fully taking the entire PDX-04 facility offline."——结果一批本应高可用的服务
+> "had dependencies on services exclusively running in PDX-04."
+>
+> 出处：https://blog.cloudflare.com/post-mortem-on-cloudflare-control-plane-and-analytics-outage/
 > ｜不可外推：三设施拓扑属特例，不能推出「所有多活架构都存在隐藏单点」。
 
 ---

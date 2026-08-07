@@ -23,16 +23,9 @@
 
 **判据：一档靠人记得，二档靠人看见，三档不需要人。**
 
-这个强度差在工具侧有一个现成的例子——Anthropic 的 Claude Code 文档把它说得很直接：
+这个强度差在工具侧有一个现成的例子（引文与出处见常见误判「我们已经写进规范了」）。
 
-> 「Unlike CLAUDE.md instructions which are advisory, hooks are deterministic
-> and guarantee the action happens.」（写进指令的是劝导，hook 才是确定性的）
-> ——https://code.claude.com/docs/en/best-practices
->
-> 边界：该表述描述的是**给模型的指令**在 Claude Code 语境下的约束力，
-> 外推到其他工具时应表述为「同类机制」。**它本身并不涉及组织流程。**
-
-**而写给人的流程要求同样只有第一档强度——这是本手册的判断，不是上述引文的结论。**
+**而写给人的流程要求同样只有第一档强度——这是本手册的判断，不是该引文的结论。**
 理由不依赖任何厂商口径：一条要求只有在「不执行就走不下去」时才具备确定性，
 而写在文档里的要求永远可以被跳过。
 
@@ -59,8 +52,9 @@ STALE_INSTANCES=0
 VERDICT=SWITCHED
 ```
 
-这样做的收益有两层：人不必解读，因此不会解读错；**更重要的是，
-一个明确的标量很难被含糊转述**——「看起来是好的」可以糊弄过去，`VERDICT=NOT_SWITCHED` 不行。
+这样做的收益有两层。第一层，人不必解读，因此不会解读错。
+**更重要的是第二层，一个明确的标量很难被含糊转述**：
+「看起来是好的」可以糊弄过去，`VERDICT=NOT_SWITCHED` 不行。
 
 设计要求：
 - 判定标量必须是**穷尽的**——每种输入都能落到一个确定值，不能有「没输出」的情况；
@@ -100,6 +94,14 @@ VERDICT=SWITCHED
 
 **「我们已经写进规范了」**
 写进文档的是第一档，不管文档写得多严厉。措辞强度不改变机制强度。
+Anthropic 的 Claude Code 文档把这个强度差（指令 vs hook）说得很直接：
+
+> 「Unlike CLAUDE.md instructions which are advisory, hooks are deterministic
+> and guarantee the action happens.」（写进指令的是劝导，hook 才是确定性的）
+> ——https://code.claude.com/docs/en/best-practices
+>
+> 边界：该表述描述的是**给模型的指令**在 Claude Code 语境下的约束力，
+> 外推到其他工具时应表述为「同类机制」。**它本身并不涉及组织流程。**
 
 **「加了检查，所以不会再漏」**
 检查存在 ≠ 检查被执行。CI 里存在一个测试文件，和它在这次提交里真的跑过并通过，

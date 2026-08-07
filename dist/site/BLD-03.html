@@ -7,8 +7,15 @@
 <a class="home" href="index.html">《FDE 手册》</a><span class="crumb">第 2 部 · BLD 搭建</span>
 </header>
 <main><h1 id="bld-03-链路迁移先列丢失能力清单">BLD-03 · 链路迁移：先列丢失能力清单</h1>
-<p><strong>目的</strong>　在把一条已经跑通的链路换成另一条（多段拆分换端到端、自建组件换托管服务、多次往返换单次调用、经中间层换直连）之前，产出一份<strong>丢失能力清单</strong>，并为清单上的每一行配好代偿方案与验证方式。本节给出六项检查、一张清单模板和一个可粘贴的判定输出。</p>
-<p><strong>前置条件</strong> - 新方案已被选定，且<strong>尚未写第一行迁移代码</strong>（本节的产出物是写代码的前置条件，不是并行产物） - 老链路当前在跑，且它承载的功能清单是已知的（若不知道，先回 SUR 阶段做勘察） - 已列出<strong>新增能力清单</strong>（用来做决策的那一份）——本节要补的是它的镜像 - 能枚举出被两条链路<strong>共用</strong>的配置件、提示词、说明书、schema 与脚本 - 已有该场景的成功标准与一套能实证测试它的手段（见 BLD-03.5 的引文）</p>
+<p><strong>目的</strong>　在把一条已经跑通的链路换成另一条之前，产出一份<strong>丢失能力清单</strong>。这里的「换」指四类替换：多段拆分换端到端、自建组件换托管服务、多次往返换单次调用、经中间层换直连。清单上的每一行都要配好代偿方案与验证方式。本节给出六项检查、一张清单模板和一个可粘贴的判定输出。</p>
+<p><strong>前置条件</strong></p>
+<ul>
+<li>新方案已被选定，且<strong>尚未写第一行迁移代码</strong>（本节的产出物是写代码的前置条件，不是并行产物）</li>
+<li>老链路当前在跑，且它承载的功能清单是已知的（若不知道，先回 SUR 阶段做勘察）</li>
+<li>已列出<strong>新增能力清单</strong>（用来做决策的那一份）——本节要补的是它的镜像</li>
+<li>能枚举出被两条链路<strong>共用</strong>的配置件、提示词、说明书、schema 与脚本</li>
+<li>已有该场景的成功标准与一套能实证测试它的手段（官方口径见案例证据的 Anthropic 引证框）</li>
+</ul>
 <hr />
 <h2 id="规程">规程</h2>
 <p>六项检查全部通过才算迁移设计完成。<strong>任何一项不通过，不得进入 <a class="xref" href="DEP-01.html">DEP-01</a> 部署。</strong></p>
@@ -18,11 +25,7 @@
 <p><strong>判据：如果新方案的优势来自「去掉了中间环节」，那么被去掉的那个环节所承载的一切能力，都在你的丢失清单上。</strong></p>
 </blockquote>
 <p>这不是概率，是同一性：新方案的优势与它的代价来自<strong>同一个决定</strong>，不是两件可以分开谈的事。</p>
-<p>OpenAI 官方 Voice agents 文档对两种语音架构的定位，把这层同一性写在了明面上：端到端（speech-to-speech，音频直接进模型、直接出音频）适合 “Natural, low-latency conversations”；而链式（先转写、再文本推理、再合成语音）适合 “Predictable workflows or extending an existing text agent”，因为 “Your app keeps explicit control over transcription, text reasoning, and speech output”，并明确给出选择条件：“Use this path when each stage needs to be visible or replaceable.”</p>
-<blockquote>
-<p><strong>它证明的是</strong>：官方把「低延迟、自然」与「各阶段可见、可替换」列为<strong>两条互斥路径的卖点</strong>，而不是同一条路径的两个优点。选走低延迟那条，可见性与可替换性就是你付出去的价钱。</p>
-<p>出处：https://developers.openai.com/api/docs/guides/voice-agents ｜不可外推：这是 OpenAI 自家产品线的架构描述，<strong>不能</strong>据此论断所有厂商的端到端方案都必然缺少工具调用或阶段可见性；换厂商需另行核实。</p>
-</blockquote>
+<p>OpenAI 官方 Voice agents 文档把这层同一性写在了明面上—— 原文与出处见常见误判「新方案是老方案的超集，所以叫升级」。</p>
 <p><strong>这一项排除的是</strong>：把迁移当成「换个更好的实现」。<strong>它不能证明清单上具体有哪几行</strong>——那是 .2。</p>
 <h3 id="bld-03.2-产出丢失能力清单在写第一行代码之前">BLD-03.2　产出丢失能力清单（在写第一行代码之前）</h3>
 <p><strong>新增能力清单是用来做决策的，丢失能力清单是用来做工程的。只有前者，你会做出正确的决定，然后错误地实施它。</strong></p>
@@ -116,7 +119,7 @@
 <li>无法逐条标注时（文件不归你改、老链路仍在依赖它），走 BLD-03.5 的覆盖层，并把这条登记回清单的代偿方案列。</li>
 </ol>
 <p>对<strong>给模型看的说明书</strong>（提示词、角色设定、流程文件），这项盘查可以机器化。 <code>kit/prompt-mode-lint.py</code> 检出五类只对「有中间环节的链路」成立的条款：结构化输出要求、工具调用指令、状态机推进、易被误读为开场播报的身份条款、依赖外部数据的动作。</p>
-<p>对一份五类条款各含一条的示例提示词运行的真实输出（<code>FILE</code> 行的路径按你传入的实际路径显示，此处替换为占位符，其余字段未改动）：</p>
+<p>以下是对一份五类条款各含一条的示例提示词运行的真实输出。 <code>FILE</code> 行的路径按你传入的实际路径显示，此处替换为占位符；其余字段未改动：</p>
 <pre><code>FILE=&lt;你传入的路径&gt;
 HIT_STRUCTURED_OUTPUT=1
 HIT_TOOL_CALL=1
@@ -182,11 +185,7 @@ VERDICT=UNSAFE_FOR_REALTIME</code></pre>
 <li><strong>位置本身是一个变量</strong>。指令放在开头还是末尾，约束力可能不同；这一点必须在你自己的场景里实测，不能照抄别人的结论。</li>
 <li><strong>能力缺失处补数据</strong>：若丢失的是「去外部取数」的能力，就把所需数据直接写进指令，并明确告诉模型这是它<strong>已经掌握的</strong>数据，不需要查询、不需要等待—— 否则它会继续模仿一个「有工具的自己」，落回 .4 那类静默。</li>
 </ol>
-<p>改这段指令之前，先确认成功标准与测试手段已经就位。Anthropic 的 prompt engineering 文档把这两项列为前置条件：“This guide assumes that you have: 1. A clear definition of the success criteria for your use case, 2. Some ways to empirically test against those criteria… If not, spend time establishing that first.”</p>
-<blockquote>
-<p><strong>它证明的是</strong>：把「先有可实证测试的成功标准」放在动手写提示词之前，是官方口径，不是洁癖。</p>
-<p>出处：https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/overview ｜不可外推：这是 Claude 的官方指南，描述的是 prompt 工程的前置条件，<strong>不能</strong>外推为「所有模型的行为都可由测试完全刻画」。</p>
-</blockquote>
+<p>改这段指令之前，先确认成功标准与测试手段已经就位——这是官方列明的前置条件，原文与出处见案例证据的 Anthropic 引证框。</p>
 <h3 id="bld-03.6-迁移回归在存量老链路上验证代偿没有反噬">BLD-03.6　迁移回归：在存量老链路上验证代偿没有反噬</h3>
 <p>代偿动作大多落在共用件上（改文件、加覆盖层、抽字段）。<strong>改了共用件，老链路就进入了变更范围</strong>，哪怕这次迁移的目标里根本没有它。</p>
 <ul>
@@ -196,7 +195,11 @@ VERDICT=UNSAFE_FOR_REALTIME</code></pre>
 </ul>
 <hr />
 <h2 id="常见误判">常见误判</h2>
-<p><strong>「新方案是老方案的超集，所以叫升级」</strong>「新版本是老版本的超集」这个假设在传统软件里大致成立，在架构换代上基本不成立。去掉中间环节换来的优势与失去的能力是同一个决定的两面（.1 的官方引文）。<strong>「升级」这个词本身就是本节全部麻烦的起点</strong>——它让人只列新增清单。</p>
+<p><strong>「新方案是老方案的超集，所以叫升级」</strong>「新版本是老版本的超集」这个假设在传统软件里大致成立，在架构换代上基本不成立。去掉中间环节换来的优势与失去的能力是同一个决定的两面。<strong>「升级」这个词本身就是本节全部麻烦的起点</strong>——它让人只列新增清单。 OpenAI 官方 Voice agents 文档对两种语音架构的定位，把这层同一性写在了明面上：端到端（speech-to-speech，音频直接进模型、直接出音频）适合 “Natural, low-latency conversations”；而链式（先转写、再文本推理、再合成语音）适合 “Predictable workflows or extending an existing text agent”，因为 “Your app keeps explicit control over transcription, text reasoning, and speech output”，并明确给出选择条件：“Use this path when each stage needs to be visible or replaceable.”</p>
+<blockquote>
+<p><strong>它证明的是</strong>：官方把「低延迟、自然」与「各阶段可见、可替换」列为<strong>两条互斥路径的卖点</strong>，而不是同一条路径的两个优点。选走低延迟那条，可见性与可替换性就是你付出去的价钱。</p>
+<p>出处：https://developers.openai.com/api/docs/guides/voice-agents ｜不可外推：这是 OpenAI 自家产品线的架构描述，<strong>不能</strong>据此论断所有厂商的端到端方案都必然缺少工具调用或阶段可见性；换厂商需另行核实。</p>
+</blockquote>
 <p><strong>「新增能力清单已经列过了」</strong>那份清单回答的是「该不该换」，本节的清单回答的是「换的时候要补什么」。两份清单服务于两个不同的动作，前者不能替代后者。</p>
 <p><strong>「这些 bug 互不相干，逐个修就行」</strong>迁移后爆出的多个症状，通常是<strong>同一个病根</strong>：为 A 写的说明书原样交给了 B。逐个修症状会一直修下去，因为病根还在源头持续生成新症状。先做 .3 的适用范围盘查。</p>
 <p><strong>「没有报错，所以迁移是干净的」</strong>无报错故障的形态就是零异常。用「没有告警」当绿灯，等于用一个从设计上就照不到这里的探照灯证明这里没有东西（同 <a class="xref" href="VER-02.html">VER-02</a> 的「监控没报警」条）。</p>
@@ -235,6 +238,12 @@ VERDICT=UNSAFE_FOR_REALTIME</code></pre>
 <p>模型做了一件很像人的事：<strong>说完一句过渡语，然后停下来等自己去查——而它并没有能力去查。</strong>进程存活、会话连接正常、通道开着、无异常、无超时、无非零退出码。所有指标绿灯，只有对面那个真人在等一个永远不会来的回答。</p>
 <p>本例说明 .4 为什么需要独立埋点：这条故障不产生任何机器可读的错误信号，它的形态是<strong>什么都没发生</strong>。同时它也说明 .2 的清单为什么必须带代偿方案—— 「工具调用：新链路无」这一行如果当时被写出来并配上「数据直接写入指令」，这次静默根本不会发生。</p>
 <p>⚠️ <strong>本例为本手册构造的教学场景，不是真实事故记录</strong>，不含任何真实读数（无时间戳、无进程号、无日志原文）。</p>
+</blockquote>
+<blockquote>
+<h3 id="引证-第三方声明anthropic成功标准与实证测试先于改提示词">引证 · 第三方声明｜Anthropic：成功标准与实证测试先于改提示词</h3>
+<p>BLD-03.5 所引：Anthropic 的 prompt engineering 文档把这两项列为前置条件： “This guide assumes that you have: 1. A clear definition of the success criteria for your use case, 2. Some ways to empirically test against those criteria… If not, spend time establishing that first.”</p>
+<p><strong>它证明的是</strong>：把「先有可实证测试的成功标准」放在动手写提示词之前，是官方口径，不是洁癖。</p>
+<p>出处：https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/overview ｜不可外推：这是 Claude 的官方指南，描述的是 prompt 工程的前置条件，<strong>不能</strong>外推为「所有模型的行为都可由测试完全刻画」。</p>
 </blockquote>
 <hr />
 <h2 id="相关小节">相关小节</h2>

@@ -1,19 +1,13 @@
 # ROL-01 · 角色定义：FDE 是什么、不是什么
 
-**目的**　用五个固定字段说清 FDE（Forward Deployed Engineer，前置部署工程师——被派到
-客户现场完成交付的工程师）这个角色，让你能做两件事：向客户、同事或新人一句话讲清
-你是干什么的；判断一件活**该不该按 FDE 交付的方式走**（该走的进 ROL-04 的生命周期，
-不该走的趁早说清楚）。
+**目的**　用五个固定字段说清 FDE 这个角色。FDE 即 Forward Deployed Engineer，
+前置部署工程师：被派到客户现场完成交付的工程师。读完本节你能做两件事：
+向客户、同事或新人一句话讲清你是干什么的；判断一件活该不该按 FDE 交付的方式走
+——该走的进 ROL-04 的生命周期，不该走的趁早说清楚。
 
 **前置条件**
 
 - 无。本节是全书入口，不依赖其他节。
-
-> **字段结构的出处**：本节的五字段（是什么 / 为什么需要 / 职责 / 谁在做 / 怎么成为）
-> 抄自 PagerDuty 事故响应手册的角色页模板——其每个角色固定用
-> "What is it? / Why have one? / What are the responsibilities? / Who are they? /
-> How can I become one?" 五问描述（https://response.pagerduty.com/before/different_roles/ ）。
-> 角色定义前置在流程之前，也是抄它的。
 
 ---
 
@@ -33,11 +27,11 @@
 | **客户结果** | 交付物是在客户环境里跑起来并被使用的系统 | 只出方案不出系统 → 咨询 |
 | **以客户目标度量** | 成功标准是客户的业务判据，不是「功能上线了」 | 以上线度量 → 实施外包 |
 
-公开系统描述这个角色、并让它广为人知的样本是 Palantir。其官方博客对两类工程师的切分：
-Dev（软件工程师）"develop and engineer our software platforms"，
-Delta（Forward Deployed Software Engineer）"deploy our software platforms to customers"；
-一句话对比是 **"one capability, many customers"（Dev）对
-"one customer, many capabilities"（Delta）**。
+这个定义不是本手册的发明。公开把这个角色讲清楚的样本是 Palantir：它把工程师切成两类，
+Dev 造平台，Delta 把平台部署到客户身上。用其官方博客的话，Dev（软件工程师）
+"develop and engineer our software platforms"，Delta（Forward Deployed Software Engineer）
+"deploy our software platforms to customers"；两者的差别压缩成一句，是
+"one capability, many customers"（Dev）对 "one customer, many capabilities"（Delta）。
 
 ### ROL-01.2　为什么需要这个角色
 
@@ -45,19 +39,17 @@ Delta（Forward Deployed Software Engineer）"deploy our software platforms to c
 和真正要用它的人。产品团队按「一个能力服务很多客户」优化，没有人对
 「这一家客户的结果」负责——FDE 补的是这个空位。
 
-Palantir 对这个空位的表述：Delta 的工作是 "technology-driven value creation"，
-且 "measure success in terms of impact on the customer's goal"——
-**度量单位是客户目标的达成，不是功能的交付。** 本手册全部验证纪律（第 3 部）
-都建立在这一句上：既然成功以客户结果度量，「做完了」就必须能在客户那一侧被观察到。
+这个空位决定了度量单位：FDE 的成功以客户目标的达成来度量，不是功能的交付。
+Palantir 对同一件事的说法是，Delta 的工作是 "technology-driven value creation"，
+并且 "measure success in terms of impact on the customer's goal"。
+本手册全部验证纪律（第 3 部）都建立在这一点上：既然成功以客户结果度量，
+「做完了」就必须能在客户那一侧被观察到。
 
 ### ROL-01.3　职责
 
-Palantir 原文描述 FDSE 的活动词是：与客户 "scoping the future of a project"、
-"monitoring, debugging, deploying, or configuring our software"、
-"reviewing pull requests"，并且 "often contribute code back to the core product"。
-
-本手册把这些活动整理为六阶段（映射关系见 ROL-04；**六阶段是本手册自建框架，
-Palantir 原文没有阶段划分**）：
+FDE 的职责就是把一次交付从头走到尾：接活之前判断能不能接，进场之后摸清环境，
+然后搭建、上线、拿到「确实做完了」的证据，最后移交出去。
+本手册把这条线整理为六阶段（映射关系见 ROL-04）：
 
 | 活动 | 阶段 |
 |---|---|
@@ -69,16 +61,21 @@ Palantir 原文没有阶段划分**）：
 | 移交运维、知识转移 | HND 移交 |
 | 把现场发现贡献回产品 | 贯穿（不属于单一阶段） |
 
-**最后一行是这个角色的双向性**：你不只是产品的输出端，也是它的传感器——
+这张表能在公开材料里找到对应物。Palantir 描述 FDSE 的活动词是：与客户
+"scoping the future of a project"、"monitoring, debugging, deploying, or configuring
+our software"、"reviewing pull requests"，并且 "often contribute code back to the
+core product"——分别落在 ENG、VER/BLD/DEP 与「贯穿」的辖区。
+六阶段的划分本身是本手册自建，Palantir 原文没有阶段概念（声明见 ROL-04）。
+
+表的最后一行是这个角色的双向性：你不只是产品的输出端，也是它的传感器——
 现场暴露的缺陷与需求回流到产品，是 FDE 与实施外包的又一条分界。
 
 ### ROL-01.4　谁在做
 
 - **Palantir**：公开系统描述此角色、最广为人知的样本（内部称 Delta / FDSE）。
 - **AI 交付领域**：随 AI 系统进客户现场，同名或近似岗位在扩散。
-  ⚠️ 本手册**未逐家核实**各公司 JD（Palantir 官方 JD 页对抓取返回 403，无法引用），
-  不在此罗列公司名单。你的岗位叫不叫 FDE 不重要——**工作满足 ROL-01.1 三个承重件，
-  本手册就适用于你。**
+  本手册未逐家核实各公司 JD，不在此罗列公司名单。你的岗位叫不叫 FDE 不重要——
+  **工作满足 ROL-01.1 三个承重件，本手册就适用于你。**
 
 ### ROL-01.5　怎么成为（从相邻角色迁移时补什么）
 
@@ -88,7 +85,7 @@ Palantir 原文没有阶段划分**）：
 |---|---|
 | 产品/平台工程师 | 现场没有你习惯的一切：权限要谈、环境不可控、可观测性经常是零。你的验证习惯需要整体降级重建（第 3 部） |
 | 咨询顾问 | 交付物从「建议」变成「运行系统」——建议无法被验收，系统可以，也必须（VER） |
-| 售前/解决方案架构师 | 演示的成功与交付的成功是两个东西；合同签了，你的计时才开始 |
+| 售前/解决方案架构师 | 演示的成功与交付的成功是两个东西；合同签了，你的计时才开始（成功标准怎么定，见 ENG-02） |
 
 ---
 
@@ -105,9 +102,10 @@ to achieve the customer's outcomes"——交付物是**部署起来的运行系�
 把 FDE 当实施外包用，丢的是「现场作为产品传感器」的那一半价值。
 
 **「FDE 是产品工程师的弱化版」**
-方向反了。Dev 是「一个能力打磨到极致」，FDE 是 "one customer, many capabilities"——
-在一家客户身上横跨全栈能力,且在**没有脚手架**（没有 CI、没有可观测性、没有同事 review）
-的环境下工作。脚手架越少，对验证纪律的要求越高，这正是第 3 部存在的理由。
+方向反了。Dev 把一个能力打磨到极致；FDE 在一家客户身上横跨全栈能力（ROL-01.1
+引过的 "one customer, many capabilities"），而且工作环境没有脚手架——没有 CI、
+没有可观测性、没有同事 review。脚手架越少，对验证纪律的要求越高，
+这正是第 3 部存在的理由。
 
 ---
 
@@ -136,11 +134,19 @@ to achieve the customer's outcomes"——交付物是**部署起来的运行系�
 > 本节全部英文引句出自 Palantir 官方博客
 > "Dev versus Delta: Demystifying Engineering Roles at Palantir"：
 > https://blog.palantir.com/dev-versus-delta-demystifying-engineering-roles-at-palantir-ad44c2a6e87
-> （2026-08-06 逐句核实实存）。
 >
 > **不可外推边界**：这是单一公司对自家岗位的自述，且博客带招聘目的；
 > 「FDE 都应如此」不能从它推出。文章**没有**给出阶段化的交付生命周期——
 > 本手册的六阶段是自建框架，出处与声明见 ROL-04。
+
+> ### 引证 · 体例出处｜PagerDuty 角色页模板
+>
+> 本节的五字段结构（是什么 / 为什么需要 / 职责 / 谁在做 / 怎么成为）
+> 抄自 PagerDuty 事故响应手册的角色页模板——其每个角色固定用
+> "What is it? / Why have one? / What are the responsibilities? / Who are they? /
+> How can I become one?" 五问描述。角色定义前置在流程之前，也是抄它的。
+>
+> 出处：https://response.pagerduty.com/before/different_roles/
 
 ---
 

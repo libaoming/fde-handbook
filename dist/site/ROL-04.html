@@ -8,10 +8,13 @@
 </header>
 <main><h1 id="rol-04-全景图六阶段与关口">ROL-04 · 全景图：六阶段与关口</h1>
 <p><strong>目的</strong>　给整本手册的主线入口一张图：交付分哪六个阶段、阶段之间的关口各要什么。读完本节你应该能随时回答三个问题：<strong>我在哪个阶段；上个关口的判定输出在哪；下个关口需要什么。</strong>——答不出其中任何一个，你就不在你以为的阶段里。</p>
-<p><strong>前置条件</strong> - 无。本节与 <a class="xref" href="ROL-01.html">ROL-01</a> 同为全书入口。</p>
+<p><strong>前置条件</strong></p>
+<ul>
+<li>无。本节与 <a class="xref" href="ROL-01.html">ROL-01</a> 同为全书入口。</li>
+</ul>
 <blockquote>
-<h3 id="框架声明诚实条款删掉它等于给框架伪造出处">⚠️ 框架声明（诚实条款，删掉它等于给框架伪造出处）</h3>
-<p><strong>六阶段是本手册的自建框架，不是行业标准。</strong> Palantir 的公开材料只给出角色定义；本手册写作时逐句核实过其 “Dev versus Delta” 原文——文中描述工作内容用的是活动词（scoping、monitoring、debugging、deploying、configuring），<strong>没有任何阶段化的交付生命周期</strong>。也没有找到其他可引用的行业标准划分。</p>
+<h3 id="框架声明">⚠️ 框架声明</h3>
+<p><strong>六阶段是本手册的自建框架，不是行业标准。</strong> Palantir 的公开材料只给出角色定义；其 “Dev versus Delta” 原文描述工作内容用的是活动词（scoping、monitoring、debugging、deploying、configuring），<strong>没有任何阶段化的交付生命周期</strong>。也没有找到其他可引用的行业标准划分。</p>
 <p>自建框架的价值不在「它是对的」，在于<strong>给关口、交付物和检查项一个不漂移的挂点</strong>（编号体系见第 0 部）。你的组织已有自己的阶段划分时，不必换掉它—— 把本手册各节映射到你的阶段名下用，检查项本身不依赖阶段叫什么。</p>
 </blockquote>
 <hr />
@@ -232,13 +235,13 @@
 <h2 id="案例证据">案例证据</h2>
 <blockquote>
 <h3 id="说明-本节不单独配案例">说明 · 本节不单独配案例</h3>
-<p>本节是框架页；框架自身的有效性不靠单个案例背书（也背不动—— 见框架声明：它是自建的）。框架中各关口的证据由对应规程节分别支撑：</p>
+<p>本节是框架页；框架自身的有效性不靠单个案例背书，也背不动：它是自建的（见框架声明）。框架中各关口的证据由对应规程节分别支撑：</p>
 <ul>
 <li>VER 关口为什么要判定标量：<a class="xref" href="VER-02.html">VER-02</a> 案例 PM-01（Slack，配置正确但运行时状态陈旧）</li>
 <li>SUR 为什么要登记非工程域阻塞项：<a class="xref" href="ROL-02.html">ROL-02</a> 合成示例（备案停摆）与 <a class="xref" href="VER-03.html">VER-03</a></li>
 <li>「跳关口的缺口不会消失，只会改名」：<a class="xref" href="BLD-03.html">BLD-03</a> 的丢失能力清单机理</li>
 </ul>
-<p>各节案例均按案例律标注档位；本节自身没有需要标注的事实性声明—— 唯一的例外是框架声明里「Palantir 原文无阶段划分」这一条，其核实记录见 <a class="xref" href="ROL-01.html">ROL-01</a> 案例框（2026-08-06 逐句核实）。</p>
+<p>各节案例均按案例律标注档位；本节自身没有需要标注的事实性声明—— 唯一的例外是框架声明里「Palantir 原文无阶段划分」这一条，其出处见 <a class="xref" href="ROL-01.html">ROL-01</a> 案例框。</p>
 </blockquote>
 <hr />
 <h2 id="相关小节">相关小节</h2>

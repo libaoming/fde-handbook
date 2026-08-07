@@ -37,9 +37,11 @@
 | 他们默认拥有 | 依据 | 你在现场（本手册判断，非原文声明） |
 |---|---|---|
 | 能改数据仓库、能定标准 | 三篇自述均隐含 | 改不动，属客户 IT 与数据团队辖区 |
-| 纠错走 review 流程、接受「故意慢」（「有 review 带宽」系据此的推断） | Replit："It's slower on purpose: what becomes canonical is deliberate and inspectable" | 客户团队通常最忙、且不愿为你的产出背书 |
+| 纠错走 review 流程、接受「故意慢」 | Replit："It's slower on purpose: what becomes canonical is deliberate and inspectable" | 客户团队通常最忙、且不愿为你的产出背书 |
 | 自家人天然懂业务定义 | Meta："Data scientists at Meta develop deep expertise in a slice of the business." | 业务定义须逐条挖掘，且口径常常无文档 |
 | 可以等飞轮转起来 | Meta 自述项目用了 "roughly six months"；Replit 自 2025 年底起持续建设 | 合同有期限，没有「再等半年」这个选项 |
+
+注：第二行的「有 review 带宽」，系据此行依据栏的 Replit 原句推断。
 
 **用法**：客户拿内部平台团队的做法（或厂商博客）来要求你照搬时，
 用这张表逐项对照——差的不是技术选型，是这四项前置条件。
@@ -100,7 +102,7 @@
 [ ] 登记表放在双方都能看到的位置，而不是你的本地笔记
 ```
 
-任何一条不满足，视作「存在无主事项」——按本节开头那句话的定价来理解它的风险。
+任何一条不满足，视作「存在无主事项」——无主事项造成的停摆不产生任何告警，是交付现场最隐蔽的一类。
 
 ---
 
@@ -121,8 +123,7 @@
 
 > ### 引证 · 第三方声明｜OpenAI / Meta / Replit 内部 agent 自述
 >
-> ROL-02.2 出处（Meta / Replit 引句 2026-08-06 逐句核实实存；OpenAI 篇同日重抓，
-> 全文落盘 `cases/raw-openai-data-agent-20260806.md`）：
+> ROL-02.2 出处：
 > - OpenAI, "Inside OpenAI's in-house data agent"：
 >   https://openai.com/index/inside-our-in-house-data-agent/ （其自述原文：
 >   "a custom internal-only tool (not an external offering), built specifically around

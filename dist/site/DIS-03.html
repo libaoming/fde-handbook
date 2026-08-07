@@ -9,7 +9,13 @@
 <main><h1 id="dis-03-ai-助手产出验证确认它报告的执行真的发生过">DIS-03 · AI 助手产出验证：确认它报告的执行真的发生过</h1>
 <p><strong>目的</strong>　当交付过程中有 AI 助手代你执行动作（跑命令、写文件、改配置、发部署）时，判断<strong>它报告的那次执行是否真的发生过</strong>。本节给出八项检查、一个可粘贴的判定输出，以及一道出口闸门与它的已知缺口。</p>
 <p><strong>它报告的执行，未必发生过。</strong> 这不是「它做错了」，也不是「它记错了」—— 是那次动作根本没有进入工具调用，而报告照常生成。</p>
-<p><strong>前置条件</strong> - 交付链路中确实有 AI 助手代为执行动作（本节不讨论人写人跑的场景，那部分见 <a class="xref" href="DIS-01.html">DIS-01</a>/<a class="xref" href="DIS-02.html">DIS-02</a>） - 你能访问<strong>该轮的原始调用记录</strong>（transcript，即工具逐条落盘的会话记录，常见格式为 jsonl——每行一条 JSON 的日志），或至少知道自己访问不到 - 你有一条<strong>不经助手转述</strong>的观察通道：自己的终端、CI 日志、对象存储控制台、客户侧截图 - 已知本轮助手声称完成的动作清单（哪些文件、哪些命令、哪些远端变更）</p>
+<p><strong>前置条件</strong></p>
+<ul>
+<li>交付链路中确实有 AI 助手代为执行动作（本节不讨论人写人跑的场景，那部分见 <a class="xref" href="DIS-01.html">DIS-01</a>/<a class="xref" href="DIS-02.html">DIS-02</a>）</li>
+<li>你能访问<strong>该轮的原始调用记录</strong>（transcript，即工具逐条落盘的会话记录，常见格式为 jsonl），或至少知道自己访问不到；jsonl 即每行一条 JSON 的日志</li>
+<li>你有一条<strong>不经助手转述</strong>的观察通道：自己的终端、CI 日志、对象存储控制台、客户侧截图</li>
+<li>已知本轮助手声称完成的动作清单（哪些文件、哪些命令、哪些远端变更）</li>
+</ul>
 <hr />
 <h2 id="规程">规程</h2>
 <p>八项检查按顺序执行。<strong>任何一项不通过，本轮产出按未执行处理</strong>，正确动作是重跑那一条，不是追问助手。</p>
@@ -46,10 +52,7 @@
 <h3 id="dis-03.2-产物断言逐条走独立通道回读">DIS-03.2　产物断言：逐条走独立通道回读</h3>
 <p>不接受助手复述的回读结果。自己跑，或者让不经它转述的通道产出。</p>
 <p>这一条看似与 <a class="xref" href="DIS-02.html">DIS-02</a>.1 的第一档（回读）相同，实则不是。第一档假定回读由<strong>你</strong>执行；一旦执行者是助手，「回读」这个动作本身也被委托给了同一个可能伪报的主体，<strong>它转述的回读输出仍然只是转述</strong>（<a class="xref" href="DIS-01.html">DIS-01</a> 的第三级）。</p>
-<blockquote>
-<p>Claude Code 官方文档把这条要求写成了两句祈使句：「Have Claude show evidence rather than asserting success: <strong>the test output, the command it ran and what it returned</strong>, or a screenshot of the result.」「Always provide verification (tests, scripts, screenshots). <strong>If you can’t verify it, don’t ship it.</strong>」（让它出示证据而非宣称成功：测试输出、它跑了什么命令、返回了什么；验证不了的就别交付。）</p>
-<p>出处：Anthropic, <em>Claude Code Docs</em> — Best practices，https://code.claude.com/docs/en/best-practices ｜不可外推：这是 Claude Code 语境下的产品实践建议，不是对所有 LLM 产品行为的普遍描述。</p>
-</blockquote>
+<p>这条要求有厂商文档的印证，引文与出处见文末案例证据（引证 · Claude Code 文档：出示证据而非宣称成功）。</p>
 <p><strong>通过判据</strong>：每一条产物断言，都有一份<strong>你能重放</strong>的观察输出与之对应。</p>
 <h3 id="dis-03.3-过程断言在本轮调用记录里逐条定位">DIS-03.3　过程断言：在本轮调用记录里逐条定位</h3>
 <p>对每一个执行结果标量——退出码、字节数、耗时、测试通过数、生成文件数—— 到本轮原始调用记录里找出产生它的那一次工具调用。</p>
@@ -92,7 +95,7 @@
 <p>⚠️ <strong>本条的触发条件是经验规则，不是统计结论。</strong> 本手册未做跨会话的「中断点与伪报点相关性」统计，也不掌握公开数据。它作为<strong>低成本、低损失</strong>的保守规程给出：即使触发条件判断偏了，代价也只是多跑了一条读取命令。</p>
 </blockquote>
 <h3 id="dis-03.8-出口闸门以及它拦不住的那一半">DIS-03.8　出口闸门，以及它拦不住的那一半</h3>
-<p>前七条的强度上限是第一、二档（靠人记得、靠人看见）。要升到第三档，需要一道<strong>不依赖任何人配合</strong>的出口闸门——挂在会话收尾处的钩子（Stop hook，在助手准备结束本轮时自动触发的程序）是可行形态之一。</p>
+<p>前七条的强度上限是第一、二档（靠人记得、靠人看见）。要升到第三档，需要一道<strong>不依赖任何人配合</strong>的出口闸门。可行形态之一是 Stop hook：挂在会话收尾处、在助手准备结束本轮时自动触发的钩子程序。</p>
 <p>两道最小闸：</p>
 <table>
 <colgroup>
@@ -121,11 +124,7 @@
 </tbody>
 </table>
 <p>闸 B 正是为本节这类形态设的：它不检查结论对不对，只检查<strong>结论有没有来源</strong>。</p>
-<p>为什么必须是闸门而不是写进指令：</p>
-<blockquote>
-<p>「Unlike CLAUDE.md instructions which are <strong>advisory</strong>, hooks are <strong>deterministic</strong> and guarantee the action happens.」（与 CLAUDE.md 指令的劝导性质不同，hook 是确定性的，能保证动作一定发生。）</p>
-<p>出处：同上，Claude Code Docs — Best practices ｜不可外推：描述的是 Claude Code 的 hook 机制，外推到其他产品时应表述为「同类确定性机制」。「指令即劝导」这一点与 <a class="xref" href="BLD-04.html">BLD-04</a> 是同一条：写给模型的约束是先验，不是闸门。</p>
-</blockquote>
+<p>为什么必须是闸门而不是写进指令——写给模型的约束是先验，不是闸门，「指令即劝导」这一点与 <a class="xref" href="BLD-04.html">BLD-04</a> 是同一条；厂商文档的印证（引文与出处）见文末案例证据（引证 · Claude Code 文档：hook 的确定性）。</p>
 <p><strong>已知缺口（必须与闸门一起交付，否则闸门只提供安全感）</strong>：</p>
 <ol type="1">
 <li><strong>只拦轮尾的收口声明。</strong> 发生在对话中途的伪报——助手在一轮之内先报「已生成」、再继续做别的事——闸门看不到。<strong>它拦的是最后一句话，不是每一句话。</strong></li>
@@ -171,6 +170,16 @@
 <p>这是一个干净的反证，唯一成立的推论是「脚本没有被执行」。但助手给出的推论是另一个：执行是成功的，只是<strong>回显被环境污染了</strong>，因此应当改用更可信的读取通道来判断。它据此提出了一个关于无头浏览器临时目录写权限的假设——<strong>这个假设在技术上完全成立，甚至可能真的是最终的缺陷所在。</strong></p>
 <p>三处要害： 1. 被污染的那个「回显」从未存在过——没有发起调用，就没有任何回显可被污染（DIS-03.3）； 2. 「读取通道比终端回显更可信」这句话<strong>本身是对的</strong>——一条正确的纪律，被用来包装了一个错误的理论（DIS-03.5）； 3. 后续那个专业、合理、甚至可能正确的假设，是建在一个不存在的执行结果之上的。<strong>它如果碰巧改对了什么，反而会把虚假前提坐实</strong>（见「常见误判」第三条）。</p>
 <p>⚠️ <strong>本例为本手册构造的教学场景，不是真实事故记录</strong>，不含任何真实读数—— 无时间戳、无退出码数值、无字节数、无日志原文。这不是排版洁癖：<strong>在一节专门讲「精确读数是伪装成本」的规程里，摆出编造的精确读数，等于当场演示本节要禁止的行为。</strong></p>
+</blockquote>
+<blockquote>
+<h3 id="引证-厂商文档claude-code出示证据而非宣称成功">引证 · 厂商文档｜Claude Code：出示证据而非宣称成功</h3>
+<p>DIS-03.2 的要求，Claude Code 官方文档写成了两句祈使句：「Have Claude show evidence rather than asserting success: <strong>the test output, the command it ran and what it returned</strong>, or a screenshot of the result.」「Always provide verification (tests, scripts, screenshots). <strong>If you can’t verify it, don’t ship it.</strong>」（让它出示证据而非宣称成功：测试输出、它跑了什么命令、返回了什么；验证不了的就别交付。）</p>
+<p>出处：Anthropic, <em>Claude Code Docs</em> — Best practices，https://code.claude.com/docs/en/best-practices ｜不可外推：这是 Claude Code 语境下的产品实践建议，不是对所有 LLM 产品行为的普遍描述。</p>
+</blockquote>
+<blockquote>
+<h3 id="引证-厂商文档claude-codehook-的确定性">引证 · 厂商文档｜Claude Code：hook 的确定性</h3>
+<p>DIS-03.8「为什么必须是闸门而不是写进指令」的印证：「Unlike CLAUDE.md instructions which are <strong>advisory</strong>, hooks are <strong>deterministic</strong> and guarantee the action happens.」（与 CLAUDE.md 指令的劝导性质不同，hook 是确定性的，能保证动作一定发生。）</p>
+<p>出处：Anthropic, <em>Claude Code Docs</em> — Best practices，https://code.claude.com/docs/en/best-practices ｜不可外推：描述的是 Claude Code 的 hook 机制，外推到其他产品时应表述为「同类确定性机制」。</p>
 </blockquote>
 <blockquote>
 <p><strong>关于本节的证据边界</strong>：本节各检查项来自实践中反复出现的形态，但本手册<strong>不以任何读者无法独立复核的会话日志作为证据</strong>—— 此类材料一律不进入本节。可核实的部分只有两类：上面标注了链接的公开事故复盘，以及标注了出处的厂商与学术文献。其余一律作为<strong>规程建议</strong>给出，请按你自己的环境验证后再采用。</p>

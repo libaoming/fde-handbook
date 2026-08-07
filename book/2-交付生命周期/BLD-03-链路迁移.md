@@ -1,8 +1,9 @@
 # BLD-03 · 链路迁移：先列丢失能力清单
 
-**目的**　在把一条已经跑通的链路换成另一条（多段拆分换端到端、自建组件换托管服务、
-多次往返换单次调用、经中间层换直连）之前，产出一份**丢失能力清单**，并为清单上的每一行
-配好代偿方案与验证方式。本节给出六项检查、一张清单模板和一个可粘贴的判定输出。
+**目的**　在把一条已经跑通的链路换成另一条之前，产出一份**丢失能力清单**。
+这里的「换」指四类替换：多段拆分换端到端、自建组件换托管服务、
+多次往返换单次调用、经中间层换直连。清单上的每一行都要配好代偿方案与验证方式。
+本节给出六项检查、一张清单模板和一个可粘贴的判定输出。
 
 **前置条件**
 
@@ -10,7 +11,7 @@
 - 老链路当前在跑，且它承载的功能清单是已知的（若不知道，先回 SUR 阶段做勘察）
 - 已列出**新增能力清单**（用来做决策的那一份）——本节要补的是它的镜像
 - 能枚举出被两条链路**共用**的配置件、提示词、说明书、schema 与脚本
-- 已有该场景的成功标准与一套能实证测试它的手段（见 BLD-03.5 的引文）
+- 已有该场景的成功标准与一套能实证测试它的手段（官方口径见案例证据的 Anthropic 引证框）
 
 ---
 
@@ -28,19 +29,8 @@
 
 这不是概率，是同一性：新方案的优势与它的代价来自**同一个决定**，不是两件可以分开谈的事。
 
-OpenAI 官方 Voice agents 文档对两种语音架构的定位，把这层同一性写在了明面上：
-端到端（speech-to-speech，音频直接进模型、直接出音频）适合
-"Natural, low-latency conversations"；而链式（先转写、再文本推理、再合成语音）适合
-"Predictable workflows or extending an existing text agent"，因为
-"Your app keeps explicit control over transcription, text reasoning, and speech output"，
-并明确给出选择条件："Use this path when each stage needs to be visible or replaceable."
-
-> **它证明的是**：官方把「低延迟、自然」与「各阶段可见、可替换」列为**两条互斥路径的卖点**，
-> 而不是同一条路径的两个优点。选走低延迟那条，可见性与可替换性就是你付出去的价钱。
->
-> 出处：https://developers.openai.com/api/docs/guides/voice-agents
-> ｜不可外推：这是 OpenAI 自家产品线的架构描述，**不能**据此论断所有厂商的端到端方案
-> 都必然缺少工具调用或阶段可见性；换厂商需另行核实。
+OpenAI 官方 Voice agents 文档把这层同一性写在了明面上——
+原文与出处见常见误判「新方案是老方案的超集，所以叫升级」。
 
 **这一项排除的是**：把迁移当成「换个更好的实现」。**它不能证明清单上具体有哪几行**——那是 .2。
 
@@ -95,8 +85,8 @@ OpenAI 官方 Voice agents 文档对两种语音架构的定位，把这层同�
 结构化输出要求、工具调用指令、状态机推进、易被误读为开场播报的身份条款、
 依赖外部数据的动作。
 
-对一份五类条款各含一条的示例提示词运行的真实输出（`FILE` 行的路径按你传入的实际路径显示，
-此处替换为占位符，其余字段未改动）：
+以下是对一份五类条款各含一条的示例提示词运行的真实输出。
+`FILE` 行的路径按你传入的实际路径显示，此处替换为占位符；其余字段未改动：
 
 ```
 FILE=<你传入的路径>
@@ -163,16 +153,8 @@ VERDICT=UNSAFE_FOR_REALTIME
    并明确告诉模型这是它**已经掌握的**数据，不需要查询、不需要等待——
    否则它会继续模仿一个「有工具的自己」，落回 .4 那类静默。
 
-改这段指令之前，先确认成功标准与测试手段已经就位。Anthropic 的 prompt engineering 文档
-把这两项列为前置条件："This guide assumes that you have: 1. A clear definition of the
-success criteria for your use case, 2. Some ways to empirically test against those
-criteria... If not, spend time establishing that first."
-
-> **它证明的是**：把「先有可实证测试的成功标准」放在动手写提示词之前，是官方口径，不是洁癖。
->
-> 出处：https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/overview
-> ｜不可外推：这是 Claude 的官方指南，描述的是 prompt 工程的前置条件，
-> **不能**外推为「所有模型的行为都可由测试完全刻画」。
+改这段指令之前，先确认成功标准与测试手段已经就位——这是官方列明的前置条件，
+原文与出处见案例证据的 Anthropic 引证框。
 
 ### BLD-03.6　迁移回归：在存量老链路上验证代偿没有反噬
 
@@ -190,8 +172,21 @@ criteria... If not, spend time establishing that first."
 
 **「新方案是老方案的超集，所以叫升级」**
 「新版本是老版本的超集」这个假设在传统软件里大致成立，在架构换代上基本不成立。
-去掉中间环节换来的优势与失去的能力是同一个决定的两面（.1 的官方引文）。
+去掉中间环节换来的优势与失去的能力是同一个决定的两面。
 **「升级」这个词本身就是本节全部麻烦的起点**——它让人只列新增清单。
+OpenAI 官方 Voice agents 文档对两种语音架构的定位，把这层同一性写在了明面上：
+端到端（speech-to-speech，音频直接进模型、直接出音频）适合
+"Natural, low-latency conversations"；而链式（先转写、再文本推理、再合成语音）适合
+"Predictable workflows or extending an existing text agent"，因为
+"Your app keeps explicit control over transcription, text reasoning, and speech output"，
+并明确给出选择条件："Use this path when each stage needs to be visible or replaceable."
+
+> **它证明的是**：官方把「低延迟、自然」与「各阶段可见、可替换」列为**两条互斥路径的卖点**，
+> 而不是同一条路径的两个优点。选走低延迟那条，可见性与可替换性就是你付出去的价钱。
+>
+> 出处：https://developers.openai.com/api/docs/guides/voice-agents
+> ｜不可外推：这是 OpenAI 自家产品线的架构描述，**不能**据此论断所有厂商的端到端方案
+> 都必然缺少工具调用或阶段可见性；换厂商需另行核实。
 
 **「新增能力清单已经列过了」**
 那份清单回答的是「该不该换」，本节的清单回答的是「换的时候要补什么」。
@@ -304,6 +299,19 @@ VERDICT=MIGRATION_READY
 >
 > ⚠️ **本例为本手册构造的教学场景，不是真实事故记录**，不含任何真实读数
 > （无时间戳、无进程号、无日志原文）。
+
+> ### 引证 · 第三方声明｜Anthropic：成功标准与实证测试先于改提示词
+>
+> BLD-03.5 所引：Anthropic 的 prompt engineering 文档把这两项列为前置条件：
+> "This guide assumes that you have: 1. A clear definition of the
+> success criteria for your use case, 2. Some ways to empirically test against those
+> criteria... If not, spend time establishing that first."
+>
+> **它证明的是**：把「先有可实证测试的成功标准」放在动手写提示词之前，是官方口径，不是洁癖。
+>
+> 出处：https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/overview
+> ｜不可外推：这是 Claude 的官方指南，描述的是 prompt 工程的前置条件，
+> **不能**外推为「所有模型的行为都可由测试完全刻画」。
 
 ---
 

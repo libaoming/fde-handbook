@@ -37,10 +37,9 @@
 - **客户资产类**：这家客户特有的数据语义、业务口径、强制过滤条件、累积的纠错记录——
   **归客户，你不能带走**。
 
-这条分界线借用 Meta 内部 agent 的设计原则："Recipes define what to do (workflows,
-analysis steps, response formats), but not what the data means. Data definitions belong
-in a separate layer called Ingredients."——**方法（Recipes）与数据含义（Ingredients）
-分层存放**。⚠️ Meta 原文只讲工程解耦，**没有**提归属或合同；
+这条分界线借用 Meta 内部 agent 的设计原则——**方法（Recipes）与数据含义（Ingredients）
+分层存放**（引文与出处见案例证据「Meta "Recipes / Ingredients" 分层」）。
+⚠️ Meta 原文只讲工程解耦，**没有**提归属或合同；
 「方法归你、语义归客户」的归属含义是**本手册的引申**，引用时须保留这个标注。
 
 为什么这刀非切不可：
@@ -107,8 +106,10 @@ runbook 没被客户的手跑过一遍，你不知道它缺哪一步——写的
 > ### 引证 · 第三方声明｜Meta "Recipes / Ingredients" 分层
 >
 > ROL-03.2 引句出自 Analytics at Meta, "Inside Meta's Home Grown AI Analytics Agent"：
-> https://medium.com/@AnalyticsAtMeta/inside-metas-home-grown-ai-analytics-agent-4ea6779acfb3
-> （2026-08-06 逐句核实实存）。
+> "Recipes define what to do (workflows, analysis steps, response formats), but not what
+> the data means. Data definitions belong in a separate layer called Ingredients."
+>
+> 出处：https://medium.com/@AnalyticsAtMeta/inside-metas-home-grown-ai-analytics-agent-4ea6779acfb3
 >
 > **不可外推边界**：Meta 语境是内部工程解耦，原文不涉及归属、合同或交付；
 > 本节把这个分层用作归属切割线，是**本手册的引申**，不是 Meta 的主张。

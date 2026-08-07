@@ -1,8 +1,8 @@
 # BLD-04 · 模型行为约束：把要求落成结构与闸门
 
 **目的**　搭建阶段，当一条要求的形态是「模型必须做 X」或「模型禁止做 Y」时，判断这条要求
-该写进提示词、该改成数据与格式的形状、还是该做成模型之外的闸门；并在进入上线阶段前，
-检出提示词里「写的是约束、读到的是建议」的那些写法。
+该写进提示词、该改成数据与格式的形状、还是该做成模型之外的闸门。
+另在进入上线阶段前，检出提示词里「写的是约束、读到的是建议」的那些写法。
 
 > **判据：写进提示词的每一条「必须」，到了模型那里都是一个较强的倾向，不是一道闸门。**
 > 它要和模型在训练中形成的先验（prior，即训练数据里学到的默认倾向）竞争。
@@ -10,17 +10,11 @@
 
 **前置条件**
 
-- 已有成功标准的清晰定义，以及针对该标准做实证测试的手段（否则本节的判定无处落地，见下方引文）
+- 已有成功标准的清晰定义，以及针对该标准做实证测试的手段
+  （否则本节的判定无处落地；官方口径见案例证据的 Anthropic 引证框）
 - 已知目标链路的模型形态（端到端语音 / 文本对话 / 工具调用），因为同一句话在不同形态下竞争的先验不同
 - 提示词全文可读且纳入版本控制——未入版本控制的提示词无法做 BLD-04.4 的逐项审查
 - 若本次是链路迁移：旧链路的提示词及其**运行形态**（谁在消费它的输出）可获取，见 BLD-03
-
-> "This guide assumes that you have: 1. A clear definition of the success criteria for your
-> use case, 2. Some ways to empirically test against those criteria... If not, spend time
-> establishing that first."
-> ——Anthropic, *Claude Docs* · Prompt engineering overview
-> ｜https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/overview
-> ｜不可外推：这是官方把「可实证测试」列为 prompt 工程的**前置条件**，不是对效果的承诺。
 
 ---
 
@@ -62,14 +56,7 @@
 「不要反问」「必须给出一个答案」「猜一个最接近的」「不准说不知道」。
 这类句子比「没写出路」严重，因为它是在主动命令模型编造。
 
-> "…producing plausible yet incorrect statements instead of admitting uncertainty"；
-> "language models hallucinate because the training and evaluation procedures reward
-> guessing over acknowledging uncertainty."
-> ——Kalai, Nachum, Vempala, Zhang, "Why Language Models Hallucinate", arXiv:2509.04664
-> ｜https://arxiv.org/abs/2509.04664
-> ｜类型：`third-party-claim`（理论论证，非产品实测）。
-> ｜不可外推：这篇论文论证的是训练与评估机制层面的成因，**不构成对任一具体模型幻觉率的量化预测**，
-> 也不保证「写了出路就不编造」——它只说明了为什么「承认不确定」这条路默认更贵。
+本项判据的机理与出处，见案例证据的「Why Language Models Hallucinate」引证框。
 
 ### BLD-04.3　约束优先用结构性手段，措辞排在最后一档
 
@@ -86,18 +73,11 @@
 
 **判据：一条要求最终落在第几档，决定了它是约束还是建议。第 0–2 档全部是建议。**
 
-**真正确定性的约束来自模型之外的闸门，而不是提示词本身。** 这一点有官方口径：
-
-> "Unlike CLAUDE.md instructions which are advisory, hooks are deterministic and guarantee
-> the action happens."
-> ——Anthropic, *Claude Code Docs* · Best practices｜https://code.claude.com/docs/en/best-practices
-> ｜不可外推：原文描述的是 Claude Code 的 hook 机制；外推到其他 LLM 应用时，
-> 只能说「同类机制」（输出后的程序化校验与拒绝），不能宣称任一具体产品也有等价保证。
-> 可引用的核心是官方对提示词性质的定性：**给模型的指令是 advisory（劝导性的）**。
+**真正确定性的约束来自模型之外的闸门，而不是提示词本身。** 这一点有官方口径——
+原文与出处见常见误判「措辞已经写得很重了，它不可能不听」。
 
 对第 0 档的补充：措辞不仅弱，而且**加得越多越弱**——
-
-> "Bloated CLAUDE.md files cause Claude to ignore your actual instructions!"（同上出处）
+臃肿会稀释指令的官方原句，见常见误判「加粗、全大写、多写几遍，遵守率会上去」。
 
 ### BLD-04.4　迁移链路时逐项审隐性约定，不只审文档
 
@@ -142,11 +122,20 @@
 
 **「措辞已经写得很重了，它不可能不听」**
 措辞的重量不是约束的强度。「必须」和「建议」在模型那里的差别是权重差别，
-不是「可违背 / 不可违背」的差别。官方对提示词的定性就是 advisory（见 BLD-04.3 引文）。
+不是「可违背 / 不可违背」的差别。官方对提示词的定性就是 advisory：
+
+> "Unlike CLAUDE.md instructions which are advisory, hooks are deterministic and guarantee
+> the action happens."
+> ——Anthropic, *Claude Code Docs* · Best practices｜https://code.claude.com/docs/en/best-practices
+> ｜不可外推：原文描述的是 Claude Code 的 hook 机制；外推到其他 LLM 应用时，
+> 只能说「同类机制」（输出后的程序化校验与拒绝），不能宣称任一具体产品也有等价保证。
+> 可引用的核心是官方对提示词性质的定性：**给模型的指令是 advisory（劝导性的）**。
 
 **「加粗、全大写、多写几遍，遵守率会上去」**
 这些手段停留在第 0 档，且与上一条同类：把一个不确定的机制反复加码，
 换不来确定性，只换来更长的提示词——而臃肿本身会稀释真正的指令。
+
+> "Bloated CLAUDE.md files cause Claude to ignore your actual instructions!"（同上出处）
 
 **「多给几个例子总没坏处」**
 上下文里的每一份例子既是线索也是原料。判据仍是 BLD-04.1：
@@ -207,8 +196,9 @@ VERDICT=SELF_TEST_OK
 ```
 
 > ⚠️ 该 linter 的 `TURN_END_RISK` 一类噪声较高（会把写给人看的说明文字报出来），
-> 源码内已标注。保留它而不是删掉，是因为**一个不知道自己会漏什么的检查器，
-> 比没有检查器更危险——它提供的是安全感**。它的输出是线索，不能替代 BLD-04.1–.5 的人工判定。
+> 源码内已标注。噪声类型必须这样标明在源码里才能保留它：
+> **一个不知道自己会漏什么的检查器，比没有检查器更危险——它提供的只是安全感**。
+> 标明盲区之后，它的输出是线索，不能替代 BLD-04.1–.5 的人工判定。
 
 > **保守缺省**：一条要求若**无法在模型之外验证它被遵守**（拿不到输出、无法程序化判定、
 > 没有可重复的测试），一律按**未被约束**处理：下游按最坏情况设计（人工复核、
@@ -255,6 +245,28 @@ VERDICT=SELF_TEST_OK
 > 另请注意边界：「端到端语音模型在句末标点后倾向结束话轮」是一个**未经受控实验验证的机理假设**
 > ——要证实它需要同内容的句号版与连接词版各跑 N 次统计中断率。
 > 本例用于说明「隐性约定会随链路改变含义」这条通则，**不构成对该类模型的一般性论断**。
+
+> ### 引证 · 第三方声明｜Anthropic：成功标准与实证测试是前置条件
+>
+> 本节前置条件所引：
+> "This guide assumes that you have: 1. A clear definition of the success criteria for your
+> use case, 2. Some ways to empirically test against those criteria... If not, spend time
+> establishing that first."
+> ——Anthropic, *Claude Docs* · Prompt engineering overview
+> ｜https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/overview
+> ｜不可外推：这是官方把「可实证测试」列为 prompt 工程的**前置条件**，不是对效果的承诺。
+
+> ### 引证 · 第三方声明｜"Why Language Models Hallucinate"：编造为何默认更便宜
+>
+> BLD-04.2 判据的机理出处：
+> "…producing plausible yet incorrect statements instead of admitting uncertainty"；
+> "language models hallucinate because the training and evaluation procedures reward
+> guessing over acknowledging uncertainty."
+> ——Kalai, Nachum, Vempala, Zhang, "Why Language Models Hallucinate", arXiv:2509.04664
+> ｜https://arxiv.org/abs/2509.04664
+> ｜类型：`third-party-claim`（理论论证，非产品实测）。
+> ｜不可外推：这篇论文论证的是训练与评估机制层面的成因，**不构成对任一具体模型幻觉率的量化预测**，
+> 也不保证「写了出路就不编造」——它只说明了为什么「承认不确定」这条路默认更贵。
 
 ---
 

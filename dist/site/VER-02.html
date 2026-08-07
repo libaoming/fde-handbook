@@ -8,7 +8,13 @@
 </header>
 <main><h1 id="ver-02-切换验证确认接活的是新版本">VER-02 · 切换验证：确认接活的是新版本</h1>
 <p><strong>目的</strong>　部署动作执行完之后，判断这次切换是否真的完成——即确认<strong>正在处理真实流量的，就是你刚部署的那个版本</strong>。本节给出四项检查与一个可粘贴的判定输出。</p>
-<p><strong>前置条件</strong> - 部署或切换动作已执行（本节不负责部署本身，见 <a class="xref" href="DEP-01.html">DEP-01</a>） - 你能访问服务管理器或编排器（systemd / Kubernetes / 进程管理器 / 负载均衡器管理接口） - 目标服务的日志可读，且日志里能区分「启动事件」与「业务事件」 - 已知本次部署的版本标识（构建号、镜像摘要、commit 短哈希，任选其一但必须唯一）</p>
+<p><strong>前置条件</strong></p>
+<ul>
+<li>部署或切换动作已执行（本节不负责部署本身，见 <a class="xref" href="DEP-01.html">DEP-01</a>）</li>
+<li>你能访问服务管理器或编排器（systemd / Kubernetes / 进程管理器 / 负载均衡器管理接口）</li>
+<li>目标服务的日志可读，且日志里能区分「启动事件」与「业务事件」</li>
+<li>已知本次部署的版本标识（构建号、镜像摘要、commit 短哈希，任选其一但必须唯一）</li>
+</ul>
 <hr />
 <h2 id="规程">规程</h2>
 <p>四项检查全部通过才算切换完成。<strong>任何一项不通过，本次切换按未完成处理。</strong></p>
@@ -137,7 +143,13 @@
 <p>不要问「服务活着吗」，要问「<strong>回答我的这个东西，是哪个版本</strong>」。</p>
 <ul>
 <li>让服务暴露一个版本端点（<code>/version</code> 返回构建号或 commit 哈希），部署后直接查；</li>
-<li>没有版本端点时，退而查进程或镜像：容器看镜像摘要（digest，不是 tag——tag 会被覆盖），进程看启动时间与命令行。</li>
+<li>没有版本端点时，退路的锚点必须仍是<strong>不可变标识</strong>：
+<ul>
+<li>容器：查镜像摘要（digest，不是 tag——tag 会被覆盖），与本次部署的 digest 逐字符比对；</li>
+<li>裸进程（Linux）：对<strong>运行中进程的可执行文件真身</strong>做校验和——<code>sha256sum /proc/&lt;PID&gt;/exe</code>，与本次部署产物的 sha256 逐字符比对。顺手 <code>ls -l /proc/&lt;PID&gt;/exe</code>：显示 <code>(deleted)</code> 即磁盘文件已被替换而进程还跑着旧二进制——这本身就是「未切换」的直接证据；</li>
+<li>解释型服务（可执行文件是解释器，代码在脚本里）：从命令行定位实际加载的入口文件，对它做同样的校验和比对。</li>
+</ul>
+启动时间与命令行只是辅助信号：启动时间新只证明「重启过」，不证明「跑的是新版」 ——重启一个旧二进制，启动时间同样是新的。</li>
 </ul>
 <p><strong>通过判据</strong>：查到的版本标识 == 本次部署的版本标识，<strong>逐字符相等</strong>。</p>
 <blockquote>
@@ -162,8 +174,8 @@
 <tbody>
 <tr>
 <td>进程</td>
-<td>列出同类进程，核对父进程与启动时间</td>
-<td>无「父进程为 1（被 init 收养）且早于本次部署」的残留</td>
+<td><code>systemctl show -p MainPID &lt;svc&gt;</code> 取当前主进程，再列同名进程</td>
+<td>排除当前主进程后，无 PPID=1 的同名残留（启动时间早于本次部署＝实锤）</td>
 </tr>
 <tr>
 <td>容器/编排</td>
@@ -177,6 +189,7 @@
 </tr>
 </tbody>
 </table>
+<p>⚠️ 进程残留<strong>不能单看「PPID=1」</strong>——systemd 直管服务的正常主进程 PPID 也是 1，单看这一条会把刚起的新实例误判成残留。先取当前登记的主进程把它排除（<code>systemctl show -p MainPID &lt;svc&gt;</code>），剩下的同名 PPID=1 进程才是被收养的孤儿；再用启动时间复核：<code>ps -eo pid,ppid,lstart,cmd</code> 里启动早于本次部署时刻（<code>systemctl show -p ActiveEnterTimestamp &lt;svc&gt;</code> 可取）的即残留。 <code>kit/verify-switch.sh</code> 用的就是这条逻辑（PPID=1 且 PID≠MainPID 计为孤儿）。</p>
 <p><strong>负载均衡这一项必须单独给命令</strong>，因为它是本节最容易出事、也最容易被「看配置文件」蒙混过去的一项：</p>
 <table>
 <colgroup>
@@ -208,7 +221,7 @@
 </tr>
 <tr>
 <td>开源 Nginx</td>
-<td>⚠️ 无运行时查询接口。<code>nginx -T</code> 读的是<strong>配置</strong>不是运行时状态——正是本项要防的东西。只能靠「重载后核对 worker 进程启动时间」间接判断</td>
+<td>⚠️ 无运行时查询接口——走下方「开源 Nginx 三步替代」</td>
 </tr>
 </tbody>
 </table>
@@ -304,10 +317,45 @@
 <text class="sub" x="50" y="422">所以 VER-02.3 规定：读磁盘的接口一律不算数，只认运行时表。</text>
 </svg>
 <figcaption>磁盘上的配置正确，但进程内存里的后端表停在旧值：流量仍流向旧实例，新实例从未接到流量。读磁盘的检查给假绿灯，只有查运行时表能看见</figcaption></figure>
-<blockquote>
-<p><strong>为什么旧进程会活下来</strong>：杀掉父进程，子进程不会跟着死。POSIX 规定，进程退出后它的子进程与僵尸进程的父进程 ID「shall be set to the process ID of an implementation-defined system process」——也就是被 init/systemd 收养后继续运行。（POSIX.1-2017 <code>_exit()</code>：https://pubs.opengroup.org/onlinepubs/9699919799/functions/_exit.html ）</p>
-<p>systemd 手册对只杀主进程（<code>KillMode=process</code>）的评语是一个带感叹号的「不推荐」：这会让进程「escape the service manager’s lifecycle and resource management, and to remain running <strong>even while their service is considered stopped</strong>」—— <strong>服务被认为已停止，不等于进程都死了。</strong>（<code>systemd.kill(5)</code>，man7.org 官方手册镜像： https://man7.org/linux/man-pages/man5/systemd.kill.5.html ——freedesktop.org 原站拒绝抓取，内容同源）</p>
-</blockquote>
+<p><strong>开源 Nginx 三步替代</strong>（无运行时接口时的组合判据，三步全过才算本项通过）：</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>步</th>
+<th>命令</th>
+<th>通过判据</th>
+<th>它证明什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>nginx -T \| grep &lt;旧实例地址&gt;</code></td>
+<td>零命中</td>
+<td>磁盘配置已无旧地址——只证<strong>意图</strong>（<code>nginx -T</code> 读的是配置文件，不是运行时状态）</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>ps -o pid,etime,cmd -C nginx</code></td>
+<td>全部 worker 的运行时长（<code>etime</code>）短于「距 reload 已过的时间」</td>
+<td>reload 确已发生——worker 是 reload 时新起的；旧 worker 在优雅退出期内暂存属正常，等它处理完存量连接</td>
+</tr>
+<tr>
+<td>3</td>
+<td>部署后 <code>tail</code> 旧实例的 access log</td>
+<td>零新增条目（同时 VER-02.4 的唯一标识命中新实例日志）</td>
+<td>流量真的不再走旧后端——三步里唯一的<strong>直接证据</strong></td>
+</tr>
+</tbody>
+</table>
+<p>第 1 步证意图、第 2 步证动作、第 3 步证结果；缺第 3 步，前两步只是「应该切了」。</p>
+<p>旧进程为什么会活下来、为什么「服务已停止」不等于进程都死了—— 机理与出处见常见误判「停止了服务，所以旧进程都死了」。</p>
 <h3 id="ver-02.4-它真的干过活">VER-02.4　它真的干过活</h3>
 <p>前三项只证明「它站起来了」，这一项证明「<strong>活落在了它头上</strong>」。</p>
 <p><strong>通过判据</strong>：主动打一次带<strong>唯一标识</strong>的真实业务请求，然后在服务日志中 grep 该标识，命中即通过。标识可以是随机 request-id、订单号，或本次部署的短哈希—— 关键是它<strong>不可能来自上一次</strong>。</p>
@@ -319,9 +367,10 @@
 <p>边界：SRE 书主张两类监控<strong>互补</strong>，不是黑盒无用。本节只借它区分证据类型，不构成「黑盒验证可以省略」的主张。</p>
 </blockquote>
 <p><strong>「配置文件是对的，所以生效的配置是对的」</strong>磁盘上的内容是期望值，运行时加载的才是事实。两者可以静默地长期不一致（PM-01）。</p>
+<p><strong>「停止了服务，所以旧进程都死了」</strong>杀掉父进程，子进程不会跟着死。POSIX 规定，进程退出后它的子进程与僵尸进程的父进程 ID 「shall be set to the process ID of an implementation-defined system process」—— 也就是被 init/systemd 收养后继续运行（POSIX.1-2017 <code>_exit()</code>：https://pubs.opengroup.org/onlinepubs/9699919799/functions/_exit.html ）。 systemd 手册对只杀主进程（<code>KillMode=process</code>）的评语是一个带感叹号的「不推荐」：这会让进程「escape the service manager’s lifecycle and resource management, and to remain running <strong>even while their service is considered stopped</strong>」—— <strong>服务被认为已停止，不等于进程都死了</strong>（<code>systemd.kill(5)</code>，man7.org 官方手册镜像： https://man7.org/linux/man-pages/man5/systemd.kill.5.html ）。所以 VER-02.3 数的是残留进程本身，不是服务状态。</p>
 <p><strong>「探测了一次，通过了」</strong>配置与镜像的分发通常是渐进的，同一时刻不同节点可能跑着不同版本。单点单次探测可能恰好命中已完成的那部分，给出「已恢复」的假信号（PM-02）。<strong>多节点、重复采样</strong>——覆盖判据是两个问题：横向，采样是否覆盖了全部节点（或至少每个分组各有样本）；纵向，采样是否横跨了<strong>至少一个完整的下发周期</strong>。 PM-02 里那个周期是 5 分钟，你的系统的周期是多少，要先问出来—— 在下发周期内做的任何次数的采样，都只是同一时刻的重复。</p>
 <p><strong>「在新环境验证过了」</strong>全新节点的启动顺序与存量节点不同，某些故障<strong>只在存量节点重启时才显现</strong>—— 这意味着新环境的绿灯对存量环境没有证明力（PM-05）。<strong>验证必须在存量运行节点上做。</strong></p>
-<p><strong>「监控没报警，所以没问题」</strong>如果监控与被监控系统共享依赖，故障发生时验证手段会和故障一起消失—— 此时的沉默不是绿灯（PM-04）。</p>
+<p><strong>「监控没报警，所以没问题」</strong>如果监控与被监控系统共享依赖，故障发生时验证手段会和故障一起消失—— 此时的沉默不是绿灯（PM-04，案例全文见 <a class="xref" href="VER-01.html">VER-01</a>）。</p>
 <hr />
 <h2 id="判定标准">判定标准</h2>
 <p>四项全部通过才输出 <code>SWITCHED</code>。建议让脚本直接吐出判定标量，而不是让人读三段输出自己下结论（理由见 <a class="xref" href="DIS-02.html">DIS-02</a>）：</p>
@@ -331,8 +380,8 @@ STALE_INSTANCES=0                 # VER-02.3  进程/副本残留数
 BUSINESS_EVENT_SINCE_DEPLOY=yes   # VER-02.4  唯一标识已在日志中命中
 VERDICT=SWITCHED</code></pre>
 <p>任一项为否 → <code>VERDICT=NOT_SWITCHED</code>，<strong>不得进入 <a class="xref" href="VER-05.html">VER-05</a> 验收</strong>。</p>
-<p><strong>参考实现</strong>：<code>kit/verify-switch.sh</code>（systemd 场景，含 29 条自测用例）。用法与覆盖范围必须说清楚，否则它就成了本节自己批评的那种「给假绿灯的闸门」：</p>
-<pre><code>./verify-switch.sh &lt;service&gt; --pattern &lt;进程匹配串&gt; \
+<p><strong>参考实现</strong>：<code>kit/verify-switch.sh</code>（systemd 场景，含 29 条自测用例）。它不覆盖全部四项——一个覆盖范围不明的验证脚本，本身就是另一盏假绿灯，所以用法与覆盖范围如下，逐项说清：</p>
+<pre><code>./kit/verify-switch.sh &lt;service&gt; --pattern &lt;进程匹配串&gt; \
     --expect-version &lt;本次版本标识&gt; --version-cmd &lt;取版本的命令&gt; \
     --event &lt;本次唯一标识&gt;</code></pre>
 <table>
@@ -365,7 +414,7 @@ VERDICT=SWITCHED</code></pre>
 </tr>
 </tbody>
 </table>
-<p>退出码：<code>0</code>=SWITCHED，<code>1</code>=NOT_SWITCHED，<code>4</code>=测不出（<code>INDETERMINATE_*</code>），<code>2</code>=用法错误。</p>
+<p>退出码：<code>0</code>=SWITCHED，<code>1</code>=NOT_SWITCHED，<code>4</code>=测不出（<code>INDETERMINATE_*</code>）， <code>3</code>=非 systemd 环境（脚本只支持 systemd，其他环境按上文命令表人工执行四项），<code>2</code>=用法错误。版本参数的两种漏传是两种码：<strong>只传一个</strong>（<code>--expect-version</code> 与 <code>--version-cmd</code> 缺一）是用法错误，退出码 2；<strong>两个都不传</strong>是「没做版本核对」，按测不出处理，退出码 4。</p>
 <blockquote>
 <p><strong>保守缺省</strong>：四项中任何一项<strong>没做</strong>或<strong>测不出</strong>（工具不可用、权限不足、日志缺失、未传对应参数），一律按<strong>未通过</strong>处理。脚本对此是 fail-closed 的—— 没传版本参数会得到 <code>VERDICT=INDETERMINATE_NO_VERSION_CHECK</code> 并以退出码 4 结束，<strong>不会</strong>因为「没检查」而输出 <code>SWITCHED</code>。</p>
 <p>这条缺省与一条业界通行的分级原则同构：拿不准时按更坏的情况走，事后复盘再降级 ——PagerDuty 事故响应手册把它写作 <strong>“Always Assume The Worst”</strong> （https://response.pagerduty.com/before/severity_levels/ ）。该原则原本用于事故严重度分级，这里是<strong>类比借用</strong>，不是它的原始适用范围。</p>
@@ -402,8 +451,8 @@ VERDICT=SWITCHED</code></pre>
 </tr>
 <tr>
 <td>3</td>
-<td><code>ps -eo ppid,pid,cmd \| grep orders-api</code></td>
-<td>VER-02.3a：有没有「父进程为 1 且早于本次部署」的残留</td>
+<td><code>systemctl show -p MainPID orders-api</code>，再 <code>ps -eo pid,ppid,lstart,cmd \| grep orders-api</code></td>
+<td>VER-02.3a：排除当前主进程后，有没有 PPID=1 且启动早于本次部署的残留</td>
 </tr>
 <tr>
 <td>4</td>
@@ -488,7 +537,7 @@ VERDICT=SELF_TEST_OK</code></pre>
 <h3 id="案例-合成示例教学场景非真实事故">案例 · 合成示例（教学场景，非真实事故）</h3>
 <p>一次滚动更新中，编排器报告新副本 <code>Running</code> 且就绪探针通过，服务对外正常。但就绪探针只检查了进程端口是否监听，而新副本所需的配置项拉取失败，代码走了兜底分支返回缓存结果——<strong>请求全部成功，返回的却全是旧数据</strong>。</p>
 <p>本例说明 VER-02.4 为什么要断言<strong>业务事件</strong>而不是心跳：探针测的是「进程在不在」，业务事件测的是「活干得对不对」。</p>
-<p>⚠️ <strong>本例为本手册构造的教学场景，不是真实事故记录</strong>，不含任何真实读数。同类真实形态可参见 PM-03（配置服务返回合法空结果，进程健康、HTTP 200、内容是错的）。</p>
+<p>⚠️ <strong>本例为本手册构造的教学场景，不是真实事故记录</strong>，不含任何真实读数。同类真实形态可参见 PM-03（配置服务返回合法空结果，进程健康、HTTP 200、内容是错的；案例全文见 <a class="xref" href="VER-04.html">VER-04</a>）。</p>
 </blockquote>
 <hr />
 <h2 id="相关小节">相关小节</h2>
@@ -498,6 +547,7 @@ VERDICT=SELF_TEST_OK</code></pre>
 <li><strong><a class="xref" href="VER-05.html">VER-05</a> 验收与签收</strong>——本节输出 <code>SWITCHED</code> 是进入验收的前置条件</li>
 <li><strong><a class="xref" href="DIS-01.html">DIS-01</a> 证据分级</strong>——「功能能用」为什么是信号而不是证据</li>
 <li><strong><a class="xref" href="DIS-02.html">DIS-02</a> 三道焊缝</strong>——为什么要让命令吐判定标量，而不是让人读输出</li>
+<li><strong><a class="xref" href="DIS-03.html">DIS-03</a> 助手产出验证</strong>——VER-02.4「唯一标识钉死」手法的一般形式（<a class="xref" href="DIS-03.html">DIS-03</a>.2）</li>
 <li><strong><a class="xref" href="APPX-A.html">附录 A</a> · FX-SVC-01</strong>——症状「部署后改动似乎没生效」的速查入口</li>
 <li><strong><a class="xref" href="APPX-B.html">附录 B</a> · B-VER-02</strong>——本节四项检查的可打印版本</li>
 </ul>

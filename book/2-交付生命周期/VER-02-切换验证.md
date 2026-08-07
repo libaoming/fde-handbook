@@ -37,8 +37,16 @@
 不要问「服务活着吗」，要问「**回答我的这个东西，是哪个版本**」。
 
 - 让服务暴露一个版本端点（`/version` 返回构建号或 commit 哈希），部署后直接查；
-- 没有版本端点时，退而查进程或镜像：容器看镜像摘要（digest，不是 tag——tag 会被覆盖），
-  进程看启动时间与命令行。
+- 没有版本端点时，退路的锚点必须仍是**不可变标识**：
+  - 容器：查镜像摘要（digest，不是 tag——tag 会被覆盖），与本次部署的 digest 逐字符比对；
+  - 裸进程（Linux）：对**运行中进程的可执行文件真身**做校验和——`sha256sum /proc/<PID>/exe`，
+    与本次部署产物的 sha256 逐字符比对。顺手 `ls -l /proc/<PID>/exe`：显示 `(deleted)`
+    即磁盘文件已被替换而进程还跑着旧二进制——这本身就是「未切换」的直接证据；
+  - 解释型服务（可执行文件是解释器，代码在脚本里）：从命令行定位实际加载的入口文件，
+    对它做同样的校验和比对。
+
+  启动时间与命令行只是辅助信号：启动时间新只证明「重启过」，不证明「跑的是新版」
+  ——重启一个旧二进制，启动时间同样是新的。
 
 **通过判据**：查到的版本标识 == 本次部署的版本标识，**逐字符相等**。
 
@@ -56,9 +64,16 @@
 
 | 环境 | 检查 | 通过判据 |
 |---|---|---|
-| 进程 | 列出同类进程，核对父进程与启动时间 | 无「父进程为 1（被 init 收养）且早于本次部署」的残留 |
+| 进程 | `systemctl show -p MainPID <svc>` 取当前主进程，再列同名进程 | 排除当前主进程后，无 PPID=1 的同名残留（启动时间早于本次部署＝实锤） |
 | 容器/编排 | 列出全部副本 | 无旧版本副本处于 Running |
 | 负载均衡 | **查运行时后端表**，见下表 | 后端列表中无旧实例地址 |
+
+⚠️ 进程残留**不能单看「PPID=1」**——systemd 直管服务的正常主进程 PPID 也是 1，
+单看这一条会把刚起的新实例误判成残留。先取当前登记的主进程把它排除
+（`systemctl show -p MainPID <svc>`），剩下的同名 PPID=1 进程才是被收养的孤儿；
+再用启动时间复核：`ps -eo pid,ppid,lstart,cmd` 里启动早于本次部署时刻
+（`systemctl show -p ActiveEnterTimestamp <svc>` 可取）的即残留。
+`kit/verify-switch.sh` 用的就是这条逻辑（PPID=1 且 PID≠MainPID 计为孤儿）。
 
 **负载均衡这一项必须单独给命令**，因为它是本节最容易出事、也最容易被「看配置文件」蒙混过去的一项：
 
@@ -68,7 +83,7 @@
 | Envoy | `curl -s localhost:15000/clusters` |
 | Nginx Plus | `curl -s http://127.0.0.1/api/*/http/upstreams` |
 | Kubernetes | `kubectl get endpointslices -l kubernetes.io/service-name=<svc>` |
-| 开源 Nginx | ⚠️ 无运行时查询接口。`nginx -T` 读的是**配置**不是运行时状态——正是本项要防的东西。只能靠「重载后核对 worker 进程启动时间」间接判断 |
+| 开源 Nginx | ⚠️ 无运行时查询接口——走下方「开源 Nginx 三步替代」 |
 
 **你的 LB 不在此列时，只需问一句：这个接口读的是磁盘，还是内存？**
 读磁盘的一律不算数。配置文件是「期望」，运行时表才是「事实」，
@@ -76,18 +91,18 @@
 
 ![磁盘上的配置正确，但进程内存里的后端表停在旧值：流量仍流向旧实例，新实例从未接到流量。读磁盘的检查给假绿灯，只有查运行时表能看见](../figures/ver02-disk-vs-runtime.svg)
 
-> **为什么旧进程会活下来**：杀掉父进程，子进程不会跟着死。POSIX 规定，进程退出后
-> 它的子进程与僵尸进程的父进程 ID「shall be set to the process ID of an
-> implementation-defined system process」——也就是被 init/systemd 收养后继续运行。
-> （POSIX.1-2017 `_exit()`：https://pubs.opengroup.org/onlinepubs/9699919799/functions/_exit.html ）
->
-> systemd 手册对只杀主进程（`KillMode=process`）的评语是一个带感叹号的「不推荐」：
-> 这会让进程「escape the service manager's lifecycle and resource management, and to
-> remain running **even while their service is considered stopped**」——
-> **服务被认为已停止，不等于进程都死了。**
-> （`systemd.kill(5)`，man7.org 官方手册镜像：
-> https://man7.org/linux/man-pages/man5/systemd.kill.5.html
-> ——freedesktop.org 原站拒绝抓取，内容同源）
+**开源 Nginx 三步替代**（无运行时接口时的组合判据，三步全过才算本项通过）：
+
+| 步 | 命令 | 通过判据 | 它证明什么 |
+|---|---|---|---|
+| 1 | `nginx -T \| grep <旧实例地址>` | 零命中 | 磁盘配置已无旧地址——只证**意图**（`nginx -T` 读的是配置文件，不是运行时状态） |
+| 2 | `ps -o pid,etime,cmd -C nginx` | 全部 worker 的运行时长（`etime`）短于「距 reload 已过的时间」 | reload 确已发生——worker 是 reload 时新起的；旧 worker 在优雅退出期内暂存属正常，等它处理完存量连接 |
+| 3 | 部署后 `tail` 旧实例的 access log | 零新增条目（同时 VER-02.4 的唯一标识命中新实例日志） | 流量真的不再走旧后端——三步里唯一的**直接证据** |
+
+第 1 步证意图、第 2 步证动作、第 3 步证结果；缺第 3 步，前两步只是「应该切了」。
+
+旧进程为什么会活下来、为什么「服务已停止」不等于进程都死了——
+机理与出处见常见误判「停止了服务，所以旧进程都死了」。
 
 ### VER-02.4　它真的干过活
 
@@ -119,6 +134,19 @@
 **「配置文件是对的，所以生效的配置是对的」**
 磁盘上的内容是期望值，运行时加载的才是事实。两者可以静默地长期不一致（PM-01）。
 
+**「停止了服务，所以旧进程都死了」**
+杀掉父进程，子进程不会跟着死。POSIX 规定，进程退出后它的子进程与僵尸进程的父进程 ID
+「shall be set to the process ID of an implementation-defined system process」——
+也就是被 init/systemd 收养后继续运行
+（POSIX.1-2017 `_exit()`：https://pubs.opengroup.org/onlinepubs/9699919799/functions/_exit.html ）。
+systemd 手册对只杀主进程（`KillMode=process`）的评语是一个带感叹号的「不推荐」：
+这会让进程「escape the service manager's lifecycle and resource management, and to
+remain running **even while their service is considered stopped**」——
+**服务被认为已停止，不等于进程都死了**
+（`systemd.kill(5)`，man7.org 官方手册镜像：
+https://man7.org/linux/man-pages/man5/systemd.kill.5.html ）。
+所以 VER-02.3 数的是残留进程本身，不是服务状态。
+
 **「探测了一次，通过了」**
 配置与镜像的分发通常是渐进的，同一时刻不同节点可能跑着不同版本。
 单点单次探测可能恰好命中已完成的那部分，给出「已恢复」的假信号（PM-02）。
@@ -133,7 +161,7 @@ PM-02 里那个周期是 5 分钟，你的系统的周期是多少，要先问�
 
 **「监控没报警，所以没问题」**
 如果监控与被监控系统共享依赖，故障发生时验证手段会和故障一起消失——
-此时的沉默不是绿灯（PM-04）。
+此时的沉默不是绿灯（PM-04，案例全文见 VER-01）。
 
 ---
 
@@ -153,10 +181,11 @@ VERDICT=SWITCHED
 任一项为否 → `VERDICT=NOT_SWITCHED`，**不得进入 VER-05 验收**。
 
 **参考实现**：`kit/verify-switch.sh`（systemd 场景，含 29 条自测用例）。
-用法与覆盖范围必须说清楚，否则它就成了本节自己批评的那种「给假绿灯的闸门」：
+它不覆盖全部四项——一个覆盖范围不明的验证脚本，本身就是另一盏假绿灯，
+所以用法与覆盖范围如下，逐项说清：
 
 ```
-./verify-switch.sh <service> --pattern <进程匹配串> \
+./kit/verify-switch.sh <service> --pattern <进程匹配串> \
     --expect-version <本次版本标识> --version-cmd <取版本的命令> \
     --event <本次唯一标识>
 ```
@@ -168,7 +197,10 @@ VERDICT=SWITCHED
 | VER-02.3 残留清零 | ⚠️ **仅覆盖进程残留**；**负载均衡器的运行时后端表脚本读不到**，必须按上面的命令表人工执行。脚本会输出 `NOTE=lb_backend_table_not_covered_check_manually` 提醒 |
 | VER-02.4 它干过活 | ✅ 需传 `--event` |
 
-退出码：`0`=SWITCHED，`1`=NOT_SWITCHED，`4`=测不出（`INDETERMINATE_*`），`2`=用法错误。
+退出码：`0`=SWITCHED，`1`=NOT_SWITCHED，`4`=测不出（`INDETERMINATE_*`），
+`3`=非 systemd 环境（脚本只支持 systemd，其他环境按上文命令表人工执行四项），`2`=用法错误。
+版本参数的两种漏传是两种码：**只传一个**（`--expect-version` 与 `--version-cmd` 缺一）
+是用法错误，退出码 2；**两个都不传**是「没做版本核对」，按测不出处理，退出码 4。
 
 > **保守缺省**：四项中任何一项**没做**或**测不出**（工具不可用、权限不足、日志缺失、
 > 未传对应参数），一律按**未通过**处理。脚本对此是 fail-closed 的——
@@ -195,7 +227,7 @@ VERDICT=SWITCHED
 |---|---|---|
 | 1 | `systemctl is-active orders-api` | VER-02.1：服务管理器认为它在运行吗 |
 | 2 | `curl -s localhost:8080/version` | VER-02.2：**回答我的这个东西**是 `build-4187` 吗（逐字符比对） |
-| 3 | `ps -eo ppid,pid,cmd \| grep orders-api` | VER-02.3a：有没有「父进程为 1 且早于本次部署」的残留 |
+| 3 | `systemctl show -p MainPID orders-api`，再 `ps -eo pid,ppid,lstart,cmd \| grep orders-api` | VER-02.3a：排除当前主进程后，有没有 PPID=1 且启动早于本次部署的残留 |
 | 4 | 按 VER-02.3 命令表查 LB 运行时后端表 | VER-02.3b：后端表里还有没有旧实例地址（**脚本覆盖不到，必须人工**） |
 | 5 | 发一笔带唯一标识的真实请求，再 `grep <标识> 日志` | VER-02.4：活真的落在了它头上吗 |
 
@@ -344,7 +376,7 @@ VERDICT=SELF_TEST_OK
 > 探针测的是「进程在不在」，业务事件测的是「活干得对不对」。
 >
 > ⚠️ **本例为本手册构造的教学场景，不是真实事故记录**，不含任何真实读数。
-> 同类真实形态可参见 PM-03（配置服务返回合法空结果，进程健康、HTTP 200、内容是错的）。
+> 同类真实形态可参见 PM-03（配置服务返回合法空结果，进程健康、HTTP 200、内容是错的；案例全文见 VER-04）。
 
 ---
 
@@ -355,5 +387,6 @@ VERDICT=SELF_TEST_OK
 - **VER-05 验收与签收**——本节输出 `SWITCHED` 是进入验收的前置条件
 - **DIS-01 证据分级**——「功能能用」为什么是信号而不是证据
 - **DIS-02 三道焊缝**——为什么要让命令吐判定标量，而不是让人读输出
+- **DIS-03 助手产出验证**——VER-02.4「唯一标识钉死」手法的一般形式（DIS-03.2）
 - **附录 A · FX-SVC-01**——症状「部署后改动似乎没生效」的速查入口
 - **附录 B · B-VER-02**——本节四项检查的可打印版本

@@ -20,14 +20,8 @@
 与被验证系统的依赖**做交集**。交集里的每一项都是一个盲区制造者：
 它故障时，验证手段和故障一起消失，你得到的不是告警，是安静。
 
-两个公开事故把这个形态写得很清楚：
-
-- Roblox 2021（2021-10-28～31，持续三天余的全站故障）："Critical monitoring systems that would have provided
-  better visibility into the cause of the outage relied on affected systems, such as
-  Consul. This combination severely hampered the triage process."
-- AWS S3 2017：连状态页都受灾——"we were unable to update the individual services'
-  status on the AWS Service Health Dashboard (SHD) because of a dependency the SHD
-  administration console has on Amazon S3."
+两个公开事故把这个形态写得很清楚：Roblox 2021 的关键监控跑在出故障的 Consul 之上，
+AWS S3 2017 连状态页都受灾——引文见案例证据 PM-04 与 PM-10。
 
 **判据**：假设被验证系统整体宕机，逐项问「这个观测通道还工作吗」。
 答案为否的通道，**它的『安静』永远不能当证据用**——在判定表里把它标出来。
@@ -44,8 +38,9 @@
 | 业务事件断言 | 活真的被干了 | ——这是唯一够格的终点探针（VER-02.4） |
 
 **断言强度不够支撑判据的探针，不许出现在验收判据表里**（ENG-02.3）。
-另：护栏与审计工具自身也要有验证——「护栏通过了」与「护栏没执行」
-在无验证时不可区分（机理见 DIS-02.4；公开形态见 VER-03 案例 PM-07）。
+
+护栏与审计工具自身也要有验证。「护栏通过了」与「护栏没执行」
+在无验证时不可区分（机理见 DIS-02.4）；这一失效的公开形态见 VER-03 案例 PM-07。
 
 ### VER-01.3　沉默判读：给告警链路装心跳
 
@@ -94,15 +89,24 @@ Roblox 的复盘措辞是 "severely hampered"——三天多的处置里有相�
 > ### 案例 PM-04 · 公开事故复盘｜Roblox，2021
 >
 > 为期三天余（2021-10-28～31）的全站故障中，用于定位故障的关键监控系统
-> 跑在出故障的 Consul 之上——
-> 引句见 VER-01.1（出处：https://about.roblox.com/newsroom/2021/10/roblox-return-to-service-10-28-10-31-2021 ，
-> 2026-08-07 逐句核实）。
+> 跑在出故障的 Consul 之上。
+>
+> 官方复盘原文："Critical monitoring systems that would have provided
+> better visibility into the cause of the outage relied on affected systems, such as
+> Consul. This combination severely hampered the triage process."
+>
+> 出处：https://about.roblox.com/newsroom/2021/10/roblox-return-to-service-10-28-10-31-2021
 > ｜不可外推：自建 Consul 集群的特定拓扑，不能推出「所有自托管监控不可用」。
 
 > ### 案例 PM-10 · 公开事故复盘｜AWS S3，2017
 >
-> S3 故障期间，官方状态页因依赖 S3 而无法更新状态——引句见 VER-01.1
-> （出处：https://aws.amazon.com/message/41926/ ，2026-08-07 逐句核实）。
+> S3 故障期间，官方状态页因依赖 S3 而无法更新状态。
+>
+> 官方复盘原文："we were unable to update the individual services'
+> status on the AWS Service Health Dashboard (SHD) because of a dependency the SHD
+> administration console has on Amazon S3."
+>
+> 出处：https://aws.amazon.com/message/41926/
 > ｜不可外推：特定于当时 SHD 管理控制台的依赖设计，AWS 复盘中已宣布整改。
 
 ---

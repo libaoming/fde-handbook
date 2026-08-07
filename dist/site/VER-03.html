@@ -8,7 +8,14 @@
 </header>
 <main><h1 id="ver-03-可达性验证确认用户那条路通">VER-03 · 可达性验证：确认用户那条路通</h1>
 <p><strong>目的</strong>　确认<strong>用户从他实际所在的网络位置出发，能够抵达服务并完成一次真实业务交互</strong>。 <a class="xref" href="VER-02.html">VER-02</a> 回答「谁在接活」，本节回答「活派得进来吗」——两者互不蕴含。本节给出六项检查与一个可粘贴的判定输出。</p>
-<p><strong>前置条件</strong> - <a class="xref" href="VER-02.html">VER-02</a> 已输出 <code>SWITCHED</code>（正在接活的确实是本次部署的版本） - 已知用户<strong>实际使用</strong>的域名、端口与协议（不是内网地址，不是绕过域名的 IP 直连） - 至少有<strong>两个互不相同的观测位置</strong>可用（服务器本机之外还有一个；理想情况是用户所在网络） - 能分层读到解析结果与握手过程（<code>dig</code>/<code>nslookup</code>、<code>openssl s_client</code> 或等价工具） - 能查到非工程域的状态：备案主体、账号权限、配额、商品授权、计费（见 VER-03.6）</p>
+<p><strong>前置条件</strong></p>
+<ul>
+<li><a class="xref" href="VER-02.html">VER-02</a> 已输出 <code>SWITCHED</code>（正在接活的确实是本次部署的版本）</li>
+<li>已知用户<strong>实际使用</strong>的域名、端口与协议（不是内网地址，不是绕过域名的 IP 直连）</li>
+<li>至少有<strong>两个互不相同的观测位置</strong>可用（服务器本机之外还有一个；理想情况是用户所在网络）</li>
+<li>能分层读到解析结果与握手过程（<code>dig</code>/<code>nslookup</code>、<code>openssl s_client</code> 或等价工具）</li>
+<li>能查到非工程域的状态：备案主体、账号权限、配额、商品授权、计费（见 VER-03.6）</li>
+</ul>
 <hr />
 <h2 id="规程">规程</h2>
 <p>六项检查全部通过才算可达性成立。<strong>任何一项不通过或无法验证，本次可达性按未通过处理。</strong></p>
@@ -248,14 +255,7 @@
 <p>⚠️ <strong>双栈不对称是「部分用户连不上」的常见一类</strong>：<code>dig</code> 默认只出 A 记录，而 <code>curl</code>／<code>nc</code> 可能自行选中另一个地址族——三个工具很容易在测不同的东西。两个地址族各测一次，并在结论里写明测的是哪一个。</p>
 </blockquote>
 <p><strong>TCP 能连上、TLS 握手却断在中途，指向中间设备，而不是证书或协议协商。</strong>连接已经建立，说明路由与端口都是通的；握手在完成之前被打断，说明有第三方在这两个动作之间介入。</p>
-<p>机理在于 SNI（Server Name Indication，客户端在握手第一个包里声明「我要连哪个域名」）是<strong>明文</strong>的：</p>
-<blockquote>
-<p>IETF RFC 8744 原文：“The SNI extension is carried in cleartext in the TLS ‘ClientHello’ message.” ／「SNI 扩展在 TLS ClientHello 消息中以明文携带。」出处：https://www.rfc-editor.org/rfc/rfc8744.html ｜不可外推：这描述的是 ECH（Encrypted Client Hello）普及之前的现状，ECH 正在改变这一点。</p>
-</blockquote>
-<blockquote>
-<p>Cloudflare 的通俗补充：“The problem is that SNI leaks to the network the identity of the origin server the client wants to connect to… it is the clearest signal of which server a given client is communicating with.” ／「SNI 向网络泄漏了客户端想连接的源服务器身份……它是『客户端在与哪台服务器通信』最清晰的信号。」出处：https://blog.cloudflare.com/encrypted-client-hello/ ｜不可外推：厂商博客，立场是推广 ECH；可用于说明 SNI 的可见性，不可据此论断任何具体网络的拦截策略。</p>
-</blockquote>
-<p>两条合起来给出一个操作性结论：<strong>任何在链路中间的设备，都能在证书出场之前就知道这条连接要去哪个域名，并据此单独掐掉它。</strong> 因此「握手失败」这个报错所在的层，与根因所在的层可以完全无关。</p>
+<p>机理在于 SNI（Server Name Indication，客户端在握手第一个包里声明「我要连哪个域名」）是<strong>明文</strong>的 ——<strong>任何在链路中间的设备，都能在证书出场之前就知道这条连接要去哪个域名，并据此单独掐掉它。</strong> 因此「握手失败」这个报错所在的层，与根因所在的层可以完全无关。（SNI 明文的出处引文见常见误判「报错说 TLS 握手失败，所以问题在证书或协议协商」。）</p>
 <blockquote>
 <p>⚠️ 测 TLS 时必须显式带 <code>-servername</code>。不带 SNI 的握手与带 SNI 的握手可能被区别对待，省掉这个参数等于测了一条用户不走的路。</p>
 </blockquote>
@@ -326,7 +326,13 @@
 <hr />
 <h2 id="常见误判">常见误判</h2>
 <p><strong>「服务器上 curl 通了，所以服务端没问题」</strong>这句话省略了主语的位置。它成立的前提是「自测走的路 == 用户走的路」，而这个前提通常为假。 Google SRE 把两类监控明确分开：黑盒是「以用户所见的方式测试外部可见行为」，白盒是「基于系统内部暴露的指标」（<em>Site Reliability Engineering</em>, Ch.6）。 <strong>hairpin 自测是白盒手段披着黑盒的外衣</strong>——它从外部接口发起，却站在系统内部的位置。</p>
-<p><strong>「报错说 TLS 握手失败，所以问题在证书或协议协商」</strong>报错出现的层，与根因所在的层，是两回事。更麻烦的是：握手层恰好是你有工具、有权限、能立刻动手的一层。<strong>熟悉的层会吸走注意力</strong>——你会因为「这一层查得动」而误以为「问题在这一层」。</p>
+<p><strong>「报错说 TLS 握手失败，所以问题在证书或协议协商」</strong>报错出现的层，与根因所在的层，是两回事。更麻烦的是：握手层恰好是你有工具、有权限、能立刻动手的一层。<strong>熟悉的层会吸走注意力</strong>——你会因为「这一层查得动」而误以为「问题在这一层」。 SNI 明文机理（VER-03.3）的出处：</p>
+<blockquote>
+<p>IETF RFC 8744 原文：“The SNI extension is carried in cleartext in the TLS ‘ClientHello’ message.” ／「SNI 扩展在 TLS ClientHello 消息中以明文携带。」出处：https://www.rfc-editor.org/rfc/rfc8744.html ｜不可外推：这描述的是 ECH（Encrypted Client Hello）普及之前的现状，ECH 正在改变这一点。</p>
+</blockquote>
+<blockquote>
+<p>Cloudflare 的通俗补充：“The problem is that SNI leaks to the network the identity of the origin server the client wants to connect to… it is the clearest signal of which server a given client is communicating with.” ／「SNI 向网络泄漏了客户端想连接的源服务器身份……它是『客户端在与哪台服务器通信』最清晰的信号。」出处：https://blog.cloudflare.com/encrypted-client-hello/ ｜不可外推：厂商博客，立场是推广 ECH；可用于说明 SNI 的可见性，不可据此论断任何具体网络的拦截策略。</p>
+</blockquote>
 <p><strong>「上一个假设被证伪了，那就试下一个假设」</strong>在同一个方向上换假设，不会走出这个方向。<strong>硬规矩：同一方向连续两个假设被证伪，就必须回退一层，去质疑产生这些假设的那个前提。</strong>（详见 <a class="xref" href="VER-04.html">VER-04</a>）</p>
 <p><strong>「先改个配置试试，反正没坏处」</strong>有坏处。在一个本来正确的东西上做的修改——降级证书算法、限死协议版本、关掉某项特性—— <strong>会比它试图解决的那个故障活得更久</strong>。真根因解除后故障自动消失，而那处没有理由的改动留在配置里，半年后没有人记得它为什么在那儿。</p>
 <p><strong>「探测过一次，通过了」</strong>分发通常是渐进的，同一时刻不同节点、不同链路的状态可以不同。单点单次采样有相当概率恰好命中好的那一份，给出「已恢复」的假信号（PM-02）。<strong>多位置、重复采样。</strong></p>
@@ -398,7 +404,7 @@ VERDICT=REACHABLE</code></pre>
 </tr>
 </tbody>
 </table>
-<p><strong><code>PATH_COVERAGE</code> 那一行才是本节的重点。</strong> 它强制你在看到 <code>ok</code> 的同时，看清这个 <code>ok</code> 是单点还是多点得出的——<strong>具体覆盖到第几段，仍需你按 VER-03.1 的分段表自行标注</strong>，脚本只区分「本机」与「有无第二观测点」； <code>REMOTE_TCP=skipped</code> 时它只会打印单点覆盖，不会替你把没测过的路算成通过。</p>
+<p><strong><code>PATH_COVERAGE</code> 那一行才是本节的重点。</strong> 它强制你在看到 <code>ok</code> 的同时，看清这个 <code>ok</code> 是单点还是多点得出的。脚本只区分「本机」与「有无第二观测点」——<strong>具体覆盖到第几段，仍需你按 VER-03.1 的分段表自行标注</strong>； <code>REMOTE_TCP=skipped</code> 时它只会打印单点覆盖，不会替你把没测过的路算成通过。</p>
 <p>参考实现：<code>kit/reach-probe.sh</code>（含 20 条自测用例，覆盖判定逻辑、输入校验与 fail-closed 行为）：</p>
 <pre><code>SELF_TEST_PASS=20
 SELF_TEST_FAIL=0
@@ -428,7 +434,7 @@ VERDICT=SELF_TEST_OK</code></pre>
 <p>沿「服务端已排除，问题在客户端」这个方向可以走出一串看起来都很合理的假设：换证书算法、怀疑客户端网络库版本、降级协议版本。三个假设可以逐一被证伪，<strong>而方向本身从未被质疑</strong>——因为那个全绿的自测已经把「可达性」从待办清单上划掉了。</p>
 <p>真实形态是：链路中间的设备读取明文 SNI，按域名匹配到某条策略，在 ClientHello 之后、握手完成之前掐断连接。客户端看到的现象与「证书出问题」完全同形。落到 <code>reach-probe.sh</code> 的判定逻辑上，对应两条：TCP 通而 TLS 断 → <code>MIDDLEBOX_SUSPECTED</code>；本机通而远端不通 → 同样是 <code>MIDDLEBOX_SUSPECTED</code>。</p>
 <p>这类根因的处置往往<strong>不在工程域</strong>（见 VER-03.6），正确动作可能是等待某项资质或授权生效—— 而这恰恰是工程师最难做出的动作：<strong>什么都不做。</strong></p>
-<p>⚠️ <strong>本例为本手册构造的教学场景，不是真实事故记录</strong>，不含任何真实读数、时间戳或日志原文。 SNI 明文这一机理的出处见 VER-03.3 引用的 RFC 8744 与 Cloudflare 说明；具体网络的拦截策略因地区、运营商与时间而异，本例不对任何具体网络做论断。</p>
+<p>⚠️ <strong>本例为本手册构造的教学场景，不是真实事故记录</strong>，不含任何真实读数、时间戳或日志原文。 SNI 明文这一机理的出处见常见误判引用的 RFC 8744 与 Cloudflare 说明；具体网络的拦截策略因地区、运营商与时间而异，本例不对任何具体网络做论断。</p>
 </blockquote>
 <hr />
 <h2 id="相关小节">相关小节</h2>

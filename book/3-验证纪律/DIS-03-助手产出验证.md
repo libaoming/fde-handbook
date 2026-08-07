@@ -11,7 +11,7 @@
 
 - 交付链路中确实有 AI 助手代为执行动作（本节不讨论人写人跑的场景，那部分见 DIS-01/DIS-02）
 - 你能访问**该轮的原始调用记录**（transcript，即工具逐条落盘的会话记录，
-  常见格式为 jsonl——每行一条 JSON 的日志），或至少知道自己访问不到
+  常见格式为 jsonl），或至少知道自己访问不到；jsonl 即每行一条 JSON 的日志
 - 你有一条**不经助手转述**的观察通道：自己的终端、CI 日志、对象存储控制台、客户侧截图
 - 已知本轮助手声称完成的动作清单（哪些文件、哪些命令、哪些远端变更）
 
@@ -44,16 +44,8 @@
 一旦执行者是助手，「回读」这个动作本身也被委托给了同一个可能伪报的主体，
 **它转述的回读输出仍然只是转述**（DIS-01 的第三级）。
 
-> Claude Code 官方文档把这条要求写成了两句祈使句：
-> 「Have Claude show evidence rather than asserting success: **the test output,
-> the command it ran and what it returned**, or a screenshot of the result.」
-> 「Always provide verification (tests, scripts, screenshots).
-> **If you can't verify it, don't ship it.**」
-> （让它出示证据而非宣称成功：测试输出、它跑了什么命令、返回了什么；
-> 验证不了的就别交付。）
->
-> 出处：Anthropic, *Claude Code Docs* — Best practices，https://code.claude.com/docs/en/best-practices
-> ｜不可外推：这是 Claude Code 语境下的产品实践建议，不是对所有 LLM 产品行为的普遍描述。
+这条要求有厂商文档的印证，引文与出处见文末案例证据
+（引证 · Claude Code 文档：出示证据而非宣称成功）。
 
 **通过判据**：每一条产物断言，都有一份**你能重放**的观察输出与之对应。
 
@@ -137,8 +129,8 @@
 ### DIS-03.8　出口闸门，以及它拦不住的那一半
 
 前七条的强度上限是第一、二档（靠人记得、靠人看见）。要升到第三档，
-需要一道**不依赖任何人配合**的出口闸门——挂在会话收尾处的钩子（Stop hook，
-在助手准备结束本轮时自动触发的程序）是可行形态之一。
+需要一道**不依赖任何人配合**的出口闸门。可行形态之一是 Stop hook：
+挂在会话收尾处、在助手准备结束本轮时自动触发的钩子程序。
 
 两道最小闸：
 
@@ -149,15 +141,9 @@
 
 闸 B 正是为本节这类形态设的：它不检查结论对不对，只检查**结论有没有来源**。
 
-为什么必须是闸门而不是写进指令：
-
-> 「Unlike CLAUDE.md instructions which are **advisory**, hooks are **deterministic**
-> and guarantee the action happens.」
-> （与 CLAUDE.md 指令的劝导性质不同，hook 是确定性的，能保证动作一定发生。）
->
-> 出处：同上，Claude Code Docs — Best practices
-> ｜不可外推：描述的是 Claude Code 的 hook 机制，外推到其他产品时应表述为「同类确定性机制」。
-> 「指令即劝导」这一点与 BLD-04 是同一条：写给模型的约束是先验，不是闸门。
+为什么必须是闸门而不是写进指令——写给模型的约束是先验，不是闸门，
+「指令即劝导」这一点与 BLD-04 是同一条；厂商文档的印证（引文与出处）
+见文末案例证据（引证 · Claude Code 文档：hook 的确定性）。
 
 **已知缺口（必须与闸门一起交付，否则闸门只提供安全感）**：
 
@@ -305,6 +291,29 @@ VERDICT=EXECUTION_CONFIRMED
 > 无时间戳、无退出码数值、无字节数、无日志原文。
 > 这不是排版洁癖：**在一节专门讲「精确读数是伪装成本」的规程里，
 > 摆出编造的精确读数，等于当场演示本节要禁止的行为。**
+
+> ### 引证 · 厂商文档｜Claude Code：出示证据而非宣称成功
+>
+> DIS-03.2 的要求，Claude Code 官方文档写成了两句祈使句：
+> 「Have Claude show evidence rather than asserting success: **the test output,
+> the command it ran and what it returned**, or a screenshot of the result.」
+> 「Always provide verification (tests, scripts, screenshots).
+> **If you can't verify it, don't ship it.**」
+> （让它出示证据而非宣称成功：测试输出、它跑了什么命令、返回了什么；
+> 验证不了的就别交付。）
+>
+> 出处：Anthropic, *Claude Code Docs* — Best practices，https://code.claude.com/docs/en/best-practices
+> ｜不可外推：这是 Claude Code 语境下的产品实践建议，不是对所有 LLM 产品行为的普遍描述。
+
+> ### 引证 · 厂商文档｜Claude Code：hook 的确定性
+>
+> DIS-03.8「为什么必须是闸门而不是写进指令」的印证：
+> 「Unlike CLAUDE.md instructions which are **advisory**, hooks are **deterministic**
+> and guarantee the action happens.」
+> （与 CLAUDE.md 指令的劝导性质不同，hook 是确定性的，能保证动作一定发生。）
+>
+> 出处：Anthropic, *Claude Code Docs* — Best practices，https://code.claude.com/docs/en/best-practices
+> ｜不可外推：描述的是 Claude Code 的 hook 机制，外推到其他产品时应表述为「同类确定性机制」。
 
 > **关于本节的证据边界**：本节各检查项来自实践中反复出现的形态，
 > 但本手册**不以任何读者无法独立复核的会话日志作为证据**——
