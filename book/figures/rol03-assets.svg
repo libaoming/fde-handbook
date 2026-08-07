@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" role="img" aria-label="四类交付物：运行系统人人记得，验证资产、移交资产、过程资产是烂尾高发区；一条分界刀把每项切成方法类可带走与客户资产类归客户">
+<style>
+  :root{ --paper:#ffffff; --ink:#17181a; --muted:#6b6f76; --faint:#b9b9b3; --danger:#a8321f; }
+  @media (prefers-color-scheme: dark){
+    :root{ --paper:#131416; --ink:#e9eaec; --muted:#979ba2; --faint:#4a4d53; --danger:#e0785e; }
+  }
+  text{ font-family:"PingFang SC","Noto Sans CJK SC","Hiragino Sans GB",system-ui,sans-serif }
+  .bg{ fill:var(--paper) } .node{ fill:none; stroke:var(--ink); stroke-width:1.5 }
+  .node-key{ stroke-width:3 } .node-ghost{ stroke:var(--faint); stroke-dasharray:5 4 }
+  .lbl{ fill:var(--ink); font-size:14px; font-weight:600 } .sub{ fill:var(--muted); font-size:11.5px }
+  .guide{ stroke:var(--faint); stroke-width:1; stroke-dasharray:3 4 }
+  .etxt{ fill:var(--muted); font-size:12px } .lane{ fill:var(--muted); font-size:11px; letter-spacing:.18em }
+  .knife{ stroke:var(--ink); stroke-width:2.5; fill:none }
+</style>
+<rect class="bg" width="1000" height="400"/>
+
+<rect class="node node-key" x="30" y="60" width="220" height="84" rx="6"/>
+<text class="lbl" x="46" y="88">① 运行系统</text>
+<text class="sub" x="46" y="110">链路 · 配置 · 变更清单</text>
+<text class="sub" x="46" y="130">判据：过 VER 全部签收</text>
+
+<rect class="node" x="278" y="60" width="220" height="84" rx="6"/>
+<text class="lbl" x="294" y="88">② 验证资产</text>
+<text class="sub" x="294" y="110">判据 · 脚本 · golden 集</text>
+<text class="sub" x="294" y="130">判据：客户能独立执行</text>
+
+<rect class="node" x="526" y="60" width="220" height="84" rx="6"/>
+<text class="lbl" x="542" y="88">③ 移交资产</text>
+<text class="sub" x="542" y="110">runbook · 监控 · 责任表</text>
+<text class="sub" x="542" y="130">判据：对方独立跑成过</text>
+
+<rect class="node" x="774" y="60" width="196" height="84" rx="6"/>
+<text class="lbl" x="790" y="88">④ 过程资产</text>
+<text class="sub" x="790" y="110">计划 · 决策 · 台账</text>
+<text class="sub" x="790" y="130">判据：外人能重建缘由</text>
+
+<text class="etxt" x="30" y="180">①人人都记得；②③④才是烂尾高发区——合格判据全部以「别人能做到什么」度量，不以「我写了什么」。</text>
+
+<!-- 分界刀 -->
+<path class="knife" d="M30,238 L940,238"/>
+<path class="knife" d="M940,238 L920,226 M940,238 L920,250"/>
+<text class="lbl" x="30" y="226">分界刀：每一项都要标注归哪边（ROL-03.2）</text>
+
+<rect class="node" x="30" y="262" width="440" height="76" rx="6"/>
+<text class="lbl" x="46" y="290">方法类 —— 可复用到下一家</text>
+<text class="sub" x="46" y="312">工作流 · 检查表骨架 · 脚本框架；维护责任在你</text>
+
+<rect class="node node-ghost" x="510" y="262" width="460" height="76" rx="6"/>
+<text class="lbl" x="528" y="290">客户资产类 —— 归客户，你不能带走</text>
+<text class="sub" x="528" y="312">数据语义 · 业务口径 · 强制过滤 · 累积纠错；须交到能维护的人手里</text>
+
+<line class="guide" x1="30" y1="362" x2="970" y2="362"/>
+<text class="sub" x="30" y="386">不切这刀：合同结束时归属靠临时谈判，「上家的东西用到下家」没有安全边界。本次不交付的项写「不交付＋谁承接」，不留空行。</text>
+</svg>

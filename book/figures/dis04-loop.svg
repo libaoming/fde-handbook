@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" role="img" aria-label="事故台账闭环：事故当轮写条目（误判链是主体），行动项只有两个合法终态——闸门化进检查表或显式关闭；闸门反过来拦住下一次同类事故">
+<style>
+  :root{ --paper:#ffffff; --ink:#17181a; --muted:#6b6f76; --faint:#b9b9b3; --danger:#a8321f; }
+  @media (prefers-color-scheme: dark){
+    :root{ --paper:#131416; --ink:#e9eaec; --muted:#979ba2; --faint:#4a4d53; --danger:#e0785e; }
+  }
+  text{ font-family:"PingFang SC","Noto Sans CJK SC","Hiragino Sans GB",system-ui,sans-serif }
+  .bg{ fill:var(--paper) } .node{ fill:none; stroke:var(--ink); stroke-width:1.5 }
+  .node-key{ stroke-width:3 } .node-ghost{ stroke:var(--faint); stroke-dasharray:5 4 }
+  .lbl{ fill:var(--ink); font-size:14px; font-weight:600 } .sub{ fill:var(--muted); font-size:11.5px }
+  .edge{ stroke:var(--ink); stroke-width:1.6; fill:none }
+  .edge-ghost{ stroke:var(--faint); stroke-width:1.4; fill:none; stroke-dasharray:6 5 }
+  .guide{ stroke:var(--faint); stroke-width:1; stroke-dasharray:3 4 }
+  .etxt{ fill:var(--muted); font-size:12px } .etxt-ink{ fill:var(--ink); font-size:12px; font-weight:600 }
+  .bad{ fill:var(--danger); font-size:12px; font-weight:600 }
+  .ah{ fill:var(--ink) } .ahg{ fill:var(--faint) }
+</style>
+<defs>
+  <marker id="dl-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0,0 L10,5 L0,10 z"/></marker>
+  <marker id="dl-ghost" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ahg" d="M0,0 L10,5 L0,10 z"/></marker>
+</defs>
+<rect class="bg" width="1000" height="400"/>
+
+<rect class="node" x="30" y="80" width="160" height="70" rx="6"/>
+<text class="lbl" x="46" y="108">事故发生</text>
+<text class="sub" x="46" y="130">大小都算原料</text>
+
+<rect class="node node-key" x="260" y="80" width="230" height="70" rx="6"/>
+<text class="lbl" x="276" y="108">当轮写条目</text>
+<text class="sub" x="276" y="130">误判链是主体 · 记不清标待复核</text>
+<path class="edge" d="M190,115 L254,115" marker-end="url(#dl-ink)"/>
+<text class="etxt-ink" x="200" y="103">当天内</text>
+
+<rect class="node" x="560" y="80" width="180" height="70" rx="6"/>
+<text class="lbl" x="576" y="108">行动项</text>
+<text class="sub" x="576" y="130">owner + 期限</text>
+<path class="edge" d="M490,115 L554,115" marker-end="url(#dl-ink)"/>
+
+<rect class="node" x="810" y="40" width="160" height="64" rx="6"/>
+<text class="lbl" x="826" y="66">终态①闸门化</text>
+<text class="sub" x="826" y="88">进检查表/脚本断言</text>
+<path class="edge" d="M740,100 C770,90 776,78 804,70" marker-end="url(#dl-ink)"/>
+
+<rect class="node node-ghost" x="810" y="130" width="160" height="64" rx="6"/>
+<text class="lbl" x="826" y="156">终态②显式关闭</text>
+<text class="sub" x="826" y="178">写明原因 + 签名</text>
+<path class="edge-ghost" d="M740,130 C770,140 776,150 804,158" marker-end="url(#dl-ghost)"/>
+
+<!-- 闭环：闸门拦住下一次 -->
+<path class="edge" d="M890,104 C900,240 400,290 115,158" marker-end="url(#dl-ink)"/>
+<text class="etxt-ink" x="430" y="272">闸门拦住下一次同类事故 —— 闸门的内容来自烧过你的事故，不来自想象</text>
+
+<text class="bad" x="560" y="188">逾期未达终态 =「挂着」：与没有行动项等效</text>
+<text class="etxt" x="560" y="208">（期限内在办是合法中间态）</text>
+
+<line class="guide" x1="30" y1="316" x2="970" y2="316"/>
+<text class="sub" x="30" y="342">失败被吸取的可判定义 = 证伪过程被当时记下 + 行动项达到合法终态。会议产生共识，不产生闸门。</text>
+<text class="sub" x="30" y="364">配套：闸门自身要被验证过（GitLab 2017：告警邮件走了从未验证的通道，等效于没有通知）。</text>
+<text class="sub" x="30" y="386">无责台账记机理不记追责；但对客户的事故通报是另一份文档，两者不混写。</text>
+</svg>

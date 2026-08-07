@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 300" width="1000" height="300" role="img" aria-label="我以为的链路与实际的链路汇入同一个观测结果：电话能通">
+<title>第 1 章 · 两条路径，同一个观测</title>
+<style>
+  :root{ --paper:#ffffff; --ink:#17181a; --muted:#6b6f76; --faint:#b9b9b3; --danger:#a8321f; }
+  @media (prefers-color-scheme: dark){
+    :root{ --paper:#131416; --ink:#e9eaec; --muted:#979ba2; --faint:#4a4d53; --danger:#e0785e; }
+  }
+  text{ font-family:"PingFang SC","Noto Sans CJK SC","Hiragino Sans GB",system-ui,sans-serif }
+  .bg{ fill:var(--paper) }
+  .node{ fill:none; stroke:var(--ink); stroke-width:1.5 }
+  .node-key{ stroke-width:3 }
+  .node-ghost{ fill:none; stroke:var(--faint); stroke-width:1.5; stroke-dasharray:5 4 }
+  .lbl{ fill:var(--ink); font-size:14px; font-weight:600 }
+  .sub{ fill:var(--muted); font-size:11.5px }
+  .edge{ stroke:var(--ink); stroke-width:1.6; fill:none }
+  .edge-ghost{ stroke:var(--faint); stroke-width:1.4; fill:none; stroke-dasharray:6 5 }
+  .etxt{ fill:var(--muted); font-size:12px }
+  .etxt-ink{ fill:var(--ink); font-size:12px; font-weight:600 }
+  .lane{ fill:var(--muted); font-size:11px; letter-spacing:.18em }
+  .bad{ fill:var(--danger); font-size:12px; font-weight:600 }
+  .ah{ fill:var(--ink) } .ahg{ fill:var(--faint) }
+</style>
+<defs>
+  <marker id="ah" viewBox="0 0 9 9" refX="8" refY="4.5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" class="ah"/></marker>
+  <marker id="ahg" viewBox="0 0 9 9" refX="8" refY="4.5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" class="ahg"/></marker>
+</defs>
+
+<rect class="bg" x="0" y="0" width="1000" height="300"/>
+
+<text x="15" y="22" class="lane">我以为的链路</text>
+
+<rect class="node" x="15" y="38" width="130" height="58" rx="11"/>
+<text x="80" y="63" text-anchor="middle" class="lbl">systemd</text>
+<text x="80" y="81" text-anchor="middle" class="sub">systemctl start</text>
+
+<rect class="node-ghost" x="205" y="38" width="140" height="58" rx="11"/>
+<text x="275" y="63" text-anchor="middle" class="lbl">新 worker</text>
+<text x="275" y="81" text-anchor="middle" class="sub">已注册 · 待命</text>
+
+<line class="edge" x1="145" y1="67" x2="197" y2="67" marker-end="url(#ah)"/>
+<text x="275" y="116" text-anchor="middle" class="bad">35 分钟里接了 0 通</text>
+
+<path class="edge-ghost" d="M345,67 C 470,67 500,120 592,134" marker-end="url(#ahg)"/>
+<text x="470" y="104" text-anchor="middle" class="etxt">我以为是它在接</text>
+
+<text x="15" y="182" class="lane">实际的链路</text>
+
+<rect class="node" x="15" y="198" width="130" height="58" rx="11"/>
+<text x="80" y="223" text-anchor="middle" class="lbl">kill 主进程</text>
+<text x="80" y="241" text-anchor="middle" class="sub">PID 45400</text>
+
+<rect class="node" x="205" y="198" width="140" height="58" rx="11"/>
+<text x="275" y="223" text-anchor="middle" class="lbl">110 个子进程</text>
+<text x="275" y="241" text-anchor="middle" class="sub">PPID=1 · 被 init 收养</text>
+
+<rect class="node" x="405" y="198" width="130" height="58" rx="11"/>
+<text x="470" y="223" text-anchor="middle" class="lbl">调度器</text>
+<text x="470" y="241" text-anchor="middle" class="sub">按轮询派活</text>
+
+<line class="edge" x1="145" y1="227" x2="197" y2="227" marker-end="url(#ah)"/>
+<text x="171" y="215" text-anchor="middle" class="etxt-ink">①</text>
+<line class="edge" x1="345" y1="227" x2="397" y2="227" marker-end="url(#ah)"/>
+<text x="371" y="215" text-anchor="middle" class="etxt-ink">②</text>
+<path class="edge" d="M535,227 C 560,227 570,180 592,164" marker-end="url(#ah)"/>
+<text x="565" y="205" class="etxt-ink">③</text>
+
+<rect class="node node-key" x="600" y="120" width="170" height="58" rx="11"/>
+<text x="685" y="145" text-anchor="middle" class="lbl">电话能通</text>
+<text x="685" y="163" text-anchor="middle" class="sub">AI 正常开口</text>
+
+<line class="edge-ghost" x1="770" y1="149" x2="812" y2="149" marker-end="url(#ahg)"/>
+<rect class="node-ghost" x="820" y="120" width="160" height="58" rx="11"/>
+<text x="900" y="145" text-anchor="middle" class="lbl">标记为完成</text>
+<text x="900" y="163" text-anchor="middle" class="sub">证据只有这一条</text>
+</svg>

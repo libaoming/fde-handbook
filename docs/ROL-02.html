@@ -11,6 +11,59 @@
 <p><strong>前置条件</strong> - 已明确本次交付的合同结构与干系人名单（<a class="xref" href="ENG-01.html">ENG-01</a>.4 的产出） - 没有这份名单时，<strong>本节的登记表就是你要补的第一件事</strong>，别等 ENG 补完再做</p>
 <hr />
 <h2 id="规程">规程</h2>
+<figure class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 380" role="img" aria-label="归属判定三问：谁有权限改、谁背验收、谁维护；三答一致指向唯一 owner，不一致即高危项单独登记">
+<style>
+  :root{ --paper:#ffffff; --ink:#17181a; --muted:#6b6f76; --faint:#b9b9b3; --danger:#a8321f; }
+  @media (prefers-color-scheme: dark){
+    :root{ --paper:#131416; --ink:#e9eaec; --muted:#979ba2; --faint:#4a4d53; --danger:#e0785e; }
+  }
+  text{ font-family:"PingFang SC","Noto Sans CJK SC","Hiragino Sans GB",system-ui,sans-serif }
+  .bg{ fill:var(--paper) } .node{ fill:none; stroke:var(--ink); stroke-width:1.5 }
+  .node-key{ stroke-width:3 } .node-ghost{ stroke:var(--faint); stroke-dasharray:5 4 }
+  .lbl{ fill:var(--ink); font-size:14px; font-weight:600 } .sub{ fill:var(--muted); font-size:11.5px }
+  .edge{ stroke:var(--ink); stroke-width:1.6; fill:none }
+  .edge-ghost{ stroke:var(--faint); stroke-width:1.4; fill:none; stroke-dasharray:6 5 }
+  .guide{ stroke:var(--faint); stroke-width:1; stroke-dasharray:3 4 }
+  .etxt{ fill:var(--muted); font-size:12px } .etxt-ink{ fill:var(--ink); font-size:12px; font-weight:600 }
+  .bad{ fill:var(--danger); font-size:12px; font-weight:600 } .badstroke{ stroke:var(--danger); stroke-width:2; fill:none }
+  .ah{ fill:var(--ink) } .ahg{ fill:var(--faint) }
+</style>
+<defs>
+  <marker id="ow-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0,0 L10,5 L0,10 z"/></marker>
+  <marker id="ow-ghost" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ahg" d="M0,0 L10,5 L0,10 z"/></marker>
+</defs>
+<rect class="bg" width="1000" height="380"/>
+
+<rect class="node" x="30" y="130" width="170" height="66" rx="6"/>
+<text class="lbl" x="46" y="157">任一交付物 / 阻塞项</text>
+<text class="sub" x="46" y="178">含非工程域事项</text>
+
+<rect class="node" x="280" y="40" width="190" height="54" rx="6"/><text class="lbl" x="296" y="63">① 谁有权限改？</text><text class="sub" x="296" y="83">改不动的不可能是 owner</text>
+<rect class="node" x="280" y="140" width="190" height="54" rx="6"/><text class="lbl" x="296" y="163">② 谁背验收？</text><text class="sub" x="296" y="183">谁有权定「做完了」</text>
+<rect class="node" x="280" y="240" width="190" height="54" rx="6"/><text class="lbl" x="296" y="263">③ 合同后谁维护？</text><text class="sub" x="296" y="283">维护者有形态否决权</text>
+
+<path class="edge" d="M200,150 C240,120 240,80 274,67" marker-end="url(#ow-ink)"/>
+<path class="edge" d="M200,163 L274,166" marker-end="url(#ow-ink)"/>
+<path class="edge" d="M200,178 C240,210 240,250 274,266" marker-end="url(#ow-ink)"/>
+
+<rect class="node node-key" x="620" y="80" width="190" height="66" rx="6"/>
+<text class="lbl" x="636" y="107">唯一 owner</text>
+<text class="sub" x="636" y="128">一个名字 · 当场复述确认</text>
+<path class="edge" d="M470,100 C520,96 540,102 614,110" marker-end="url(#ow-ink)"/>
+<text class="etxt-ink" x="500" y="86">三答一致</text>
+
+<rect class="node node-ghost" x="620" y="210" width="330" height="66" rx="6"/>
+<text class="lbl" x="638" y="237">高危项 · 单独登记</text>
+<text class="sub" x="638" y="258">有权限的不背验收 / 背验收的不做维护 → ENG·HND 关口显式分配</text>
+<path class="edge-ghost" d="M470,200 C530,214 550,228 614,238" marker-end="url(#ow-ghost)"/>
+<text class="etxt" x="500" y="232">三答不一致</text>
+<path class="badstroke" d="M583,206 L599,222 M599,206 L583,222"/>
+
+<line class="guide" x1="30" y1="316" x2="970" y2="316"/>
+<text class="sub" x="30" y="344">「部门」不是 owner；沉默不是认领。登记表四字段：owner · 预计完成 · 升级路径 · 证据凭证——</text>
+<text class="sub" x="30" y="364">这张表是无主停摆（FX-ORG-01）的唯一防线，因为这类停摆不产生任何技术信号。</text>
+</svg>
+<figcaption>归属判定三问：谁有权限改、谁背验收、合同后谁维护——三答一致指向唯一 owner，不一致即高危项</figcaption></figure>
 <h3 id="rol-02.1-逐角色登记他们拥有什么你依赖什么">ROL-02.1　逐角色登记：他们拥有什么，你依赖什么</h3>
 <p>对下表五类接口角色，逐一填出三列。<strong>表是模板，右两列必须按本次交付实填</strong>—— 每个现场的断裂点不同，抄通用答案等于没填。</p>
 <table>

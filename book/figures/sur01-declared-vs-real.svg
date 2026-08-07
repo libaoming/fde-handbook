@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" role="img" aria-label="声明层（schema、文档、命名、canonical 标记）与实现层（生成代码、运行时状态、真实口径）长期漂移且漂移无告警；勘察必须打到实现层">
+<style>
+  :root{ --paper:#ffffff; --ink:#17181a; --muted:#6b6f76; --faint:#b9b9b3; --danger:#a8321f; }
+  @media (prefers-color-scheme: dark){
+    :root{ --paper:#131416; --ink:#e9eaec; --muted:#979ba2; --faint:#4a4d53; --danger:#e0785e; }
+  }
+  text{ font-family:"PingFang SC","Noto Sans CJK SC","Hiragino Sans GB",system-ui,sans-serif }
+  .bg{ fill:var(--paper) } .node{ fill:none; stroke:var(--ink); stroke-width:1.5 }
+  .node-key{ stroke-width:3 } .node-ghost{ stroke:var(--faint); stroke-dasharray:5 4 }
+  .lbl{ fill:var(--ink); font-size:14px; font-weight:600 } .sub{ fill:var(--muted); font-size:11.5px }
+  .edge{ stroke:var(--ink); stroke-width:1.6; fill:none }
+  .edge-ghost{ stroke:var(--faint); stroke-width:1.4; fill:none; stroke-dasharray:6 5 }
+  .guide{ stroke:var(--faint); stroke-width:1; stroke-dasharray:3 4 }
+  .etxt{ fill:var(--muted); font-size:12px } .etxt-ink{ fill:var(--ink); font-size:12px; font-weight:600 }
+  .lane{ fill:var(--muted); font-size:11px; letter-spacing:.18em }
+  .bad{ fill:var(--danger); font-size:12px; font-weight:600 }
+  .ah{ fill:var(--ink) } .ahg{ fill:var(--faint) }
+</style>
+<defs>
+  <marker id="sd-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0,0 L10,5 L0,10 z"/></marker>
+  <marker id="sd-ghost" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ahg" d="M0,0 L10,5 L0,10 z"/></marker>
+</defs>
+<rect class="bg" width="1000" height="400"/>
+
+<text class="lane" x="30" y="40">声明层 · 人写下的意图（会腐烂，腐烂无信号）</text>
+<rect class="node node-ghost" x="30" y="54" width="150" height="52" rx="6"/><text class="lbl" x="44" y="76">schema</text><text class="sub" x="44" y="96">形状 ≠ 含义</text>
+<rect class="node node-ghost" x="200" y="54" width="150" height="52" rx="6"/><text class="lbl" x="214" y="76">数据字典 / 文档</text><text class="sub" x="214" y="96">写时的快照</text>
+<rect class="node node-ghost" x="370" y="54" width="150" height="52" rx="6"/><text class="lbl" x="384" y="76">字段命名</text><text class="sub" x="384" y="96">revenue 含退款吗</text>
+<rect class="node node-ghost" x="540" y="54" width="170" height="52" rx="6"/><text class="lbl" x="554" y="76">canonical 标记</text><text class="sub" x="554" y="96">可能已被悄悄弃用</text>
+
+<text class="bad" x="760" y="84">↕ 漂移，无告警</text>
+
+<text class="lane" x="30" y="180">实现层 · 事实所在</text>
+<rect class="node" x="30" y="194" width="220" height="56" rx="6"/><text class="lbl" x="46" y="217">生成它的代码 / 流程</text><text class="sub" x="46" y="238">口径与业务意图的实存处</text>
+<rect class="node" x="280" y="194" width="200" height="56" rx="6"/><text class="lbl" x="296" y="217">运行时状态</text><text class="sub" x="296" y="238">实测：跑一条真实查询</text>
+<rect class="node" x="510" y="194" width="220" height="56" rx="6"/><text class="lbl" x="526" y="217">近似重复对象的口径</text><text class="sub" x="526" y="238">问出哪个是权威</text>
+
+<rect class="node node-key" x="790" y="180" width="180" height="84" rx="6"/>
+<text class="lbl" x="806" y="208">勘察打到这层</text>
+<text class="sub" x="806" y="230">每项标「验证方式」</text>
+<text class="sub" x="806" y="250">口头描述 = ⚠️ 未验证</text>
+<path class="edge" d="M730,222 L784,222" marker-end="url(#sd-ink)"/>
+
+<line class="guide" x1="30" y1="296" x2="970" y2="296"/>
+<text class="sub" x="30" y="324">拿不到实现侧的对象 → 降级为「仅声明可信」，后续设计给它多留一道运行时验证（VER）。</text>
+<text class="sub" x="30" y="346">优先索要自然沉淀资产（查询历史 / 工单 / 变更单）——它们不需要任何人额外投入，且不会说谎。</text>
+<text class="sub" x="30" y="368">机理出处：OpenAI「表的真实含义活在生成它的代码里」；勘察的单位是「验证过的事实」，不是「记下来的说法」。</text>
+</svg>

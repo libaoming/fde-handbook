@@ -11,6 +11,8 @@
 
 ## 规程
 
+![事故台账闭环：当轮写条目，行动项只有闸门化或显式关闭两个合法终态，闸门反过来拦住下一次同类事故](../figures/dis04-loop.svg)
+
 ### DIS-04.1　记什么：书面、结构化、有根因
 
 行业对这个体裁有成熟定义，Google SRE："A postmortem is a written record of an

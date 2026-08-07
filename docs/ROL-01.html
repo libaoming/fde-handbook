@@ -14,6 +14,53 @@
 </blockquote>
 <hr />
 <h2 id="规程">规程</h2>
+<figure class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" role="img" aria-label="Dev 是一个能力服务许多客户；Delta（FDE）是一个客户身上横跨许多能力，成功以客户目标度量">
+<style>
+  :root{ --paper:#ffffff; --ink:#17181a; --muted:#6b6f76; --faint:#b9b9b3; --danger:#a8321f; }
+  @media (prefers-color-scheme: dark){
+    :root{ --paper:#131416; --ink:#e9eaec; --muted:#979ba2; --faint:#4a4d53; --danger:#e0785e; }
+  }
+  text{ font-family:"PingFang SC","Noto Sans CJK SC","Hiragino Sans GB",system-ui,sans-serif }
+  .bg{ fill:var(--paper) } .node{ fill:none; stroke:var(--ink); stroke-width:1.5 }
+  .node-key{ stroke-width:3 } .node-ghost{ stroke:var(--faint); stroke-dasharray:5 4 }
+  .lbl{ fill:var(--ink); font-size:14px; font-weight:600 } .sub{ fill:var(--muted); font-size:11.5px }
+  .edge{ stroke:var(--ink); stroke-width:1.6; fill:none }
+  .guide{ stroke:var(--faint); stroke-width:1; stroke-dasharray:3 4 }
+  .etxt{ fill:var(--muted); font-size:12px } .lane{ fill:var(--muted); font-size:11px; letter-spacing:.18em }
+  .ah{ fill:var(--ink) }
+</style>
+<defs><marker id="dd-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0,0 L10,5 L0,10 z"/></marker></defs>
+<rect class="bg" width="1000" height="400"/>
+
+<text class="lane" x="60" y="44">DEV · ONE CAPABILITY, MANY CUSTOMERS</text>
+<rect class="node" x="60" y="150" width="150" height="60" rx="6"/>
+<text class="lbl" x="76" y="176">一个能力</text>
+<text class="sub" x="76" y="196">打磨到极致</text>
+<rect class="node node-ghost" x="330" y="64" width="120" height="50" rx="6"/><text class="lbl" x="346" y="94">客户 甲</text>
+<rect class="node node-ghost" x="330" y="156" width="120" height="50" rx="6"/><text class="lbl" x="346" y="186">客户 乙</text>
+<rect class="node node-ghost" x="330" y="248" width="120" height="50" rx="6"/><text class="lbl" x="346" y="278">客户 丙</text>
+<path class="edge" d="M210,168 C270,140 280,100 324,90" marker-end="url(#dd-ink)"/>
+<path class="edge" d="M210,180 L324,181" marker-end="url(#dd-ink)"/>
+<path class="edge" d="M210,192 C270,220 280,262 324,272" marker-end="url(#dd-ink)"/>
+
+<line class="guide" x1="500" y1="36" x2="500" y2="330"/>
+
+<text class="lane" x="540" y="44">DELTA / FDE · ONE CUSTOMER, MANY CAPABILITIES</text>
+<rect class="node node-ghost" x="540" y="64" width="130" height="50" rx="6"/><text class="lbl" x="556" y="94">能力 A</text>
+<rect class="node node-ghost" x="540" y="156" width="130" height="50" rx="6"/><text class="lbl" x="556" y="186">能力 B</text>
+<rect class="node node-ghost" x="540" y="248" width="130" height="50" rx="6"/><text class="lbl" x="556" y="278">能力 C</text>
+<rect class="node node-key" x="790" y="146" width="180" height="70" rx="6"/>
+<text class="lbl" x="806" y="174">一家客户</text>
+<text class="sub" x="806" y="196">成功 = 客户目标达成</text>
+<path class="edge" d="M670,90 C730,100 740,140 784,166" marker-end="url(#dd-ink)"/>
+<path class="edge" d="M670,181 L784,181" marker-end="url(#dd-ink)"/>
+<path class="edge" d="M670,272 C730,262 740,222 784,196" marker-end="url(#dd-ink)"/>
+
+<line class="guide" x1="60" y1="330" x2="940" y2="330"/>
+<text class="sub" x="60" y="360">三承重件缺一不是 FDE：部署既有能力（不是从零造）· 交付运行系统（不是建议书）·</text>
+<text class="sub" x="60" y="380">以客户目标度量成功（不是以功能上线）。出处与判定两问见 ROL-01 正文。</text>
+</svg>
+<figcaption>Dev 是一个能力服务许多客户；FDE 是一家客户身上横跨许多能力，成功以客户目标度量</figcaption></figure>
 <h3 id="rol-01.1-是什么">ROL-01.1　是什么</h3>
 <p><strong>FDE 是把既有产品能力部署成客户结果、并以客户目标的达成来度量成功的工程师。</strong></p>
 <p>这个定义里有三个承重件，少一个都不是这个角色：</p>

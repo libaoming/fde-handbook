@@ -11,6 +11,68 @@
 <p><strong>前置条件</strong> - <a class="xref" href="ENG-01.html">ENG-01</a> 关口已过：可证伪赌注成立、红线已排除 - 交付物清单已建（<a class="xref" href="ROL-03.html">ROL-03</a>）——判据要挂在清单条目上，不悬空</p>
 <hr />
 <h2 id="规程">规程</h2>
+<figure class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" role="img" aria-label="成功标准流水线：从可证伪赌注写成判据句式，过三性检查，映射到具体验证动作，双方签字冻结；拆不成判据的移入不承诺项">
+<style>
+  :root{ --paper:#ffffff; --ink:#17181a; --muted:#6b6f76; --faint:#b9b9b3; --danger:#a8321f; }
+  @media (prefers-color-scheme: dark){
+    :root{ --paper:#131416; --ink:#e9eaec; --muted:#979ba2; --faint:#4a4d53; --danger:#e0785e; }
+  }
+  text{ font-family:"PingFang SC","Noto Sans CJK SC","Hiragino Sans GB",system-ui,sans-serif }
+  .bg{ fill:var(--paper) } .node{ fill:none; stroke:var(--ink); stroke-width:1.5 }
+  .node-key{ stroke-width:3 } .node-ghost{ stroke:var(--faint); stroke-dasharray:5 4 }
+  .lbl{ fill:var(--ink); font-size:14px; font-weight:600 } .sub{ fill:var(--muted); font-size:11.5px }
+  .edge{ stroke:var(--ink); stroke-width:1.6; fill:none }
+  .edge-ghost{ stroke:var(--faint); stroke-width:1.4; fill:none; stroke-dasharray:6 5 }
+  .guide{ stroke:var(--faint); stroke-width:1; stroke-dasharray:3 4 }
+  .etxt{ fill:var(--muted); font-size:12px } .etxt-ink{ fill:var(--ink); font-size:12px; font-weight:600 }
+  .ah{ fill:var(--ink) } .ahg{ fill:var(--faint) }
+</style>
+<defs>
+  <marker id="ec-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0,0 L10,5 L0,10 z"/></marker>
+  <marker id="ec-ghost" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ahg" d="M0,0 L10,5 L0,10 z"/></marker>
+</defs>
+<rect class="bg" width="1000" height="400"/>
+
+<rect class="node" x="30" y="60" width="150" height="64" rx="6"/>
+<text class="lbl" x="46" y="87">可证伪赌注</text>
+<text class="sub" x="46" y="108"><a class="xref" href="ENG-01.html">ENG-01</a> 的产出</text>
+
+<rect class="node" x="240" y="60" width="280" height="64" rx="6"/>
+<text class="lbl" x="256" y="87">判据句式</text>
+<text class="sub" x="256" y="108">在〔输入〕执行〔命令〕得〔标量〕=〔阈值〕由〔人〕确认</text>
+<path class="edge" d="M180,92 L234,92" marker-end="url(#ec-ink)"/>
+
+<rect class="node" x="580" y="40" width="110" height="44" rx="6"/><text class="lbl" x="594" y="67">可观察</text>
+<rect class="node" x="580" y="94" width="110" height="44" rx="6"/><text class="lbl" x="594" y="121">可复现</text>
+<rect class="node" x="580" y="148" width="110" height="44" rx="6"/><text class="lbl" x="594" y="175">有归属</text>
+<path class="edge" d="M520,80 C550,70 550,62 574,62" marker-end="url(#ec-ink)"/>
+<path class="edge" d="M520,96 C550,104 550,112 574,114" marker-end="url(#ec-ink)"/>
+<path class="edge" d="M520,110 C550,140 550,160 574,168" marker-end="url(#ec-ink)"/>
+<text class="etxt-ink" x="530" y="34">三性检查</text>
+
+<rect class="node" x="750" y="60" width="220" height="64" rx="6"/>
+<text class="lbl" x="766" y="87">映射到验证动作</text>
+<text class="sub" x="766" y="108"><a class="xref" href="VER-02.html">VER-02</a>/03 · <a class="xref" href="DIS-03.html">DIS-03</a> · kit 脚本</text>
+<path class="edge" d="M690,92 L744,92" marker-end="url(#ec-ink)"/>
+
+<rect class="node node-key" x="750" y="200" width="220" height="64" rx="6"/>
+<text class="lbl" x="766" y="227">双方签字冻结</text>
+<text class="sub" x="766" y="248">此后增删走显式变更</text>
+<path class="edge" d="M860,124 L860,194" marker-end="url(#ec-ink)"/>
+<text class="etxt-ink" x="872" y="164">全过</text>
+
+<rect class="node node-ghost" x="240" y="200" width="360" height="64" rx="6"/>
+<text class="lbl" x="256" y="227">不承诺项 —— 显式声明</text>
+<text class="sub" x="256" y="248">拆不成判据的不是判据，是愿望；映射不到检查的同此处理</text>
+<path class="edge-ghost" d="M380,124 L400,194" marker-end="url(#ec-ghost)"/>
+<text class="etxt" x="300" y="164">拆不动 / 测不了</text>
+
+<line class="guide" x1="30" y1="300" x2="970" y2="300"/>
+<text class="sub" x="30" y="328">判据定稿之前 BLD 不开工——先搭后定的标准必然长成「现状的描述」，而现状永远通过对自己的描述。</text>
+<text class="sub" x="30" y="350">判据总量以「验收当天能全部执行完」为上限：五十条没人跑得完的判据等于没有判据。</text>
+<text class="sub" x="30" y="372">验收只对「冻结版 + 变更记录」执行（<a class="xref" href="VER-05.html">VER-05</a>）——对着记忆验收 = 对着各自的记忆吵架。</text>
+</svg>
+<figcaption>从可证伪赌注到判据句式，过三性检查、映射验证动作、双方签字冻结；拆不成判据的移入不承诺项</figcaption></figure>
 <h3 id="eng-02.1-每条判据过三性检查">ENG-02.1　每条判据过三性检查</h3>
 <p>一条合格的验收判据同时满足三性：</p>
 <table>

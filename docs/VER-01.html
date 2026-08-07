@@ -11,6 +11,62 @@
 <p><strong>前置条件</strong> - 知道本次交付用什么看系统：监控、告警、日志、健康检查各在哪、走什么链路（<a class="xref" href="SUR-01.html">SUR-01</a>.1 的产出）</p>
 <hr />
 <h2 id="规程">规程</h2>
+<figure class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" role="img" aria-label="被验证系统与验证链路共享依赖时，共享节点故障会让验证手段和故障一起消失——安静不是绿灯；告警链路要有心跳信号">
+<style>
+  :root{ --paper:#ffffff; --ink:#17181a; --muted:#6b6f76; --faint:#b9b9b3; --danger:#a8321f; }
+  @media (prefers-color-scheme: dark){
+    :root{ --paper:#131416; --ink:#e9eaec; --muted:#979ba2; --faint:#4a4d53; --danger:#e0785e; }
+  }
+  text{ font-family:"PingFang SC","Noto Sans CJK SC","Hiragino Sans GB",system-ui,sans-serif }
+  .bg{ fill:var(--paper) } .node{ fill:none; stroke:var(--ink); stroke-width:1.5 }
+  .node-key{ stroke-width:3 } .node-ghost{ stroke:var(--faint); stroke-dasharray:5 4 }
+  .lbl{ fill:var(--ink); font-size:14px; font-weight:600 } .sub{ fill:var(--muted); font-size:11.5px }
+  .edge{ stroke:var(--ink); stroke-width:1.6; fill:none }
+  .edge-ghost{ stroke:var(--faint); stroke-width:1.4; fill:none; stroke-dasharray:6 5 }
+  .guide{ stroke:var(--faint); stroke-width:1; stroke-dasharray:3 4 }
+  .etxt{ fill:var(--muted); font-size:12px } .etxt-ink{ fill:var(--ink); font-size:12px; font-weight:600 }
+  .bad{ fill:var(--danger); font-size:12px; font-weight:600 } .badstroke{ stroke:var(--danger); stroke-width:2; fill:none }
+  .ah{ fill:var(--ink) } .ahg{ fill:var(--faint) }
+</style>
+<defs>
+  <marker id="vb-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0,0 L10,5 L0,10 z"/></marker>
+  <marker id="vb-ghost" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ahg" d="M0,0 L10,5 L0,10 z"/></marker>
+</defs>
+<rect class="bg" width="1000" height="400"/>
+
+<rect class="node" x="60" y="60" width="220" height="70" rx="6"/>
+<text class="lbl" x="76" y="88">被验证系统</text>
+<text class="sub" x="76" y="110">你交付的那套东西</text>
+
+<rect class="node" x="60" y="220" width="220" height="70" rx="6"/>
+<text class="lbl" x="76" y="248">验证链路</text>
+<text class="sub" x="76" y="270">监控 · 告警 · 日志 · 状态页</text>
+
+<rect class="node node-key" x="420" y="140" width="200" height="70" rx="6"/>
+<text class="lbl" x="436" y="168">共享依赖</text>
+<text class="sub" x="436" y="190">同一注册中心/网络/存储</text>
+<path class="badstroke" d="M590,132 L610,152 M610,132 L590,152"/>
+
+<path class="edge" d="M280,100 C340,110 360,140 414,160" marker-end="url(#vb-ink)"/>
+<path class="edge" d="M280,250 C340,240 360,210 414,192" marker-end="url(#vb-ink)"/>
+
+<rect class="node node-ghost" x="720" y="60" width="250" height="90" rx="6"/>
+<text class="lbl" x="738" y="88">它一倒：故障 + 观测同时消失</text>
+<text class="sub" x="738" y="110">你得到的不是告警，是安静</text>
+<text class="bad" x="738" y="134">安静 ≠ 绿灯，是盲区</text>
+<path class="edge-ghost" d="M620,160 C670,140 680,120 714,106" marker-end="url(#vb-ghost)"/>
+
+<rect class="node" x="720" y="220" width="250" height="90" rx="6"/>
+<text class="lbl" x="738" y="248">防线：交集清单 + 心跳</text>
+<text class="sub" x="738" y="270">交集项的「安静」标注为不可作证；</text>
+<text class="sub" x="738" y="290">告警链路定期发已知信号，信号停=链路死</text>
+<path class="edge" d="M620,192 C670,210 680,230 714,246" marker-end="url(#vb-ink)"/>
+
+<line class="guide" x1="30" y1="340" x2="970" y2="340"/>
+<text class="sub" x="30" y="366">公开形态：Roblox 2021（监控依赖出故障的 Consul）· AWS 2017（状态页依赖出故障的 S3）。</text>
+<text class="sub" x="30" y="386">配套核查：每个探针写一行「它实际断言了什么」——把端口存活读成业务可用，是私自升级断言强度。</text>
+</svg>
+<figcaption>验证链路与被验证系统共享依赖时，故障和观测一起消失——安静不是绿灯；防线是交集清单加心跳</figcaption></figure>
 <h3 id="ver-01.1-独立性核查故障发生时报信的通道还活着吗">VER-01.1　独立性核查：故障发生时，报信的通道还活着吗</h3>
 <p>列出验证链路（监控采集、告警投递、日志存储、状态页）的依赖，与被验证系统的依赖<strong>做交集</strong>。交集里的每一项都是一个盲区制造者：它故障时，验证手段和故障一起消失，你得到的不是告警，是安静。</p>
 <p>两个公开事故把这个形态写得很清楚：</p>
