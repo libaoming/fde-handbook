@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 470" role="img" aria-label="磁盘上的配置正确，但负载均衡进程内存中的后端表停在旧状态，流量仍流向旧实例，新实例从未接到流量；只有查运行时表的检查能发现">
+<style>
+  :root{ --paper:#ffffff; --ink:#17181a; --muted:#6b6f76; --faint:#b9b9b3; --danger:#a8321f; }
+  @media (prefers-color-scheme: dark){
+    :root{ --paper:#131416; --ink:#e9eaec; --muted:#979ba2; --faint:#4a4d53; --danger:#e0785e; }
+  }
+  text{ font-family:"PingFang SC","Noto Sans CJK SC","Hiragino Sans GB",system-ui,sans-serif }
+  .bg{ fill:var(--paper) }
+  .node{ fill:none; stroke:var(--ink); stroke-width:1.5 }
+  .node-key{ stroke-width:3 }
+  .node-ghost{ stroke:var(--faint); stroke-dasharray:5 4 }
+  .lbl{ fill:var(--ink); font-size:14px; font-weight:600 }
+  .sub{ fill:var(--muted); font-size:11.5px }
+  .edge{ stroke:var(--ink); stroke-width:1.6; fill:none }
+  .edge-ghost{ stroke:var(--faint); stroke-width:1.4; fill:none; stroke-dasharray:6 5 }
+  .guide{ stroke:var(--faint); stroke-width:1; stroke-dasharray:3 4 }
+  .etxt{ fill:var(--muted); font-size:12px }
+  .etxt-ink{ fill:var(--ink); font-size:12px; font-weight:600 }
+  .lane{ fill:var(--muted); font-size:11px; letter-spacing:.18em }
+  .bad{ fill:var(--danger); font-size:12px; font-weight:600 }
+  .badstroke{ stroke:var(--danger); stroke-width:2; fill:none }
+  .ah{ fill:var(--ink) } .ahg{ fill:var(--faint) }
+</style>
+<defs>
+  <marker id="m-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path class="ah" d="M0,0 L10,5 L0,10 z"/>
+  </marker>
+  <marker id="m-ghost" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path class="ahg" d="M0,0 L10,5 L0,10 z"/>
+  </marker>
+</defs>
+<rect class="bg" x="0" y="0" width="1000" height="470"/>
+
+<!-- 泳道标签与分隔 -->
+<text class="lane" x="50" y="42">磁盘 · 期望</text>
+<text class="lane" x="415" y="42">内存 · 事实</text>
+<text class="lane" x="765" y="42">后端 · 流量去向</text>
+<line class="guide" x1="365" y1="30" x2="365" y2="330"/>
+<line class="guide" x1="720" y1="30" x2="720" y2="330"/>
+
+<!-- 磁盘：配置文件（期望，虚线） -->
+<rect class="node node-ghost" x="50" y="80" width="260" height="70" rx="6"/>
+<text class="lbl" x="70" y="110">配置文件</text>
+<text class="sub" x="70" y="132">渲染产物 · 主机列表 · 内容完全正确</text>
+
+<!-- 内存：负载均衡进程（主角，粗框） -->
+<rect class="node node-key" x="410" y="80" width="260" height="70" rx="6"/>
+<text class="lbl" x="430" y="110">负载均衡进程</text>
+<text class="sub" x="430" y="132">内存中的后端表 · 运行时状态 · 停在旧值</text>
+
+<!-- 后端：旧实例 / 新实例 -->
+<rect class="node" x="765" y="72" width="185" height="62" rx="6"/>
+<text class="lbl" x="783" y="99">旧实例</text>
+<text class="sub" x="783" y="119">上一版 · 本应已下线</text>
+
+<rect class="node" x="765" y="212" width="185" height="62" rx="6"/>
+<text class="lbl" x="783" y="239">新实例</text>
+<text class="sub" x="783" y="259">本次部署 · 等着接活</text>
+
+<!-- ① 同步/重载（可能失败且不报错） -->
+<path class="edge-ghost" d="M310,115 L404,115" marker-end="url(#m-ghost)"/>
+<text class="etxt" x="318" y="103">① 同步 / 重载</text>
+<text class="etxt" x="318" y="140">可能失败且不报错</text>
+
+<!-- ② 流量仍流向旧实例 -->
+<path class="edge" d="M670,103 L759,103" marker-end="url(#m-ink)"/>
+<text class="etxt-ink" x="676" y="91">② 流量仍流向这里</text>
+
+<!-- ③ 新实例从未接到流量 -->
+<path class="edge-ghost" d="M670,140 C720,180 726,225 759,240" marker-end="url(#m-ghost)"/>
+<path class="badstroke" d="M714,196 L734,216 M734,196 L714,216"/>
+<text class="bad" x="744" y="188">③ 从未接到流量</text>
+
+<!-- 两种检查 -->
+<rect class="node node-ghost" x="50" y="250" width="260" height="62" rx="6"/>
+<text class="lbl" x="70" y="277">读磁盘的检查</text>
+<text class="sub" x="70" y="297">cat / nginx -T · 「配置是对的」→ 假绿灯</text>
+<path class="edge-ghost" d="M180,250 L180,156" marker-end="url(#m-ghost)"/>
+
+<rect class="node" x="410" y="250" width="260" height="62" rx="6"/>
+<text class="lbl" x="430" y="277">查运行时表的检查</text>
+<text class="sub" x="430" y="297">show servers state · 唯一能看见 ③ 的位置</text>
+<path class="edge" d="M540,250 L540,156" marker-end="url(#m-ink)"/>
+
+<!-- 底注 -->
+<line class="guide" x1="50" y1="352" x2="950" y2="352"/>
+<text class="sub" x="50" y="382">这张图是案例 PM-01（Slack，2020）的形态：磁盘正确 + 进程健康 + 功能正常，三者同时成立，</text>
+<text class="sub" x="50" y="402">新实例却一个请求都没接到。「期望」与「事实」可以长期不一致而不报任何错——</text>
+<text class="sub" x="50" y="422">所以 VER-02.3 规定：读磁盘的接口一律不算数，只认运行时表。</text>
+</svg>

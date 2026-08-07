@@ -15,6 +15,8 @@
 
 四项检查全部通过才算切换完成。**任何一项不通过，本次切换按未完成处理。**
 
+![四项检查的判定流：四项全是才输出 SWITCHED；任一项为否输出 NOT_SWITCHED；任一项没做或测不出输出 INDETERMINATE，按未通过处理](../figures/ver02-four-checks.svg)
+
 ### VER-02.1　服务管理器认为它在运行
 
 | 环境 | 命令 | 通过判据 |
@@ -69,7 +71,9 @@
 
 **你的 LB 不在此列时，只需问一句：这个接口读的是磁盘，还是内存？**
 读磁盘的一律不算数。配置文件是「期望」，运行时表才是「事实」，
-两者可以长期不一致而不报任何错——本节案例 PM-01 正是这个形态。
+两者可以长期不一致而不报任何错——本节案例 PM-01 正是这个形态：
+
+![磁盘上的配置正确，但进程内存里的后端表停在旧值：流量仍流向旧实例，新实例从未接到流量。读磁盘的检查给假绿灯，只有查运行时表能看见](../figures/ver02-disk-vs-runtime.svg)
 
 > **为什么旧进程会活下来**：杀掉父进程，子进程不会跟着死。POSIX 规定，进程退出后
 > 它的子进程与僵尸进程的父进程 ID「shall be set to the process ID of an
@@ -117,7 +121,10 @@
 **「探测了一次，通过了」**
 配置与镜像的分发通常是渐进的，同一时刻不同节点可能跑着不同版本。
 单点单次探测可能恰好命中已完成的那部分，给出「已恢复」的假信号（PM-02）。
-**多节点、重复采样。**
+**多节点、重复采样**——覆盖判据是两个问题：横向，采样是否覆盖了全部节点
+（或至少每个分组各有样本）；纵向，采样是否横跨了**至少一个完整的下发周期**。
+PM-02 里那个周期是 5 分钟，你的系统的周期是多少，要先问出来——
+在下发周期内做的任何次数的采样，都只是同一时刻的重复。
 
 **「在新环境验证过了」**
 全新节点的启动顺序与存量节点不同，某些故障**只在存量节点重启时才显现**——
@@ -174,6 +181,88 @@ VERDICT=SWITCHED
 
 ---
 
+## 示例走查：一次完整执行
+
+> 本节是**操作走查**，不是事故记录：按顺序列出你在一次真实切换后要跑的命令、
+> 每条命令回答哪一问、以及判定输出的三种形态。命令是可直接抄的；
+> 判定输出的字段与取值由 `kit/verify-switch.sh` 定义（见文末真实自测输出）。
+
+设定：你刚在一台 systemd 机器上部署了 `orders-api` 服务，本次构建号 `build-4187`，
+服务暴露 `/version` 端点。逐项走查：
+
+| 步骤 | 命令 | 它回答哪一问 |
+|---|---|---|
+| 1 | `systemctl is-active orders-api` | VER-02.1：服务管理器认为它在运行吗 |
+| 2 | `curl -s localhost:8080/version` | VER-02.2：**回答我的这个东西**是 `build-4187` 吗（逐字符比对） |
+| 3 | `ps -eo ppid,pid,cmd \| grep orders-api` | VER-02.3a：有没有「父进程为 1 且早于本次部署」的残留 |
+| 4 | 按 VER-02.3 命令表查 LB 运行时后端表 | VER-02.3b：后端表里还有没有旧实例地址（**脚本覆盖不到，必须人工**） |
+| 5 | 发一笔带唯一标识的真实请求，再 `grep <标识> 日志` | VER-02.4：活真的落在了它头上吗 |
+
+五步合成一条命令（第 4 步除外）：
+
+```
+./kit/verify-switch.sh orders-api --pattern orders-api \
+    --expect-version build-4187 \
+    --version-cmd "curl -s localhost:8080/version" \
+    --event "req-$(date +%s)-$RANDOM"
+```
+
+**判定输出的三种形态**（字段名与本节检查项一一对应）：
+
+- 四项全过——退出码 0，可进入 VER-05：
+
+  ```
+  SERVICE_ACTIVE=yes
+  VERSION_MATCH=yes
+  STALE_INSTANCES=0
+  BUSINESS_EVENT_SINCE_DEPLOY=yes
+  VERDICT=SWITCHED
+  NOTE=lb_backend_table_not_covered_check_manually
+  ```
+
+  注意最后一行：即使 `SWITCHED`，脚本也会提醒 LB 后端表未覆盖——
+  第 4 步没做完，这个 `SWITCHED` 就还不完整。
+
+- 旧实例有残留——退出码 1，回去清理后**重跑全部四项**：
+
+  ```
+  STALE_INSTANCES=2
+  VERDICT=NOT_SWITCHED
+  ```
+
+- 忘了传版本参数——退出码 4，**不会**因为「没检查」而放行：
+
+  ```
+  VERSION_MATCH=unchecked
+  VERDICT=INDETERMINATE_NO_VERSION_CHECK
+  ```
+
+  这是 fail-closed 的含义：「没测」与「测了是好的」在输出上必须可区分。
+
+**脚本自身的可信度**：它带 29 条自测用例，覆盖判定逻辑与 fail-closed 缺省。
+以下为 2026-08-07 在本手册仓库实跑 `bash kit/verify-switch.sh --self-test` 的输出摘录
+（`reproducible` 档：读者可自行复跑）：
+
+```
+self-test: adjudicate_verdict（四项全对才通过）
+  ok   四项全对
+  ok   有残留→不算
+  ok   服务没起→不算
+  ok   版本对不上→不算
+  ok   起了但没干活→不算
+self-test: fail-closed（没做的检查不得算通过）
+  ok   没做版本核对→测不出
+  ok   没做业务事件→测不出
+  ok   两项都没做→测不出
+  ok   进程数据缺失优先报
+
+SELF_TEST_PASS=29
+SELF_TEST_FAIL=0
+VERDICT=SELF_TEST_OK
+```
+
+---
+
 ## 案例证据
 
 > ### 案例 PM-01 · 公开事故复盘｜Slack，2020
@@ -191,6 +280,58 @@ VERDICT=SWITCHED
 >
 > 出处：https://slack.engineering/a-terrible-horrible-no-good-very-bad-day-at-slack/
 > ｜不可外推：这是 HAProxy Runtime API 特定的槽位复用逻辑，不能据此论断所有 LB 都会静默保留旧后端。
+
+> ### 案例 PM-05 · 公开事故复盘｜Datadog，2023
+>
+> 一次多区域网络故障，根因是一个**装上之后没有立刻生效**的更新：
+> "a security update to systemd was automatically applied to a number of VMs, which caused
+> a latent adverse interaction in the network stack (on Ubuntu 22.04 via systemd v249)
+> to manifest upon systemd-networkd restarting."——磁盘上的包版本与运行中进程的版本
+> 长期不一致，故障要等进程重启那一刻才显现。
+>
+> 更关键的是官方复盘对「为什么测试没拦住」的解释：
+> "neither a fresh node nor a rebooted node exhibit this behavior because during a normal
+> boot sequence systemd-networkd always starts before routing rules are installed by the
+> CNI plugin."——**全新节点与重启节点的启动顺序不同，故障只在存量运行节点上显现**。
+> 任何在新环境做的验证都必然通过，且这份「通过」对存量环境毫无证明力。
+>
+> **它验证了本节两条规矩**：VER-02.2 的「安装 ≠ 生效」（版本核对必须问运行中的进程，
+> 不是磁盘上的包），以及常见误判里的「验证必须在存量运行节点上做」。
+>
+> 出处：https://www.datadoghq.com/blog/2023-03-08-multiregion-infrastructure-connectivity-issue/
+> ｜不可外推：绑定 Ubuntu 22.04 + systemd v249 + CNI 的具体组合，不能写成「自动安全更新普遍危险」。
+
+> ### 案例 PM-02 · 公开事故复盘｜Cloudflare，2025
+>
+> 一次全网故障中，一个特征文件由数据库集群每 5 分钟生成一次，而集群正在灰度升级：
+> "every five minutes there was a chance of either a good or a bad set of configuration
+> files being generated and rapidly propagated across the network. This fluctuation made
+> it unclear what was happening as the entire system would recover and then fail again"——
+> 系统在恢复与崩溃之间横跳，且 "Initially, this led us to believe this might be caused
+> by an attack."
+>
+> **它验证了「探测了一次，通过了」为什么是误判**：分发是渐进的，单点单次采样有相当
+> 概率恰好命中好的那一批，给出「已恢复」的假信号——并把排查引向完全错误的方向
+> （误判为攻击）。采样必须覆盖多节点、横跨至少一个完整下发周期。
+>
+> 出处：https://blog.cloudflare.com/18-november-2025-outage/
+> ｜不可外推：波动源于上游权限变更的特定 bug，不能用来论证「配置灰度本身有害」。
+
+> ### 案例 PM-09 · 公开事故复盘｜GitLab，2017
+>
+> 数据库事故后需要恢复备份时才发现：
+> "The standard backup procedure uses pg_dump to perform a logical backup of the database.
+> This procedure failed silently."——备份任务天天在跑，产物一直是空的。
+> 失败通知也没送到："Unfortunately DMARC was not enabled for the cronjob emails,
+> resulting in them being rejected by the receiver. This means we were never aware of
+> the backups failing, until it was too late."
+>
+> **它验证了 VER-02.4 的锚点选择**：「任务在跑」「没收到告警」都是间接信号；
+> 自动化动作的验收锚点是**产物本身**（对备份：产物存在、非空、且能恢复出来）。
+> 把这条平移到切换验证：进程在跑不算数，**带唯一标识的业务事件落进了新实例的日志**才算数。
+>
+> 出处：https://about.gitlab.com/blog/2017/02/10/postmortem-of-database-outage-of-january-31/
+> ｜不可外推：pg_dump 版本不匹配的具体故障，不可推广为「逻辑备份不可靠」。
 
 > ### 案例 · 合成示例（教学场景，非真实事故）
 >
@@ -214,4 +355,4 @@ VERDICT=SWITCHED
 - **DIS-01 证据分级**——「功能能用」为什么是信号而不是证据
 - **DIS-02 三道焊缝**——为什么要让命令吐判定标量，而不是让人读输出
 - **附录 A · FX-SVC-01**——症状「部署后改动似乎没生效」的速查入口
-- **附录 B（未成稿）**——本节四项检查的可打印版本
+- **附录 B · B-VER-02**——本节四项检查的可打印版本
