@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VER-05 · 验收与签收：判据表的执行日 · FDE 手册</title>
+<link rel="stylesheet" href="assets/style.css"></head>
+<body><header class="top">
+<a class="home" href="index.html">《FDE 手册》</a><span class="crumb">第 2 部 · VER 签收</span>
+</header>
+<main><h1 id="ver-05-验收与签收判据表的执行日">VER-05 · 验收与签收：判据表的执行日</h1>
+<p><strong>目的</strong>　把 <a class="xref" href="ENG-02.html">ENG-02</a> 冻结的判据表逐条执行、留档、签字。验收不是一场会议，是一次<strong>可复现的批量验证</strong>——它的全部悬念都应该在这天之前就被消化掉：判据是冻结的、执行方式是写好的、前置检查是绿的。验收日只剩执行。</p>
+<p><strong>前置条件</strong>（任何一条不满足，验收日不开场） - <code>VERDICT=SWITCHED</code>（<a class="xref" href="VER-02.html">VER-02</a>）：接活的确实是要验收的那个版本 - 可达性已从用户网络位置验证（<a class="xref" href="VER-03.html">VER-03</a>） - 交付过程使用了 AI 助手的部分已取得 <code>EXECUTION_CONFIRMED</code>（<a class="xref" href="DIS-03.html">DIS-03</a>） - 判据表处于冻结态且双方签过字（<a class="xref" href="ENG-02.html">ENG-02</a>.4），变更记录在手</p>
+<hr />
+<h2 id="规程">规程</h2>
+<h3 id="ver-05.1-只对冻结版-变更记录执行">VER-05.1　只对「冻结版 + 变更记录」执行</h3>
+<p>验收对象是签过字的那份判据表加上其变更记录，<strong>不是任何人的记忆，也不是现场的临时提议</strong>。会上冒出的新期望一律登记为变更申请（走 <a class="xref" href="ENG-02.html">ENG-02</a>.4 流程），不当场加入本次验收——当场加判据与当场删判据是同一种腐蚀，方向相反而已。</p>
+<h3 id="ver-05.2-逐条执行逐条留档">VER-05.2　逐条执行，逐条留档</h3>
+<p>每条判据的执行记录四个字段：</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>字段</th>
+<th>要求</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>执行人</td>
+<td>按判据的「归属」栏——<strong>该客户方执行的必须客户方亲手执行</strong>，你可以在旁边，不能代跑</td>
+</tr>
+<tr>
+<td>命令与输出</td>
+<td>原样粘贴，不摘要、不转述（判定标量的形态，<a class="xref" href="DIS-02.html">DIS-02</a>）</td>
+</tr>
+<tr>
+<td>判定</td>
+<td>通过 / 不通过 / 测不出——三态，没有「基本通过」</td>
+</tr>
+<tr>
+<td>时间与环境</td>
+<td>何时、在哪个环境跑的</td>
+</tr>
+</tbody>
+</table>
+<p><strong>「测不出」按不通过处理</strong>（保守缺省）——工具坏了、权限没了、数据缺了，都是验收环境不完备的证据，不是跳过该条的理由。</p>
+<h3 id="ver-05.3-不通过的处理回边不讨价">VER-05.3　不通过的处理：回边，不讨价</h3>
+<p>出现不通过项：</p>
+<ol type="1">
+<li>定位属于哪个阶段的缺口（切换问题回 DEP、构建问题回 BLD、判据本身有歧义回 <a class="xref" href="ENG-02.html">ENG-02</a> 走变更）；</li>
+<li>修复后<strong>重跑全部相关判据</strong>，不是只补挂掉的那条（<a class="xref" href="ROL-04.html">ROL-04</a>.3 回边规则—— 修复动作本身可能弄坏已通过的项）；</li>
+<li><strong>不接受「这条先算过、下次补」</strong>——判据表上没有「暂计通过」这个状态。商务上要提前放行是商务决策，走的是变更（把该条移出本次范围并签字），不是把红的记成绿的。</li>
+</ol>
+<h3 id="ver-05.4-签字与证据链归档">VER-05.4　签字与证据链归档</h3>
+<p>全部判据通过后：验收单签字（签字人 = 判据表指定的验收人，<a class="xref" href="ROL-02.html">ROL-02</a>.3），执行记录整体归档进过程资产（<a class="xref" href="ROL-03.html">ROL-03</a>.1 第四类）。归档判据：<strong>半年后一个没参与过项目的人，仅凭归档能回答「当时每条是怎么过的」</strong>。</p>
+<h3 id="ver-05.5-验收-移交">VER-05.5　验收 ≠ 移交</h3>
+<p>签收只结束了「做没做完」的问题。「客户能不能自己跑下去」是 HND 的判据（按 runbook 独立执行成功，<a class="xref" href="ROL-03.html">ROL-03</a>.1）——两者分开签，防止「验收通过」被顺手当成「移交完成」用。</p>
+<hr />
+<h2 id="常见误判">常见误判</h2>
+<p><strong>「演示式验收」</strong>你操作、客户观看的验收，验的是你的操作熟练度。判据的「归属」栏写谁执行就谁执行—— 客户方跑不动的判据，在 <a class="xref" href="ENG-02.html">ENG-02</a> 就不该写成客户方执行。</p>
+<p><strong>「口头通过，回头补签」</strong>没有签字的通过在下一次人事变动时清零。签字不是仪式，是把「谁认可了什么」钉进过程资产的动作。</p>
+<p><strong>「验收会上顺手加两条」</strong>临时加的判据没有执行方式、没有归属、没有双方共识——它们不是判据，是现场情绪。一律走变更登记（VER-05.1）。</p>
+<p><strong>「全绿了，项目结束了」</strong>还差 HND（VER-05.5）。验收日宣布「项目结束」是移交烂尾的标准起点。</p>
+<hr />
+<h2 id="判定标准">判定标准</h2>
+<div class="checklist"><ul><li><span class="box">☐</span>四项前置全部满足后才开场</li><li><span class="box">☐</span>每条判据四字段留档，判定只有三态，测不出=不通过</li><li><span class="box">☐</span>不通过项走回边并重跑全部相关判据，无「暂计通过」</li><li><span class="box">☐</span>验收单由指定验收人签字，证据链归档可独立复原</li><li><span class="box">☐</span>已明确向客户区分：验收完成 ≠ 移交完成</li></ul></div>
+<hr />
+<h2 id="案例证据">案例证据</h2>
+<blockquote>
+<h3 id="案例证据说明">案例证据说明</h3>
+<p>本节是 <a class="xref" href="ENG-02.html">ENG-02</a> 的执行侧，不新增外部事实性断言。支撑证据在上游各节：判据被临场期望击穿的形态见 <strong><a class="xref" href="ENG-02.html">ENG-02</a> 合成示例</strong>（两份不同的合同）；「命令与输出原样粘贴」的方法论出处见 <strong><a class="xref" href="DIS-02.html">DIS-02</a>/<a class="xref" href="DIS-03.html">DIS-03</a></strong>（含 Claude Code 官方「出示证据而非宣称成功」的背书，见 <a class="xref" href="DIS-03.html">DIS-03</a> 引证框）；「测不出=不通过」的保守缺省谱系见 <strong><a class="xref" href="VER-02.html">VER-02</a> 判定标准</strong>。</p>
+</blockquote>
+<hr />
+<h2 id="相关小节">相关小节</h2>
+<ul>
+<li><strong><a class="xref" href="ENG-02.html">ENG-02</a> 成功标准</strong>——判据表从哪来、怎么冻结</li>
+<li><strong><a class="xref" href="VER-02.html">VER-02</a> / <a class="xref" href="VER-03.html">VER-03</a></strong>——验收日之前必须已绿的前置检查</li>
+<li><strong><a class="xref" href="DIS-03.html">DIS-03</a> 助手产出验证</strong>——AI 参与部分的前置判定</li>
+<li><strong>HND 移交（<a class="xref" href="HND-01.html">HND-01</a>）</strong>——签收之后的另一场验收</li>
+<li><strong><a class="xref" href="APPX-C.html">附录 C</a> · C-02</strong>——验收执行记录模板</li>
+<li><strong><a class="xref" href="APPX-A.html">附录 A</a> · FX-ORG-06（待写）</strong>——症状「验收全过但客户说不是想要的」</li>
+</ul>
+</main>
+<nav class="pager"><a href="VER-04.html">← VER-04</a><a href="HND-01.html">HND-01 →</a></nav>
+<footer>案例三档强制标注 · 引文写作当轮核实 · <a href="https://github.com/libaoming/fde-handbook">GitHub 源仓库</a>（发现分档冒充或引文失实，请提 issue——那是本手册的红线）</footer>
+</body></html>

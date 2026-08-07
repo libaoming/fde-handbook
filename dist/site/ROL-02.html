@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ROL-02 · 相邻角色边界：一件事归谁 · FDE 手册</title>
+<link rel="stylesheet" href="assets/style.css"></head>
+<body><header class="top">
+<a class="home" href="index.html">《FDE 手册》</a><span class="crumb">第 1 部 · 这份工作</span>
+</header>
+<main><h1 id="rol-02-相邻角色边界一件事归谁">ROL-02 · 相邻角色边界：一件事归谁</h1>
+<p><strong>目的</strong>　把你周围每个角色「默认拥有什么、你依赖他们什么」写成登记表，让一件事卡住时你能在一分钟内回答：<strong>这归谁，找谁，等多久。</strong>交付现场最隐蔽的一类停摆不是技术故障，是「双方都以为对方在办」——它不产生任何告警。</p>
+<p><strong>前置条件</strong> - 已明确本次交付的合同结构与干系人名单（<a class="xref" href="ENG-01.html">ENG-01</a>.4 的产出） - 没有这份名单时，<strong>本节的登记表就是你要补的第一件事</strong>，别等 ENG 补完再做</p>
+<hr />
+<h2 id="规程">规程</h2>
+<h3 id="rol-02.1-逐角色登记他们拥有什么你依赖什么">ROL-02.1　逐角色登记：他们拥有什么，你依赖什么</h3>
+<p>对下表五类接口角色，逐一填出三列。<strong>表是模板，右两列必须按本次交付实填</strong>—— 每个现场的断裂点不同，抄通用答案等于没填。</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>接口角色</th>
+<th>他们默认拥有</th>
+<th>你依赖他们的（实填）</th>
+<th>常见断裂点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>产品工程团队（Dev）</td>
+<td>产品代码、发布节奏、通用路线图</td>
+<td>缺陷修复、能力缺口排期</td>
+<td>你的紧急 ≠ 他们的优先级；现场需求进不了排期</td>
+</tr>
+<tr>
+<td>售前 / 解决方案架构师</td>
+<td>客户关系、成交承诺、演示环境</td>
+<td>承诺过什么的完整清单</td>
+<td>演示环境里成立的，客户环境里未必成立</td>
+</tr>
+<tr>
+<td>交付经理 / 项目经理</td>
+<td>合同边界、里程碑、商务口径</td>
+<td>范围仲裁、资源协调</td>
+<td>技术上的「做不了」翻译不到商务层</td>
+</tr>
+<tr>
+<td>客户 IT</td>
+<td>客户环境的一切权限：网络、账号、审批流</td>
+<td>开权限、开网络、走审批</td>
+<td>审批节奏与你的工期无关，且他们不背你的验收</td>
+</tr>
+<tr>
+<td>客户内部平台/数据团队</td>
+<td>数据口径、内部工具、业务定义</td>
+<td>口径解释、历史沉淀</td>
+<td>最懂的人最忙；口头解释无法验收</td>
+</tr>
+</tbody>
+</table>
+<h3 id="rol-02.2-客户内部平台团队为什么不能照搬四项默认条件对照">ROL-02.2　「客户内部平台团队」为什么不能照搬——四项默认条件对照</h3>
+<p>厂商内部平台团队的公开自述（OpenAI / Meta / Replit 三家对自建内部 agent 的描述，见案例证据框）是难得的一手材料：<strong>这类相邻角色通常只能靠观察推测，这里对方亲口写下了自己的工作条件。</strong> 他们默认拥有、而你在现场没有的，是四项：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>他们默认拥有</th>
+<th>依据</th>
+<th>你在现场（本手册判断，非原文声明）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>能改数据仓库、能定标准</td>
+<td>三篇自述均隐含</td>
+<td>改不动，属客户 IT 与数据团队辖区</td>
+</tr>
+<tr>
+<td>纠错走 review 流程、接受「故意慢」（「有 review 带宽」系据此的推断）</td>
+<td>Replit：“It’s slower on purpose: what becomes canonical is deliberate and inspectable”</td>
+<td>客户团队通常最忙、且不愿为你的产出背书</td>
+</tr>
+<tr>
+<td>自家人天然懂业务定义</td>
+<td>Meta：“Data scientists at Meta develop deep expertise in a slice of the business.”</td>
+<td>业务定义须逐条挖掘，且口径常常无文档</td>
+</tr>
+<tr>
+<td>可以等飞轮转起来</td>
+<td>Meta 自述项目用了 “roughly six months”；Replit 自 2025 年底起持续建设</td>
+<td>合同有期限，没有「再等半年」这个选项</td>
+</tr>
+</tbody>
+</table>
+<p><strong>用法</strong>：客户拿内部平台团队的做法（或厂商博客）来要求你照搬时，用这张表逐项对照——差的不是技术选型，是这四项前置条件。</p>
+<h3 id="rol-02.3-归属判定三问">ROL-02.3　归属判定三问</h3>
+<p>任何一件交付物或阻塞项，归属用三问判定：</p>
+<ol type="1">
+<li><strong>谁有权限改？</strong>（改不动的人不可能是 owner）</li>
+<li><strong>谁在合同里背这项验收？</strong>（验收落谁头上，谁有权定「做完了」）</li>
+<li><strong>合同结束后谁维护？</strong>（维护者对形态有否决权，见 HND）</li>
+</ol>
+<p>三问答案一致 → 那就是 owner。<strong>三问答案不一致的项是高危项</strong>：有权限的不背验收、背验收的不做维护—— 这类项必须在登记表里单独标出，并在 ENG/HND 关口显式分配（而不是默认「到时候再说」）。</p>
+<h3 id="rol-02.4-落成登记表">ROL-02.4　落成登记表</h3>
+<p>把 ROL-02.1 与 ROL-02.3 的结果落成一张表，放进交付计划（模板见<a class="xref" href="APPX-C.html">附录 C</a> · C-01）：</p>
+<ul>
+<li>每项交付物、每个阻塞项，<strong>一个唯一 owner——一个名字，不是一个部门</strong>；</li>
+<li><strong>非工程域事项照登不误</strong>：域名备案、账号审批、合同盖章、合规评估—— 它们不产生任何技术信号，却能让整条链路停摆（<a class="xref" href="VER-03.html">VER-03</a> 的教训）；</li>
+<li>owner 之外记两个字段：预计完成时间、卡住时的升级路径（找谁拍板）。</li>
+</ul>
+<hr />
+<h2 id="常见误判">常见误判</h2>
+<p><strong>「售前展示过，所以在范围内」</strong>售前的度量是成交，演示环境是为成交搭的。范围以 ENG 阶段双方写下的成功标准为准，不以任何演示或口头承诺为准。承诺清单（ROL-02.1 第二行）的用途正是在 ENG 关口把「展示过的」与「承诺交付的」显式切开。</p>
+<p><strong>「客户 IT 会像我的平台团队一样响应」</strong>不会，而且<strong>这不是他们的失职</strong>。你的验收不在他们的目标里，你的工期不在他们的审批流里。正确动作是把依赖客户 IT 的每一项都提前登记（ROL-02.4）并把审批时长问到手——他们的两周流程，从你知道的那天起才开始算。</p>
+<p><strong>「厂商内部实践可以照搬到现场」</strong>三家自述共同的前提是<strong>自建自用</strong>：不需要说服任何人、权限自己给自己、资产归属没有争议、没有合同期限。这四件事恰恰是现场交付的主要工作量。照搬其技术结论前，先过 ROL-02.2 的四项对照。</p>
+<p><strong>「没人反对 = 有人负责」</strong>会议上无人反对，只说明无人认领。归属只认 ROL-02.3 三问的答案，且 owner 必须当场复述确认——沉默不是认领。</p>
+<hr />
+<h2 id="判定标准">判定标准</h2>
+<div class="checklist"><ul><li><span class="box">☐</span>五类接口角色的「你依赖他们什么」均已实填（不是模板原文）</li><li><span class="box">☐</span>每项交付物与阻塞项有唯一 owner（一个名字，不是一个部门）</li><li><span class="box">☐</span>三问答案不一致的高危项已单独标出并显式分配</li><li><span class="box">☐</span>非工程域阻塞项（备案/审批/合同/合规）已登记，且各有预计时长与升级路径</li><li><span class="box">☐</span>登记表放在双方都能看到的位置，而不是你的本地笔记</li></ul></div>
+<p>任何一条不满足，视作「存在无主事项」——按本节开头那句话的定价来理解它的风险。</p>
+<hr />
+<h2 id="案例证据">案例证据</h2>
+<blockquote>
+<h3 id="案例-合成示例教学场景非真实事故">案例 · 合成示例（教学场景，非真实事故）</h3>
+<p>一次对外服务上线前两周，工程侧一切就绪：链路通、验收脚本绿、客户业务方已试用。上线当天发现域名备案没有办——交付方以为「客户的域名当然客户办」，客户 IT 以为「上线相关的事当然交付方办」。备案流程以周计，且无法用技术手段缩短。项目停摆，且<strong>停摆前没有任何技术信号</strong>：没有报错、没有告警，每一方的工作清单都是全绿的。</p>
+<p>本例说明 ROL-02.4 为什么要求非工程域事项照登不误、且各有唯一 owner：这类事项不在任何监控里，唯一的防线是登记表。</p>
+<p>⚠️ <strong>本例为本手册构造的教学场景，不是真实事故记录</strong>，不含任何真实读数。</p>
+</blockquote>
+<blockquote>
+<h3 id="引证-第三方声明openai-meta-replit-内部-agent-自述">引证 · 第三方声明｜OpenAI / Meta / Replit 内部 agent 自述</h3>
+<p>ROL-02.2 出处（Meta / Replit 引句 2026-08-06 逐句核实实存；OpenAI 篇同日重抓，全文落盘 <code>cases/raw-openai-data-agent-20260806.md</code>）： - OpenAI, “Inside OpenAI’s in-house data agent”： https://openai.com/index/inside-our-in-house-data-agent/ （其自述原文： “a custom internal-only tool (not an external offering), built specifically around OpenAI’s data, permissions, and workflows”——「自建自用」前提的直接出处） - Replit, “AI adoption starts with truth”：https://replit.com/blog/ai-adoption - Analytics at Meta, “Inside Meta’s Home Grown AI Analytics Agent”： https://medium.com/<span class="citation" data-cites="AnalyticsAtMeta/inside-metas-home-grown-ai-analytics-agent-4ea6779acfb3">@AnalyticsAtMeta/inside-metas-home-grown-ai-analytics-agent-4ea6779acfb3</span></p>
+<p><strong>不可外推边界</strong>：三家均为 in-house 自建自用、厂商自报、无第三方审计；对照表右列（「你在现场」一列）是本手册的判断，<strong>不是</strong>原文声明——两列证据等级不同。</p>
+</blockquote>
+<hr />
+<h2 id="相关小节">相关小节</h2>
+<ul>
+<li><strong><a class="xref" href="ROL-01.html">ROL-01</a> 角色定义</strong>——你自己那一格的定义</li>
+<li><strong><a class="xref" href="ROL-03.html">ROL-03</a> 交付物清单</strong>——每项交付物的 owner 从本节的登记表来</li>
+<li><strong><a class="xref" href="ROL-04.html">ROL-04</a> 全景图</strong>——ENG 与 HND 两个关口消费本节的登记表</li>
+<li><strong><a class="xref" href="VER-03.html">VER-03</a> 可达性验证</strong>——非工程域根因的排查位（「正确动作往往是什么都不做」）</li>
+<li><strong><a class="xref" href="APPX-A.html">附录 A</a> · FX-ORG-01</strong>——症状「一件事卡住，双方都以为对方在做」的速查入口</li>
+</ul>
+</main>
+<nav class="pager"><a href="ROL-01.html">← ROL-01</a><a href="ROL-03.html">ROL-03 →</a></nav>
+<footer>案例三档强制标注 · 引文写作当轮核实 · <a href="https://github.com/libaoming/fde-handbook">GitHub 源仓库</a>（发现分档冒充或引文失实，请提 issue——那是本手册的红线）</footer>
+</body></html>

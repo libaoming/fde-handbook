@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ENG-01 · 承接判定：这活能不能接 · FDE 手册</title>
+<link rel="stylesheet" href="assets/style.css"></head>
+<body><header class="top">
+<a class="home" href="index.html">《FDE 手册》</a><span class="crumb">第 2 部 · ENG 承接</span>
+</header>
+<main><h1 id="eng-01-承接判定这活能不能接">ENG-01 · 承接判定：这活能不能接</h1>
+<p><strong>目的</strong>　在任何人签字之前回答三个问题：这个问题<strong>有没有界</strong>、红线在哪、现在拒绝和改范围还来得及吗。承接阶段做错的决定不会在承接阶段暴露—— 它会伪装成 BLD 的技术困难、VER 的验收扯皮和 HND 的无人接盘，在最贵的时候结账。</p>
+<p><strong>前置条件</strong> - 有明确的对手方与诉求（哪怕诉求还很模糊——本节的一半工作就是把它变清楚） - <a class="xref" href="ROL-01.html">ROL-01</a> 判定标准的两问已过：这确实是一个 FDE 交付，不是定制开发或纯咨询</p>
+<hr />
+<h2 id="规程">规程</h2>
+<figure class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 440" role="img" aria-label="承接判定流：客户诉求先改写成可证伪赌注，写不出数字就先算集中度；集中度算不出或很低走缩范围或拒绝；赌注成立后过红线清单，全否才过承接关口">
+<style>
+  :root{ --paper:#ffffff; --ink:#17181a; --muted:#6b6f76; --faint:#b9b9b3; --danger:#a8321f; }
+  @media (prefers-color-scheme: dark){
+    :root{ --paper:#131416; --ink:#e9eaec; --muted:#979ba2; --faint:#4a4d53; --danger:#e0785e; }
+  }
+  text{ font-family:"PingFang SC","Noto Sans CJK SC","Hiragino Sans GB",system-ui,sans-serif }
+  .bg{ fill:var(--paper) }
+  .node{ fill:none; stroke:var(--ink); stroke-width:1.5 }
+  .node-key{ stroke-width:3 }
+  .node-ghost{ stroke:var(--faint); stroke-dasharray:5 4 }
+  .lbl{ fill:var(--ink); font-size:14px; font-weight:600 }
+  .sub{ fill:var(--muted); font-size:11.5px }
+  .edge{ stroke:var(--ink); stroke-width:1.6; fill:none }
+  .edge-ghost{ stroke:var(--faint); stroke-width:1.4; fill:none; stroke-dasharray:6 5 }
+  .guide{ stroke:var(--faint); stroke-width:1; stroke-dasharray:3 4 }
+  .etxt{ fill:var(--muted); font-size:12px }
+  .etxt-ink{ fill:var(--ink); font-size:12px; font-weight:600 }
+  .ah{ fill:var(--ink) } .ahg{ fill:var(--faint) }
+</style>
+<defs>
+  <marker id="eg-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path class="ah" d="M0,0 L10,5 L0,10 z"/>
+  </marker>
+  <marker id="eg-ghost" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path class="ahg" d="M0,0 L10,5 L0,10 z"/>
+  </marker>
+</defs>
+<rect class="bg" x="0" y="0" width="1000" height="440"/>
+
+<!-- 主链 -->
+<rect class="node" x="30" y="70" width="180" height="66" rx="6"/>
+<text class="lbl" x="46" y="97">客户诉求</text>
+<text class="sub" x="46" y="118">通常是一个愿景句</text>
+
+<rect class="node" x="290" y="70" width="220" height="66" rx="6"/>
+<text class="lbl" x="306" y="97">① 改写成可证伪赌注</text>
+<text class="sub" x="306" y="118">因为数据 X → 应能做到 Y</text>
+
+<rect class="node" x="590" y="70" width="180" height="66" rx="6"/>
+<text class="lbl" x="606" y="97">③ 红线清单</text>
+<text class="sub" x="606" y="118">六条逐项核（ENG-01.3）</text>
+
+<rect class="node node-key" x="840" y="70" width="130" height="66" rx="6"/>
+<text class="lbl" x="856" y="97">承接关口</text>
+<text class="sub" x="856" y="118">进入 SUR</text>
+
+<path class="edge" d="M210,103 L284,103" marker-end="url(#eg-ink)"/>
+<path class="edge" d="M510,103 L584,103" marker-end="url(#eg-ink)"/>
+<text class="etxt-ink" x="522" y="92">赌注成立</text>
+<path class="edge" d="M770,103 L834,103" marker-end="url(#eg-ink)"/>
+<text class="etxt-ink" x="778" y="92">全否</text>
+
+<!-- 支路：写不出 X → 算集中度 -->
+<rect class="node" x="290" y="210" width="220" height="66" rx="6"/>
+<text class="lbl" x="306" y="237">② 先算集中度</text>
+<text class="sub" x="306" y="258">用客户自己的数据（ENG-01.2）</text>
+
+<path class="edge" d="M400,136 L400,204" marker-end="url(#eg-ink)"/>
+<text class="etxt" x="410" y="176">写不出 X</text>
+<path class="edge" d="M510,236 C560,232 560,150 512,120" marker-end="url(#eg-ink)"/>
+<text class="etxt" x="548" y="192">集中度高 → 回①补上 X</text>
+
+<!-- 出口：缩范围或拒绝 -->
+<rect class="node node-ghost" x="640" y="290" width="330" height="76" rx="6"/>
+<text class="lbl" x="658" y="318">改范围 / 拒绝</text>
+<text class="sub" x="658" y="340">缩到最集中的一块重新过流程；或明确不接——</text>
+<text class="sub" x="658" y="358">此刻拒绝的成本是全周期里最低的</text>
+
+<path class="edge-ghost" d="M510,258 C580,290 600,306 634,318" marker-end="url(#eg-ghost)"/>
+<text class="etxt" x="500" y="292">集中度低 / 算不出（本身即红线信号）</text>
+<path class="edge-ghost" d="M680,136 C690,190 700,240 740,284" marker-end="url(#eg-ghost)"/>
+<text class="etxt" x="700" y="212">任一红线命中且无法解除</text>
+
+<!-- 底注 -->
+<line class="guide" x1="30" y1="398" x2="970" y2="398"/>
+<text class="sub" x="30" y="424">红线是结构性无解（不随努力改善），困难不是红线——环境差、数据脏、排期紧属于困难，进 SUR 量化。</text>
+</svg>
+<figcaption>承接判定流：诉求改写成可证伪赌注（写不出数字先算集中度）→ 红线清单全否 → 过承接关口；集中度低或红线命中 → 改范围或拒绝</figcaption></figure>
+<h3 id="eng-01.1-把立项理由改写成一个可证伪的赌注">ENG-01.1　把立项理由改写成一个可证伪的赌注</h3>
+<p>立项论证有两种形态，<strong>只接受第二种</strong>：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>形态</th>
+<th>例子</th>
+<th>问题</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>不可证伪的愿景</td>
+<td>「AI 应该能帮上客服团队」</td>
+<td>永远吵不完，也永远无法验收</td>
+</tr>
+<tr>
+<td>可证伪的赌注</td>
+<td>「该团队 80% 的工单集中在 12 类问题上，其中 9 类有标准处理路径，agent 应能自主处理这 9 类」（示意数字）</td>
+<td>数字错了当场就能证伪；数字对了，验收标准已经在里面了</td>
+</tr>
+</tbody>
+</table>
+<p>参照系是 Meta 内部 agent 的立项方式（他们的自述）：“We had a specific hypothesis that, given 88% of queries by Data Scientists on any given day rely solely on tables queried in the preceding 90 days, an AI agent could perform these routine data analysis tasks autonomously.” ——并明确对比了两种形态：“This wasn’t a vague”AI could help with analytics” pitch, it was a specific, measurable hypothesis based on data.”</p>
+<p><strong>动作</strong>：把客户的诉求改写成一句「因为数据 X，所以 agent 应能做到 Y」。写不出 X → 先去做 ENG-01.2；写出来了 → 它就是 <a class="xref" href="ENG-02.html">ENG-02</a> 成功标准的母句。</p>
+<h3 id="eng-01.2-先算集中度问题有没有界">ENG-01.2　先算集中度：问题有没有界</h3>
+<p>全域规模吓人不等于问题无界。Meta 的数仓有数百万张表，但 “any individual analyst’s work typically lives within a few dozen.”—— <strong>决定可行性的是个体工作域的集中度，不是全域规模。</strong></p>
+<p><strong>动作</strong>：接手前先用客户自己的数据算一个集中度数字—— 80% 的调用集中在多少类输入上？90% 的查询落在多少张表上？高频路径覆盖多少业务量？</p>
+<ul>
+<li>集中度高（少数模式覆盖大多数量）→ 问题有界，赌注成立；</li>
+<li>集中度算不出来（客户拿不出数据、或没有权限看）→ <strong>这本身就是红线信号</strong>，转 ENG-01.3；</li>
+<li>算出来集中度低 → 缩范围到最集中的那一块，或不接。</li>
+</ul>
+<blockquote>
+<p>⚠️ 可搬走的是<strong>「先算这个数」这个动作</strong>，不是 Meta 的 88% 那个数值—— 那是他们自家群体的统计，方法未公开，不构成行业常数。另注意：说服客户的数字必须来自<strong>客户自己的数据</strong>—— Meta 是内部立项，说服的是自己人；你面对的客户不会认别家的数。</p>
+</blockquote>
+<h3 id="eng-01.3-红线清单什么情况下不接或改范围">ENG-01.3　红线清单：什么情况下不接或改范围</h3>
+<p>逐条核，任何一条为真且无法解除，<strong>当场改范围或拒绝</strong>——这是本节存在的意义：</p>
+<div class="checklist"><ul><li><span class="box">☐</span>成功标准无法定义：客户说不出「做好了长什么样」，且拒绝一起定义（<a class="xref" href="ENG-02.html">ENG-02</a> 无法开工）</li><li><span class="box">☐</span>关键数据出不了域：勘察与验证所需的数据/日志/环境，权限明确拿不到</li><li><span class="box">☐</span>非工程域死锁：备案/合规/审批类前置事项的周期长于合同期，或无人认领（<a class="xref" href="ROL-02.html">ROL-02</a>.4）</li><li><span class="box">☐</span>验收权不明：没有任何一个人能代表客户签「验收通过」（<a class="xref" href="ROL-02.html">ROL-02</a>.3 三问全崩）</li><li><span class="box">☐</span>赌注被证伪：ENG-01.2 算出集中度低，且客户拒绝缩范围</li><li><span class="box">☐</span>期望错位无法纠正：客户要的是「效果承诺」（保证指标 X），而你能承诺的是「交付物 + 验收判据」</li></ul></div>
+<p><strong>红线不是「困难」</strong>。困难（环境差、数据脏、排期紧）是交付的常态，进 SUR 去摸清；红线是<strong>结构性无解</strong>——它不随努力改善，只随合同条款和范围改变。</p>
+<h3 id="eng-01.4-产出承接判定走关口">ENG-01.4　产出承接判定，走关口</h3>
+<p>承接关口的判定输出（可粘贴进过程资产，形态见 <a class="xref" href="DIS-02.html">DIS-02</a>）：</p>
+<div class="checklist"><ul><li><span class="box">☐</span>可证伪赌注已写成一句话，且其中的数字来自客户自己的数据</li><li><span class="box">☐</span>集中度已算出并附计算口径</li><li><span class="box">☐</span>红线清单逐条核过，全部为否（或已通过改范围解除）</li><li><span class="box">☐</span>干系人与承接表已建（<a class="xref" href="ROL-02.html">ROL-02</a>.4），验收权落到具体人名</li><li><span class="box">☐</span>成功标准草案已随赌注产出（定稿走 <a class="xref" href="ENG-02.html">ENG-02</a>）</li></ul></div>
+<p>任何一条不满足就进入 SUR = 把承接的缺口带进勘察——勘察只能回答「环境是什么样」，回答不了「这活该不该接」。</p>
+<hr />
+<h2 id="常见误判">常见误判</h2>
+<p><strong>「客户很有诚意，所以能做」</strong>诚意是合作意愿的信号，不是问题有界性的证据。诚意最高的客户往往正是问题最无界的客户 ——因为他们自己也不知道要什么，所以格外需要你。诚意核对的是 <a class="xref" href="ROL-02.html">ROL-02</a> 的配合项，可行性只认 ENG-01.2 的数字。</p>
+<p><strong>「先接下来，做着做着就清楚了」</strong>做着做着清楚的是环境（那是 SUR 的事），不清楚的赌注做到最后仍然不清楚—— 只是此时它的名字变成了「验收争议」。范围可以留弹性，<strong>赌注不能留空白</strong>。</p>
+<p><strong>「demo 打动了客户，说明可行」</strong> demo 证明的是「最顺利路径在演示环境能走通」，与「该问题在客户环境里有界」无关。把 demo 当可行性证据，等于用 BLD 最早的中间产物回答 ENG 的问题——层级用错了（证据分级见 <a class="xref" href="DIS-01.html">DIS-01</a>）。</p>
+<p><strong>「愿景大不要紧，先按大愿景签」</strong>签下的范围就是验收的范围。大愿景 + 小预算 = 验收时你欠客户一个愿景。正确动作是把愿景拆出第一个可证伪赌注，签赌注，愿景写进「后续阶段」。</p>
+<hr />
+<h2 id="判定标准">判定标准</h2>
+<p>见 ENG-01.4 的关口清单——它就是本节的判定标准。补一条保守缺省：<strong>「拿不准能不能接」按不能接处理</strong>，回去补 ENG-01.2 的数字；用乐观填补数据缺口，等于把证伪的机会留给交付失败。</p>
+<hr />
+<h2 id="案例证据">案例证据</h2>
+<blockquote>
+<h3 id="引证-第三方声明meta可证伪赌注与集中度">引证 · 第三方声明｜Meta：可证伪赌注与集中度</h3>
+<p>本节引句出自 Analytics at Meta, “Inside Meta’s Home Grown AI Analytics Agent”： https://medium.com/<span class="citation" data-cites="AnalyticsAtMeta/inside-metas-home-grown-ai-analytics-agent-4ea6779acfb3">@AnalyticsAtMeta/inside-metas-home-grown-ai-analytics-agent-4ea6779acfb3</span> （2026-08-07 逐句核实实存）。其复盘对这条方法的总结： “The lesson: don’t start with a solution looking for a problem. Start with data that proves the problem is tractable.”</p>
+<p><strong>不可外推边界</strong>：Meta 是内部立项——说服对象是自己人、数据权限天然齐备； 88% 是其自家统计，非行业常数。可搬的是「先证明问题有界再动手」的动作序列，不是任何数值。</p>
+</blockquote>
+<hr />
+<h2 id="相关小节">相关小节</h2>
+<ul>
+<li><strong><a class="xref" href="ENG-02.html">ENG-02</a> 成功标准</strong>——赌注的下游：把「应能做到 Y」翻译成可机械执行的验收判据</li>
+<li><strong><a class="xref" href="ROL-02.html">ROL-02</a> 相邻角色边界</strong>——红线清单里「验收权不明」「非工程域死锁」的判定工具</li>
+<li><strong><a class="xref" href="ROL-04.html">ROL-04</a> 全景图</strong>——SUR 发现红线时回本节重议（回边规则）</li>
+<li><strong><a class="xref" href="DIS-01.html">DIS-01</a> 证据分级</strong>——为什么 demo 不是可行性证据</li>
+<li><strong><a class="xref" href="APPX-A.html">附录 A</a> · FX-ORG-05（待写）</strong>——症状「项目做到一半发现结构性做不了」的速查入口</li>
+</ul>
+</main>
+<nav class="pager"><a href="ROL-04.html">← ROL-04</a><a href="ENG-02.html">ENG-02 →</a></nav>
+<footer>案例三档强制标注 · 引文写作当轮核实 · <a href="https://github.com/libaoming/fde-handbook">GitHub 源仓库</a>（发现分档冒充或引文失实，请提 issue——那是本手册的红线）</footer>
+</body></html>

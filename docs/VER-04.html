@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VER-04 · 故障定位：先加分辨率，再提假设 · FDE 手册</title>
+<link rel="stylesheet" href="assets/style.css"></head>
+<body><header class="top">
+<a class="home" href="index.html">《FDE 手册》</a><span class="crumb">第 2 部 · VER 签收</span>
+</header>
+<main><h1 id="ver-04-故障定位先加分辨率再提假设">VER-04 · 故障定位：先加分辨率，再提假设</h1>
+<p><strong>目的</strong>　在一个已经被观测到的故障症状面前，把「排查」变成一条可收敛的纪律—— 每一步都在缩小可能性空间，而不是在制造新故障。本节给出七项检查与一个可粘贴的判定输出。<strong>本节只负责定位，不负责修复</strong>；输出 <code>LOCATED</code> 是动手改代码的前置条件，不是排查的终点。</p>
+<p><strong>前置条件</strong> - 有一句具体的症状陈述：<strong>谁、在什么条件下、观察到了什么</strong>（「不好用」不是症状陈述） - 你能对被测系统追加观测——加一行日志、打印一个中间量、提高日志级别——并重新触发症状 - 你能撤销自己的每一次改动（工作区干净，或改动有独立记录） - 症状出现在<strong>已通过切换验证的版本</strong>上（否则先回 <a class="xref" href="VER-02.html">VER-02</a>：你可能正在给一个根本没上线的版本查 bug）</p>
+<hr />
+<h2 id="规程">规程</h2>
+<p>七项按顺序执行。<strong>在第 1 项完成之前，不得提出任何关于原因的解释。</strong></p>
+<h3 id="ver-04.1-先建立一条能变红的观测">VER-04.1　先建立一条能变红的观测</h3>
+<p>排查的起点不是「可能是什么原因」，是「<strong>用哪条命令能看见它坏</strong>」。</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>症状形态</th>
+<th>最低限度的可复现观测</th>
+<th>不算数的</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>行为不对</td>
+<td>一条能重放该请求、并打印可判读输出的命令</td>
+<td>用户口述、截图</td>
+</tr>
+<tr>
+<td>间歇性</td>
+<td>循环 N 次并统计发生率的脚本</td>
+<td>手工试一次</td>
+</tr>
+<tr>
+<td>性能回归</td>
+<td>固定输入下的耗时打印，带基线数值</td>
+<td>「感觉变慢了」</td>
+</tr>
+<tr>
+<td>产出内容不对</td>
+<td>断言<strong>内容</strong>的检查，而不是断言状态码或退出码</td>
+<td>HTTP 200 / exit 0</td>
+</tr>
+</tbody>
+</table>
+<p><strong>没有一条已经跑过、会对着原始症状变红的观测，后面所有判断都无法被证伪。</strong>无法复现时，「不能复现」就是本轮的结论，把它记下来（见常见误判最后一条）—— <strong>不要在没有观测的情况下顺手改代码试试看</strong>。</p>
+<h3 id="ver-04.2-提假设之前先加一个能分辨真假的量">VER-04.2　提假设之前，先加一个能分辨真假的量</h3>
+<p><strong>调试的第一动作不是提出解释，是增加分辨率。</strong></p>
+<ul>
+<li>在数据流的<strong>边界</strong>处打印中间量：进出某个模块的长度、类型、幅度、条数、编码；</li>
+<li>一次打印<strong>一对互斥的量</strong>，而不是一个。</li>
+</ul>
+<blockquote>
+<p><strong>一个数只能被解释，一对数才能被分辨。</strong>一个孤立的读数总能被套进某个故事里——峰值撞到量程上限，可以解释成「音量太大」，也可以解释成「格式读错了」。把同一段数据按两种解释各算一个值同时打出来，通常只剩一种解释站得住。</p>
+</blockquote>
+<p>这正是白盒观测存在的理由。Google SRE 要求「你的监控系统应回答两个问题：什么坏了，以及为什么」（<em>Site Reliability Engineering</em>, Ch.6，https://sre.google/sre-book/monitoring-distributed-systems/ ）。<strong>症状回答的是 what’s broken，分辨率观测量回答的是 why</strong>；缺了后者，排查就只能靠猜。不可外推：SRE 主张黑盒与白盒互补，此处不构成「外部行为验证可以省略」。</p>
+<h3 id="ver-04.3-每个假设必须附一条可证伪的预测">VER-04.3　每个假设必须附一条可证伪的预测</h3>
+<p><strong>「能解释症状」几乎没有筛选力——能解释同一个症状的理论通常不止一个。</strong>有线索、有动机、有机制、能完整讲通因果的理论，仍然可以是错的。真正的筛选力来自<strong>预测</strong>：如果这个理论成立，还有什么东西<strong>现在为假、改完之后会变真</strong>？</p>
+<p>假设一律写成这个句式，写不满就说明它还不是一个可测的假设：</p>
+<pre><code>假设：____________________________________
+若成立，则 ______ 现在应为 ______（当前为假 / 尚未观测）
+测法：____________________________________
+若观测到 ______，则本假设被推翻</code></pre>
+<p><strong>硬约束</strong>：没有最后一行的假设，不许驱动任何代码改动。</p>
+<h3 id="ver-04.4-用独立观测量判定不用症状变化判定">VER-04.4　用独立观测量判定，不用症状变化判定</h3>
+<p>改完之后，判定只能落在 VER-04.3 事先声明的那个观测量上。</p>
+<blockquote>
+<p><strong>「症状变了」不等于「假设被验证」。</strong>症状变化只证明改动<strong>产生了影响</strong>，完全不证明改动<strong>方向正确</strong>—— 把好数据改坏，同样会让症状变化。</p>
+</blockquote>
+<ul>
+<li>观测量的定义在改动前后必须<strong>保持不变</strong>；改判据的同时改代码，等于没有判据。</li>
+<li>症状从 A 变成 B，默认按「<strong>引入了一个新故障</strong>」处理：先回滚，再继续，而不是把它当成进展、继续调参。</li>
+<li>「更接近了」「有进展」不是可观察量，不得写进判定。</li>
+</ul>
+<h3 id="ver-04.5-同方向连续两个假设被证伪回退去质疑前提">VER-04.5　同方向连续两个假设被证伪，回退去质疑前提</h3>
+<p>一个方向上第一个假设被推翻时，人的默认动作是在同方向上换一个更细的假设。<strong>第二个也被推翻，就不要再要第三个</strong>——停止细化，改为把这条方向所依赖的前提逐条列出来，每条配一个验证方法。</p>
+<p>常见的、几乎从不被检查的前提：</p>
+<ul>
+<li>上游给的<strong>格式 / 单位 / 时区 / 编码</strong>是你以为的那个</li>
+<li>这台机器上跑的<strong>就是</strong>你改的那份代码（→ <a class="xref" href="VER-02.html">VER-02</a>）</li>
+<li>你正在读的日志来自<strong>本次</strong>运行，不是上一次的残留</li>
+<li>这条链路上没有中间层在改写请求或响应（→ <a class="xref" href="VER-03.html">VER-03</a>）</li>
+<li>报症状的人和你说的是<strong>同一个环境、同一个入口</strong></li>
+</ul>
+<blockquote>
+<p><strong>假设不会自己举手。</strong> 它不是待办事项，没有人会去检查它—— 除非有人把它从「背景」提升成「待验证项」。</p>
+</blockquote>
+<h3 id="ver-04.6-分清测量工具与被测对象">VER-04.6　分清测量工具与被测对象</h3>
+<p><strong>判据本身也会坏。</strong> 两种坏法都会把排查带进沟里：</p>
+<ol type="1">
+<li><strong>判据太严，把真实现象判成「未复现」</strong>——阈值卡死一个点位，实测差几个单位就报否定。</li>
+<li><strong>诊断通道与故障共享依赖，工具先垮</strong>——此时「测不出来」不等于「没问题」（PM-04、PM-06）。</li>
+</ol>
+<p>对应动作：</p>
+<ul>
+<li>每次拿到「未复现 / 未观测到」的结论，先做一次<strong>阳性对照</strong>（用一个<strong>已知会触发</strong>的输入喂给同一套观测，确认它确实会变红）。对照不变红 → 坏的是观测，不是结论。</li>
+<li>诊断通道必须与故障域无共享依赖：故障网络里的诊断请求、被观测系统上跑的监控，在最需要它们的时刻恰好是最可能失效的（PM-06）。</li>
+<li>调整阈值时，<strong>把「为什么调」写在阈值旁边</strong>。否则下一个人无法区分「修正过严的判据」和「为了让断言通过而挪靶子」——这两件事在 diff 里长得一模一样。</li>
+</ul>
+<h3 id="ver-04.7-修复后留下防复发的痕迹">VER-04.7　修复后留下防复发的痕迹</h3>
+<p>定位完成、改动落地之后，还有三件事，缺一件这次排查就会被重复一遍：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>留什么</th>
+<th>留在哪</th>
+<th>为什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>这一步为什么必须存在</strong></td>
+<td>代码里，紧挨着那一步</td>
+<td>提交信息与 wiki 不在阅读路径上；一个没有理由的转换步骤，迟早会被当成冗余删掉</td>
+</tr>
+<tr>
+<td><strong>那个分辨率观测量</strong></td>
+<td>生产日志里，别删</td>
+<td>它已经证明过一次自己的价值；下次同类误判会撞在它上面</td>
+</tr>
+<tr>
+<td><strong>最终判据（含阈值与理由）</strong></td>
+<td>一个可跑的脚本</td>
+<td>让判据可被重跑、可被质疑（→ <a class="xref" href="DIS-02.html">DIS-02</a>）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>如果一步操作的理由不在它旁边，它就等着被下一个人删掉。</strong></p>
+<hr />
+<h2 id="常见误判">常见误判</h2>
+<p><strong>「这个理论完美地解释了症状，所以它是对的」</strong>解释力和正确性是两回事。一个错误理论同样可以有线索、有动机、有机制、有预期症状。唯一能把它和正确理论分开的，是 VER-04.3 那条<strong>现在为假、改完会变真</strong>的预测。</p>
+<p><strong>「症状变了，说明方向对了」</strong>这通常是整个排查里最危险的一刻——不是提出错误理论的那一刻，是错误理论看起来被印证的那一刻。从「完全不工作」变成「工作但质量差」看起来像进展，但把好数据改坏也会产生同样的轨迹。判定见 VER-04.4。</p>
+<p><strong>「先随便改一下，看看有没有变化」</strong>无观测的试错会同时污染两样东西：系统的状态，和你对「改之前是什么样」的记忆。每一次改动前后，至少要有一个定义不变的观测量（VER-04.2）。</p>
+<p><strong>「日志里没有报错，所以这一段没问题」</strong>故障可以以「合法结果」的形态出现：进程健康、端口可连、状态码 200，只有内容是错的。 Monzo 那次事故里，配置服务对请求的键返回的是 404 而不是错误，「服务是活的」这个判断把排查方向带偏了（PM-03）。</p>
+<p><strong>「诊断工具跑不出来 / 监控没告警，所以问题没那么严重」</strong>当可观测链路与被观测系统共用依赖，故障发生时验证手段会和故障一起消失（PM-04）；当诊断流量和故障流量抢同一条已经拥塞的链路，工具会在最需要它的时候失败（PM-06）。<strong>此时的沉默不是绿灯，是没有信号。</strong></p>
+<p><strong>「现象没复现，所以那个解释是错的」</strong>先怀疑判据，再怀疑现象（VER-04.6）。没有阳性对照的「未复现」，信息量接近于零。</p>
+<p><strong>「本机能重放，线上那个不是这个原因」（或反过来）</strong>本机重放证明的是代码的行为，不是那套系统的行为。 Charity Majors 的说法是：「一旦部署，你测的就不再是代码，而是系统—— 由用户、代码、环境、基础设施和某个时间点构成的复杂系统」，且「每次部署都是制品、环境、基础设施与时刻的独一无二、不可重放的组合」（“I test in prod”, <em>Increment</em> issue 10，https://increment.com/testing/i-test-in-production/ ）。不可外推：作者立场偏 observability 布道，这不构成「不需要本机复现或预发环境」。</p>
+<p><strong>「症状自己消失了，所以问题解决了」</strong>未定位的消失就是未定位。它下次会在同一个位置、以同样的方式回来，而那时排查会从「上次那个已经修好了」这个错误前提开始。见下方保守缺省。</p>
+<hr />
+<h2 id="判定标准">判定标准</h2>
+<p>七项全部通过才输出 <code>LOCATED</code>。让脚本吐判定标量，不要让人读三屏输出自己下结论（理由见 <a class="xref" href="DIS-02.html">DIS-02</a>）：</p>
+<div class="checklist"><ul><li class="cont">REPRO_OBSERVATION=yes          # VER-04.1  有一条跑过、会变红的观测</li><li class="cont">DISCRIMINATOR_ADDED=yes        # VER-04.2  提假设前已加入分辨率观测量</li><li class="cont">HYPOTHESES_WITH_PREDICTION=3/3 # VER-04.3  每个假设都带可证伪预测</li><li class="cont">VERDICT_ON_INDEPENDENT_SIGNAL=yes  # VER-04.4  判定落在独立观测量，不在症状变化</li><li class="cont">PREMISES_REVISITED=yes         # VER-04.5  同方向两次证伪后已回退质疑前提</li><li class="cont">CONTROL_POSITIVE=yes           # VER-04.6  阳性对照通过：判据确实会变红</li><li class="cont">GUARD_LEFT_IN_CODE=yes         # VER-04.7  防复发痕迹已落在代码旁</li><li class="cont">VERDICT=LOCATED</li></ul></div>
+<p>未完成时输出 <code>VERDICT=NOT_LOCATED</code>，并<strong>同时列出当前尚未被排除的假设清单</strong>—— 「没有头绪」不是一个合法状态，「还剩 3 个未排除假设，各自的测法如下」才是。</p>
+<blockquote>
+<p><strong>保守缺省</strong>：症状在机理未被定位的情况下消失，一律按 <code>NOT_LOCATED</code> 记录并进事故台账（<a class="xref" href="DIS-04.html">DIS-04</a>），<strong>不按已解决处理</strong>。与之配套的一条：当手上同时存在「一个修复」和「一个没被解释的症状」时，<strong>先回滚那个修复</strong>。一个没有证据支撑的修复留在生产里比症状本身更贵——下一次排查会从它开始，而它不会自称是可疑对象。</p>
+</blockquote>
+<hr />
+<h2 id="案例证据">案例证据</h2>
+<blockquote>
+<h3 id="案例-pm-03-公开事故复盘monzo2019事故发生于-7-月-29-日">案例 PM-03 · 公开事故复盘｜Monzo，2019（事故发生于 7 月 29 日）</h3>
+<p>扩容之后，新节点已经接管分区，但数据尚未流过来。读请求拿到的不是错误，是<strong>合法的空结果</strong>。</p>
+<p>官方复盘原文：「We try to get data from our configuration service directly and realise it’s returning a 404 (not found) response for the key we attempted to retrieve. We’re confused, as we believe that if the configuration service wasn’t working, it’d have a much wider impact than we were seeing.」</p>
+<p><strong>它验证了 VER-04.1 为什么要求观测断言内容而不是状态</strong>：进程健康、端口可连、有响应回来，全部成立；只有内容是错的。也验证了 VER-04.5—— 「配置服务是活的」是一个从未被提升为待验证项的<strong>前提</strong>，它把排查方向带偏了一段时间。</p>
+<p>出处：https://monzo.com/blog/2019/09/08/why-monzo-wasnt-working-on-july-29th ｜不可外推：特定于 Cassandra 的 quorum 与数据流转时序，不能据此论断所有数据库扩容都会读到空值。</p>
+</blockquote>
+<blockquote>
+<h3 id="案例-pm-02-公开事故复盘cloudflare2025-11-18">案例 PM-02 · 公开事故复盘｜Cloudflare，2025-11-18</h3>
+<p>一份配置每 5 分钟重新生成一次，好坏两种版本交替下发到全网，系统在恢复与崩溃之间横跳。</p>
+<p>官方复盘原文：「As a result, every five minutes there was a chance of either a good or a bad set of configuration files being generated and rapidly propagated across the network. This fluctuation made it unclear what was happening as the entire system would recover and then fail again… Initially, this led us to believe this might be caused by an attack.」</p>
+<p><strong>它验证了 VER-04.1 对间歇性症状的要求</strong>：单次采样在这种系统上会随机给出「好了」或「坏了」，只有循环 N 次统计发生率的观测才有分辨力。同时验证 VER-04.4——在一个自己会来回变化的系统上，把「症状变了」当作改动奏效的证据，得到的是纯噪声；这次事故最初据此得出的判断是「可能遭到攻击」。</p>
+<p>出处：https://blog.cloudflare.com/18-november-2025-outage/ ｜不可外推：波动源于上游权限变更导致文件体积翻倍，不能用来论证「配置灰度本身有害」。</p>
+</blockquote>
+<blockquote>
+<h3 id="案例-pm-06-公开事故复盘google-cloud事故-2019-06-02报告-2019-06-06">案例 PM-06 · 公开事故复盘｜Google Cloud，事故 2019-06-02（报告 2019-06-06）</h3>
+<p>一次维护操作的作用域在逻辑层与物理层不一致，网络控制任务被跨物理位置地取消调度。随后出现的是本节最关心的那一幕——</p>
+<p>官方复盘原文：「Debugging the problem was significantly hampered by failure of tools competing over use of the now-congested network.」</p>
+<p><strong>它验证了 VER-04.6 的第二种判据故障</strong>：诊断工具和故障流量走同一条链路，于是工具在最需要它的时刻失效。此时「测不出来」既不是「没问题」，也不是「问题不在这里」，它只是<strong>没有信号</strong>。同型可参见 PM-04（Roblox）：关键监控依赖了受故障影响的系统本身。</p>
+<p>出处：https://status.cloud.google.com/incident/cloud-networking/19009 ｜不可外推：Google 内部集群管理软件的特定 bug，不能外推为「所有自动化维护都会跨区扩散」。</p>
+</blockquote>
+<blockquote>
+<h3 id="案例-可复现实验reproducible-档读者可自己跑出来">案例 · 可复现实验（<code>reproducible</code> 档，读者可自己跑出来）</h3>
+<p><code>kit/float32-int16-misread.py</code>，固定随机种子，<code>python3 kit/float32-int16-misread.py --assert</code>。</p>
+<p>它构造一段振幅正常的浮点音频，分别走「按数值正确缩放」与「把原始字节直接当整数读」两条路径，输出判定标量：<code>F32_MAX_ABS</code> / <code>CORRECT_I16_MAX_ABS</code> / <code>CORRECT_NEAR_RAIL_RATE</code> / <code>MISREAD_I16_MAX_ABS</code> / <code>MISREAD_NEAR_RAIL_RATE</code> / <code>MISREAD_SAMPLE_COUNT_RATIO</code> / <code>RAIL_THRESHOLD</code> / <code>VERDICT</code>。</p>
+<p><strong>它演示 VER-04.2 的「一对数」</strong>：错读路径的整数峰值紧贴量程上限（<code>32760</code>，上限 <code>32767</code>），而同一段数据的浮点峰值只有 <code>0.3611</code>。单看前者可以解释成「音量太大」；两个数放在一起，只剩「格式读错了」这一种解释。附带一个当时没人注意的特征—— <code>MISREAD_SAMPLE_COUNT_RATIO=2.0</code>：四字节的浮点采样被拆成两个整数采样，<strong>采样点数翻倍</strong>。</p>
+<p><strong>它同时演示 VER-04.6 的第一种判据故障</strong>：脚本注释里记着首轮运行的失败—— 断言把「顶满量程」的阈值卡在了接近上限的一个整数上，实测值距上限只差个位数，于是脚本吐出 <code>NOT_REPRODUCED</code>。坏的是判据，不是现象。阈值改为量程的 99.9% 之后，改动理由被写在阈值旁边（脚本内注释原文）：</p>
+<blockquote>
+<p>把判据卡在 32766 是过严的实验设计缺陷，而不是现象未复现。此处放宽是修正判据，不是为了让断言通过而挪靶子。</p>
+</blockquote>
+<p>⚠️ <strong>本框是一段可复现实验，不是事故现场记录。</strong> 上述数值全部由该脚本在固定种子下产生，任何人可自行跑出；本节不引用任何无法被读者独立复核的现场读数。</p>
+</blockquote>
+<hr />
+<h2 id="相关小节">相关小节</h2>
+<ul>
+<li><strong><a class="xref" href="VER-02.html">VER-02</a> 切换验证</strong>——排查开始前的前置：先确认在跑的是你要查的那个版本，否则查的是幻影</li>
+<li><strong><a class="xref" href="VER-03.html">VER-03</a> 可达性验证</strong>——症状形如「用户到不了」时的上游分岔；本节假定链路已通</li>
+<li><strong><a class="xref" href="DIS-01.html">DIS-01</a> 证据分级</strong>——「症状变了」为什么是信号而不是证据</li>
+<li><strong><a class="xref" href="DIS-02.html">DIS-02</a> 三道焊缝</strong>——为什么判据要吐标量、为什么阳性对照要进闸门而不是靠自觉</li>
+<li><strong><a class="xref" href="DIS-04.html">DIS-04</a> 事故台账</strong>——<code>NOT_LOCATED</code> 与「自己消失的症状」往哪里归档</li>
+<li><strong><a class="xref" href="APPX-A.html">附录 A</a></strong>——症状「一切都正常，只有结果不对」与「改完之后症状变了但没变对」的速查入口（本节须登记这两条）</li>
+<li><strong><a class="xref" href="APPX-B.html">附录 B</a>（本节条目待收录）</strong>——本节七项检查的可打印版本</li>
+</ul>
+</main>
+<nav class="pager"><a href="VER-03.html">← VER-03</a><a href="VER-05.html">VER-05 →</a></nav>
+<footer>案例三档强制标注 · 引文写作当轮核实 · <a href="https://github.com/libaoming/fde-handbook">GitHub 源仓库</a>（发现分档冒充或引文失实，请提 issue——那是本手册的红线）</footer>
+</body></html>

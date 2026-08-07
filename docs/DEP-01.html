@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DEP-01 · 部署与切换：影响清单、回退与渐进 · FDE 手册</title>
+<link rel="stylesheet" href="assets/style.css"></head>
+<body><header class="top">
+<a class="home" href="index.html">《FDE 手册》</a><span class="crumb">第 2 部 · DEP 上线</span>
+</header>
+<main><h1 id="dep-01-部署与切换影响清单回退与渐进">DEP-01 · 部署与切换：影响清单、回退与渐进</h1>
+<p><strong>目的</strong>　把「执行变更」这个动作本身管起来：动手前知道<strong>实际会碰到什么</strong>，出事时有<strong>演练过的</strong>退路，推进时每一步都隔着观测窗口。本节管动作，动作完成后的验证归 <a class="xref" href="VER-02.html">VER-02</a>——<strong>跑完 <a class="xref" href="VER-02.html">VER-02</a> 并拿到 <code>SWITCHED</code>，DEP 才算出关。</strong></p>
+<p><strong>前置条件</strong> - BLD 关口已过：链路在客户环境跑通，丢失能力清单已确认（<a class="xref" href="BLD-03.html">BLD-03</a>） - 本次变更有唯一版本标识（<a class="xref" href="VER-02.html">VER-02</a> 前置条件的上游） - 变更窗口与干系人已知会（<a class="xref" href="ROL-02.html">ROL-02</a> 登记表）</p>
+<hr />
+<h2 id="规程">规程</h2>
+<h3 id="dep-01.1-影响清单先行让工具把实际会碰谁打印出来">DEP-01.1　影响清单先行：让工具把「实际会碰谁」打印出来</h3>
+<p>执行任何变更前，让工具<strong>打印实际将被影响的对象清单</strong>并人工核对—— 不是你以为的范围，是工具解析出来的范围。两者的差距是一类著名事故的根源： Google Cloud 2019 年的全网降级，起点是一次「本地」维护—— “The automation software created a list of jobs to deschedule in that physical location, which included the logical clusters running network control jobs. Those logical clusters also included network control jobs in other physical locations.” ——<strong>作用域在逻辑层与物理层不一致，操作者看到的范围与实际生效范围不是同一个东西。</strong></p>
+<p><strong>判据</strong>：影响清单已打印、逐项核对过、且清单里没有你解释不了的条目。「解释不了的条目」不是噪音，是这次变更理解不完整的直接证据——先解释，再执行。</p>
+<h3 id="dep-01.2-回退预案没演练过的路径不计入可用能力">DEP-01.2　回退预案：没演练过的路径不计入可用能力</h3>
+<p>回退预案三问：</p>
+<ol type="1">
+<li><strong>写了吗</strong>——回退步骤、触发条件、决策人；</li>
+<li><strong>演过吗</strong>——在等价环境真实执行过，含「最不敢演的那一种」；</li>
+<li><strong>演的是这一种吗</strong>——演练矩阵覆盖没覆盖这次变更实际依赖的路径。</li>
+</ol>
+<p>第三问是 Cloudflare 2023 控制面故障的教训：他们演练过高可用集群—— “We had performed testing of our high availability cluster by taking each (and both) of the other two data center facilities entirely offline… However, we had never tested fully taking the entire PDX-04 facility offline.”——结果一批本应高可用的服务 “had dependencies on services exclusively running in PDX-04.” <strong>「演练过」背书的只是演练矩阵里的那几格；没演过的那一格才是账单。</strong></p>
+<p><strong>判据</strong>：本次变更的回退路径在演练记录里能找到对应条目。找不到 → 回退能力按「未知」计，变更方案按无退路的标准重审（更小的批次、更长的观测窗口）。</p>
+<h3 id="dep-01.3-渐进推进批次之间隔观测窗口">DEP-01.3　渐进推进：批次之间隔观测窗口</h3>
+<ul>
+<li>分批推进，每批之后过一个<strong>观测窗口</strong>再继续；</li>
+<li>窗口长度 ≥ 一个完整的配置/镜像下发周期（周期多长先问清，机理见 <a class="xref" href="VER-02.html">VER-02</a> 的多节点采样判据与 PM-02）；</li>
+<li>窗口内看什么：<a class="xref" href="VER-01.html">VER-01</a>.2 里断言强度够的那些探针 + 带唯一标识的业务事件；</li>
+<li><strong>任何一批异常即停</strong>，走 DEP-01.2 的回退——「继续推完再看」是把灰度用成了全量。</li>
+</ul>
+<h3 id="dep-01.4-交棒给-ver-02">DEP-01.4　交棒给 <a class="xref" href="VER-02.html">VER-02</a></h3>
+<p>切换动作执行完 ≠ 切换完成。立即执行 <a class="xref" href="VER-02.html">VER-02</a> 四项检查，取得 <code>VERDICT=SWITCHED</code> 才算 DEP 阶段出关。<strong>回滚同样是一次切换</strong>——回滚后同样跑完整 <a class="xref" href="VER-02.html">VER-02</a>（FX-SVC-01 的 Rollback 规则）。</p>
+<hr />
+<h2 id="常见误判">常见误判</h2>
+<p><strong>「我只动了 X，所以只会影响 X」</strong> PM-06 的操作者也这么以为。作用域要以工具打印的清单为准，且清单要在<strong>执行前</strong>看——执行后看到的那份叫事故报告。</p>
+<p><strong>「高可用/回滚演练过，所以退路是通的」</strong>演练背书的范围止于演练矩阵（DEP-01.2 第三问）。每次变更前把「这次依赖的路径」对到演练记录上，对不上的按无退路处理。</p>
+<p><strong>「灰度了，所以安全」</strong>灰度的安全来自「批次 + 窗口 + 异常即停」三件套。批次之间不隔观测窗口的灰度，只是把全量发布拆成了几次连续动作——风险原样，多了个安心的名字。</p>
+<p><strong>「诊断工具肯定能用」</strong> PM-06 的第二课：“Debugging the problem was significantly hampered by failure of tools competing over use of the now-congested network.”——诊断工具与故障共享资源时，出事那一刻它们一起失效。这是 <a class="xref" href="VER-01.html">VER-01</a>.1 独立性核查在变更场景的应用：<strong>变更前确认诊断通道与变更影响面无交集。</strong></p>
+<hr />
+<h2 id="判定标准">判定标准</h2>
+<div class="checklist"><ul><li><span class="box">☐</span>影响清单已打印并逐项核对，无解释不了的条目</li><li><span class="box">☐</span>回退预案三问全过：写了、演过、演的覆盖本次路径</li><li><span class="box">☐</span>分批推进，批间观测窗口 ≥ 一个下发周期，异常即停规则已约定</li><li><span class="box">☐</span>诊断通道与变更影响面无共享依赖（<a class="xref" href="VER-01.html">VER-01</a>.1）</li><li><span class="box">☐</span>动作完成后 <a class="xref" href="VER-02.html">VER-02</a> 已跑，VERDICT=SWITCHED</li></ul></div>
+<hr />
+<h2 id="案例证据">案例证据</h2>
+<blockquote>
+<h3 id="案例-pm-06-公开事故复盘google-cloud2019">案例 PM-06 · 公开事故复盘｜Google Cloud，2019</h3>
+<p>一次区域维护的自动化软件，把「该物理位置的任务清单」算成了包含<strong>其他物理位置</strong>网络控制任务的逻辑集群清单，随后诊断工具与故障流量挤在同一条拥塞网络上一起失效。引句见 DEP-01.1 与常见误判（出处：https://status.cloud.google.com/incident/cloud-networking/19009 ， 2026-08-07 逐句核实）。｜不可外推：Google 内部集群管理软件的特定 bug，不能推出「自动化维护普遍会跨区扩散」。</p>
+</blockquote>
+<blockquote>
+<h3 id="案例-pm-08-公开事故复盘cloudflare2023">案例 PM-08 · 公开事故复盘｜Cloudflare，2023</h3>
+<p>高可用集群演练做过多次，唯独没演过整个 PDX-04 设施下线——而一批服务的独占依赖恰好全在那里。引句见 DEP-01.2（出处： https://blog.cloudflare.com/post-mortem-on-cloudflare-control-plane-and-analytics-outage/ ， 2026-08-07 逐句核实）。｜不可外推：三设施拓扑属特例，不能推出「所有多活架构都存在隐藏单点」。</p>
+</blockquote>
+<hr />
+<h2 id="相关小节">相关小节</h2>
+<ul>
+<li><strong><a class="xref" href="BLD-03.html">BLD-03</a> 链路迁移</strong>——上游：链路怎么搭、丢失能力清单</li>
+<li><strong><a class="xref" href="VER-02.html">VER-02</a> 切换验证</strong>——下游：动作完成后的四项检查</li>
+<li><strong><a class="xref" href="VER-01.html">VER-01</a> 验证前提</strong>——诊断通道独立性的完整规程</li>
+<li><strong><a class="xref" href="ROL-04.html">ROL-04</a> 全景图</strong>——DEP 关口在生命周期里的位置</li>
+<li><strong><a class="xref" href="APPX-A.html">附录 A</a> · FX-SVC-01</strong>——「部署完了改动没生效」的速查入口</li>
+</ul>
+</main>
+<nav class="pager"><a href="BLD-04.html">← BLD-04</a><a href="VER-01.html">VER-01 →</a></nav>
+<footer>案例三档强制标注 · 引文写作当轮核实 · <a href="https://github.com/libaoming/fde-handbook">GitHub 源仓库</a>（发现分档冒充或引文失实，请提 issue——那是本手册的红线）</footer>
+</body></html>

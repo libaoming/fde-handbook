@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BLD-04 · 模型行为约束：把要求落成结构与闸门 · FDE 手册</title>
+<link rel="stylesheet" href="assets/style.css"></head>
+<body><header class="top">
+<a class="home" href="index.html">《FDE 手册》</a><span class="crumb">第 2 部 · BLD 搭建</span>
+</header>
+<main><h1 id="bld-04-模型行为约束把要求落成结构与闸门">BLD-04 · 模型行为约束：把要求落成结构与闸门</h1>
+<p><strong>目的</strong>　搭建阶段，当一条要求的形态是「模型必须做 X」或「模型禁止做 Y」时，判断这条要求该写进提示词、该改成数据与格式的形状、还是该做成模型之外的闸门；并在进入上线阶段前，检出提示词里「写的是约束、读到的是建议」的那些写法。</p>
+<blockquote>
+<p><strong>判据：写进提示词的每一条「必须」，到了模型那里都是一个较强的倾向，不是一道闸门。</strong>它要和模型在训练中形成的先验（prior，即训练数据里学到的默认倾向）竞争。冲突时胜负取决于哪一边信号更强，<strong>不取决于措辞多重</strong>。</p>
+</blockquote>
+<p><strong>前置条件</strong> - 已有成功标准的清晰定义，以及针对该标准做实证测试的手段（否则本节的判定无处落地，见下方引文） - 已知目标链路的模型形态（端到端语音 / 文本对话 / 工具调用），因为同一句话在不同形态下竞争的先验不同 - 提示词全文可读且纳入版本控制——未入版本控制的提示词无法做 BLD-04.4 的逐项审查 - 若本次是链路迁移：旧链路的提示词及其<strong>运行形态</strong>（谁在消费它的输出）可获取，见 <a class="xref" href="BLD-03.html">BLD-03</a></p>
+<blockquote>
+<p>“This guide assumes that you have: 1. A clear definition of the success criteria for your use case, 2. Some ways to empirically test against those criteria… If not, spend time establishing that first.” ——Anthropic, <em>Claude Docs</em> · Prompt engineering overview ｜https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/overview ｜不可外推：这是官方把「可实证测试」列为 prompt 工程的<strong>前置条件</strong>，不是对效果的承诺。</p>
+</blockquote>
+<hr />
+<h2 id="规程">规程</h2>
+<p>五项检查全部通过，本节才算完成。<strong>任何一项不通过，该约束按「未生效」处理，不得进入 <a class="xref" href="DEP-01.html">DEP-01</a>。</strong></p>
+<h3 id="bld-04.1-先分清要它识别还是要它照做再决定给不给清单">BLD-04.1　先分清「要它识别」还是「要它照做」，再决定给不给清单</h3>
+<p>对每一份要放进上下文的清单、示例、候选集、枚举，先回答一个问题：<strong>如果模型把这一项原样吐出来，那是正确输出，还是编造？</strong></p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>意图</th>
+<th>典型形态</th>
+<th>清单该不该进上下文</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>要它照做</strong></td>
+<td>三个待推荐的岗位、四档价目、固定话术</td>
+<td><strong>该给</strong>。原样复述就是正确行为</td>
+</tr>
+<tr>
+<td><strong>要它识别</strong></td>
+<td>可能出现的岗位词、可能的意图类别、易混词表</td>
+<td><strong>不该给</strong>。原样复述就是编造</td>
+</tr>
+</tbody>
+</table>
+<p><strong>判据：需要它识别的，别给清单；需要它照做的，才给清单。</strong></p>
+<p>上下文里的任何候选集都同时是两样东西——识别的线索，和<strong>编造的原料</strong>。在信息不足时，模型会优先使用手边的原料。识别类需求应改由程序侧承担：语音识别侧的词表偏置（biasing，把候选词交给 ASR 而不是交给下游模型）、检索、或输出之后的模糊匹配与人工确认。</p>
+<p><strong>这一项排除的是</strong>：把参考资料当成了许可。<strong>它不能证明模型会遵守任何别的规则。</strong></p>
+<h3 id="bld-04.2-给出承认不知道的合法出路并写明话术">BLD-04.2　给出「承认不知道」的合法出路，并写明话术</h3>
+<p>一条出路必须同时包含三件东西，缺一不算：</p>
+<ol type="1">
+<li><strong>触发条件</strong>——什么算信息不足（可判定，不能是「觉得不确定时」）</li>
+<li><strong>动作</strong>——反问 / 挂起 / 转人工 / 降级到固定话术</li>
+<li><strong>话术原句</strong>——直接给出要说的那句话，不要让模型自己想</li>
+</ol>
+<p><strong>判据：模型编造的直接成因，通常是「猜一个」的成本低于「承认不知道」。要做的是把后者的成本降下来，而不是禁止前者。</strong></p>
+<p>反向检查同样重要，且优先级更高：<strong>全文不得出现堵死出路的指令</strong>—— 「不要反问」「必须给出一个答案」「猜一个最接近的」「不准说不知道」。这类句子比「没写出路」严重，因为它是在主动命令模型编造。</p>
+<blockquote>
+<p>“…producing plausible yet incorrect statements instead of admitting uncertainty”； “language models hallucinate because the training and evaluation procedures reward guessing over acknowledging uncertainty.” ——Kalai, Nachum, Vempala, Zhang, “Why Language Models Hallucinate”, arXiv:2509.04664 ｜https://arxiv.org/abs/2509.04664 ｜类型：<code>third-party-claim</code>（理论论证，非产品实测）。｜不可外推：这篇论文论证的是训练与评估机制层面的成因，<strong>不构成对任一具体模型幻觉率的量化预测</strong>，也不保证「写了出路就不编造」——它只说明了为什么「承认不确定」这条路默认更贵。</p>
+</blockquote>
+<h3 id="bld-04.3-约束优先用结构性手段措辞排在最后一档">BLD-04.3　约束优先用结构性手段，措辞排在最后一档</h3>
+<p>模型不听话时，<strong>加强措辞通常是最低效的修法</strong>。先问一句：它现在的行为，是不是某种训练先验的自然结果？如果是，要找的是能压过那个先验的结构性手段。</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>档</th>
+<th>手段</th>
+<th>确定性</th>
+<th>形态举例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td><strong>措辞</strong>：「必须」「禁止」「硬性要求」、加粗、感叹号</td>
+<td>无。只是调高一个权重</td>
+<td>「不得中途停顿」</td>
+</tr>
+<tr>
+<td>1</td>
+<td><strong>上下文形状</strong>：给什么、不给什么、放在哪、多长</td>
+<td>无，但改变了竞争条件</td>
+<td>移走识别类清单；删冗余段落</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>数据/文本形状</strong>：让不该发生的事在语法上不成立</td>
+<td>无，但与先验同向而非对抗</td>
+<td>多条目之间不以句末标点收尾，用连接词让句子保持「未说完」状态</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>输出格式约束</strong>：枚举、JSON schema、函数签名、受限解码</td>
+<td>较高，取决于是否由服务端强制</td>
+<td>把岗位做成枚举字段，而不是自由文本</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>模型之外的闸门</strong>：程序校验、hook、拒绝不合规输出并重试或降级</td>
+<td><strong>确定</strong></td>
+<td>输出不在已知岗位表内 → 拒绝该输出，回退到反问话术</td>
+</tr>
+</tbody>
+</table>
+<p><strong>判据：一条要求最终落在第几档，决定了它是约束还是建议。第 0–2 档全部是建议。</strong></p>
+<p><strong>真正确定性的约束来自模型之外的闸门，而不是提示词本身。</strong> 这一点有官方口径：</p>
+<blockquote>
+<p>“Unlike CLAUDE.md instructions which are advisory, hooks are deterministic and guarantee the action happens.” ——Anthropic, <em>Claude Code Docs</em> · Best practices｜https://code.claude.com/docs/en/best-practices ｜不可外推：原文描述的是 Claude Code 的 hook 机制；外推到其他 LLM 应用时，只能说「同类机制」（输出后的程序化校验与拒绝），不能宣称任一具体产品也有等价保证。可引用的核心是官方对提示词性质的定性：<strong>给模型的指令是 advisory（劝导性的）</strong>。</p>
+</blockquote>
+<p>对第 0 档的补充：措辞不仅弱，而且<strong>加得越多越弱</strong>——</p>
+<blockquote>
+<p>“Bloated CLAUDE.md files cause Claude to ignore your actual instructions!”（同上出处）</p>
+</blockquote>
+<h3 id="bld-04.4-迁移链路时逐项审隐性约定不只审文档">BLD-04.4　迁移链路时逐项审隐性约定，不只审文档</h3>
+<p><strong>判据：为老链路建立的约定——标点、格式、空行、顺序、字段名——从来没被当作「规则」写下来过，所以不会出现在任何一份迁移检查清单上；而它们在新链路里的含义可能完全相反。</strong></p>
+<p>审查方法不是通读提示词（读一遍发现不了，因为标点看起来根本不像一条规则），而是<strong>按消费者列表</strong>：对每一类隐性约定，问「老链路里这个信号被谁消费？新链路里同一个信号被谁消费？」</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>隐性约定</th>
+<th>老链路的消费者（举例）</th>
+<th>新链路里要核实的问题</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>句末标点 / 换行</td>
+<td>语音合成：据此决定停顿时长</td>
+<td>端到端语音模型是否把它读作<strong>话轮结束</strong>信号？</td>
+</tr>
+<tr>
+<td>条目顺序</td>
+<td>下游解析器按位置取值</td>
+<td>新链路是否还保证顺序稳定？</td>
+</tr>
+<tr>
+<td>字段名</td>
+<td>老 schema 的键名，仅作标识</td>
+<td>模型是否会据字段名推断语义（改名即改行为）？</td>
+</tr>
+<tr>
+<td>空行 / 分段</td>
+<td>模板渲染的分隔符</td>
+<td>进入上下文后是否成为分段线索、影响指令归属？</td>
+</tr>
+<tr>
+<td>全角半角、大小写</td>
+<td>正则匹配</td>
+<td>是否改变分词边界？</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>表中「新链路」一列是<strong>必须逐项核实的问题，不是已成立的断言</strong>。它的作用是保证这些项被列出来接受检查，而不是替你给出答案。</p>
+</blockquote>
+<p>同一份提示词在两条链路上可以同时「都是对的」和「一边是自杀开关」，且两者不产生任何报错。<strong>没有报错，是这一项最危险的地方。</strong></p>
+<h3 id="bld-04.5-补丁冲突登记不把张力推给模型仲裁">BLD-04.5　补丁冲突登记，不把张力推给模型仲裁</h3>
+<p>每新增一条行为补丁，登记一行：</p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th>补丁号</th>
+<th>要压住的行为</th>
+<th>适用场景</th>
+<th>与哪条已有规则冲突</th>
+<th>仲裁者</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P-07</td>
+<td>多条目播报中途停下</td>
+<td>条目播报</td>
+<td>P-03「每句话都要有完整结束」</td>
+<td>⚠️ <strong>模型自行判断</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>判据：当「仲裁者」这一栏填的是模型自己，这条冲突就是未决状态。</strong>未决冲突必须转成可判定的触发条件（写明各自适用于哪个可观察的状态），或者把两条规则合并；两者都做不到时，登记为已知风险并在下游加闸门（BLD-04.3 第 4 档）。</p>
+<p>不登记的后果不是某一条规则失效，而是<strong>没人说得清哪条规则在管哪件事</strong>—— 到那时，改一句话导致另一处坏掉将成为常态，且无法定位。</p>
+<hr />
+<h2 id="常见误判">常见误判</h2>
+<p><strong>「措辞已经写得很重了，它不可能不听」</strong>措辞的重量不是约束的强度。「必须」和「建议」在模型那里的差别是权重差别，不是「可违背 / 不可违背」的差别。官方对提示词的定性就是 advisory（见 BLD-04.3 引文）。</p>
+<p><strong>「加粗、全大写、多写几遍，遵守率会上去」</strong>这些手段停留在第 0 档，且与上一条同类：把一个不确定的机制反复加码，换不来确定性，只换来更长的提示词——而臃肿本身会稀释真正的指令。</p>
+<p><strong>「多给几个例子总没坏处」</strong>上下文里的每一份例子既是线索也是原料。判据仍是 BLD-04.1：先问「模型把它原样吐出来算不算编造」，答案是「算」就不该给。</p>
+<p><strong>「这次它照做了，说明规则生效了」</strong>单次通过是一次采样的结果，不是约束的证据。先验竞争的胜负是概率性的，<strong>验证必须重复采样</strong>；只跑一次的绿灯没有证明力。</p>
+<p><strong>「老提示词在旧链路稳定跑了很久，直接搬过来」</strong>稳定运行证明的是它与<strong>老消费者</strong>的配合正确，对新消费者没有任何证明力。迁移必须走 BLD-04.4 的消费者列表，逐项重问。</p>
+<p><strong>「加一条补丁只影响它针对的那个场景」</strong>补丁之间的冲突不会报错，它以「模型在某些场景下行为不稳定」的形式出现，而这个症状指不向任何一条具体规则。冲突必须在加入时登记，事后无法反推（BLD-04.5）。</p>
+<hr />
+<h2 id="判定标准">判定标准</h2>
+<p>五项全部通过才输出 <code>CONSTRAINED</code>。建议让脚本吐判定标量，而不是让人通读提示词自己下结论（理由见 <a class="xref" href="DIS-02.html">DIS-02</a>）：</p>
+<div class="checklist"><ul><li class="cont">RECOGNITION_LIST_IN_CONTEXT=0     # BLD-04.1  识别类清单不得进上下文</li><li class="cont">ESCAPE_HATCH_DEFINED=yes          # BLD-04.2  触发条件+动作+话术，三者齐备</li><li class="cont">ANTI_ESCAPE_DIRECTIVE=0           # BLD-04.2  堵死出路的指令数，必须为 0</li><li class="cont">ENFORCEMENT_TIER=4                # BLD-04.3  该约束最终落在第几档</li><li class="cont">IMPLICIT_CONVENTION_REVIEWED=yes  # BLD-04.4  迁移时才要求；非迁移填 n/a</li><li class="cont">UNRESOLVED_PATCH_CONFLICTS=0      # BLD-04.5  仲裁者=模型 的冲突数</li><li class="cont">VERDICT=CONSTRAINED</li></ul></div>
+<p>任一项为否，或 <code>ENFORCEMENT_TIER&lt;=2</code> 而该要求属于<strong>不可失败</strong>的类别（涉及金额、承诺、对外发布、不可逆动作）→ <code>VERDICT=ADVISORY_ONLY</code>，<strong>不得进入 <a class="xref" href="DEP-01.html">DEP-01</a></strong>。</p>
+<p>参考实现：<code>kit/soft-prior-lint.py</code>，检四类风险并给出判定标量。真实输出字段为：</p>
+<div class="checklist"><ul><li class="cont">FILE=&lt;被检文件&gt;</li><li class="cont">HIT_CANDIDATE_LIST=&lt;n&gt;      # 候选清单（可能被当成编造原料）</li><li class="cont">HIT_PUNCT_DIRECTIVE=&lt;n&gt;     # 要求用标点做控制（跨链路含义反转）</li><li class="cont">HIT_TURN_END_RISK=&lt;n&gt;       # 多条目播报语境中的句号（⚠️ 已知噪声较高）</li><li class="cont">HIT_NO_ESCAPE_HATCH=&lt;n&gt;     # 缺出路，或存在明令禁止承认无知的指令</li><li class="cont">TOTAL_HITS=&lt;n&gt;</li><li class="cont">VERDICT=OK | SOFT_PRIOR_RISK</li></ul></div>
+<p>退出码：<code>0</code>=OK，<code>1</code>=SOFT_PRIOR_RISK，<code>2</code>=用法错误。自测可复现：</p>
+<pre><code>$ python3 kit/soft-prior-lint.py --self-test
+...
+SELF_TEST_PASS=15
+SELF_TEST_FAIL=0
+VERDICT=SELF_TEST_OK</code></pre>
+<blockquote>
+<p>⚠️ 该 linter 的 <code>TURN_END_RISK</code> 一类噪声较高（会把写给人看的说明文字报出来），源码内已标注。保留它而不是删掉，是因为<strong>一个不知道自己会漏什么的检查器，比没有检查器更危险——它提供的是安全感</strong>。它的输出是线索，不能替代 BLD-04.1–.5 的人工判定。</p>
+</blockquote>
+<blockquote>
+<p><strong>保守缺省</strong>：一条要求若<strong>无法在模型之外验证它被遵守</strong>（拿不到输出、无法程序化判定、没有可重复的测试），一律按<strong>未被约束</strong>处理：下游按最坏情况设计（人工复核、拒绝该输出、或降级到固定话术），不按已生效处理。</p>
+</blockquote>
+<hr />
+<h2 id="案例证据">案例证据</h2>
+<blockquote>
+<h3 id="案例-合成示例教学场景非真实事故">案例 · 合成示例（教学场景，非真实事故）</h3>
+<p>一条语音招聘链路里，识别准确率不佳，于是把一份岗位候选词表加进了给模型的指令，意图是「让它知道可能出现哪些词，识别模糊时往正确方向靠」。</p>
+<p>上线后出现的行为是：识别结果严重跑偏时，模型没有反问，而是<strong>从那份词表里挑了一个与错误识别结果发音接近的岗位，当作用户说过的话直接往下接</strong>。用户从未提过那个岗位——它是被亲手递进上下文的。</p>
+<p>本例说明 BLD-04.1 与 BLD-04.2 为什么是一对：词表把「没听清」这个正确答案挤出了选项空间，而指令里又没有写明「听不清该说什么」。修法不是加强措辞，是两件事—— 把词表移出上下文（识别类需求交给 ASR 侧），并补上触发条件与话术明确的反问出路。</p>
+<p>⚠️ <strong>本例为本手册构造的教学场景，不是真实事故记录</strong>，不含任何真实读数（时间戳、日志原文均无）。</p>
+</blockquote>
+<blockquote>
+<h3 id="案例-合成示例教学场景非真实事故同一个标点两条链路含义相反">案例 · 合成示例（教学场景，非真实事故）｜同一个标点，两条链路，含义相反</h3>
+<p>设想一份为「先生成文本、再交给语音合成」的链路写的提示词，其中有这样一条规则：</p>
+<blockquote>
+<p>句间停顿 0.6 秒（用句号或换行体现）。</p>
+</blockquote>
+<p>同一批提示词里还配了一张标点与时长的对照表。<strong>在那条链路里这完全正确</strong>：语音合成器读到句号会自然停顿，「想要停顿就打句号」是精确、有效、成本极低的控制手段。</p>
+<p>迁移到端到端语音模型之后，同一个句号不再被合成器消费，而是被<strong>模型本身</strong>消费—— 而模型在对话数据上学到的模式是「一句话说完，通常该把话轮交给对方」。于是一条为老链路写的<strong>节奏控制规则</strong>，在新链路里变成了<strong>话轮结束信号</strong>：模型念完第一项就停下来等待，而指令明明要求它连续念完三项。</p>
+<p><strong>它说明 BLD-04.4 为什么要按「谁消费这条规则」逐项审</strong>：这条规则通不过任何一次「把提示词读一遍」的检查，因为<strong>句号看起来根本不像一条规则</strong>。冲突不在句子层面，在标点层面。</p>
+<p>⚠️ <strong>本例为本手册构造的教学场景，不是真实事故记录</strong>，不含任何真实读数。另请注意边界：「端到端语音模型在句末标点后倾向结束话轮」是一个<strong>未经受控实验验证的机理假设</strong> ——要证实它需要同内容的句号版与连接词版各跑 N 次统计中断率。本例用于说明「隐性约定会随链路改变含义」这条通则，<strong>不构成对该类模型的一般性论断</strong>。</p>
+</blockquote>
+<hr />
+<h2 id="相关小节">相关小节</h2>
+<ul>
+<li><strong><a class="xref" href="BLD-03.html">BLD-03</a> 链路迁移：丢失能力清单</strong>——本节的上游；BLD-04.4 是它在「隐性约定」维度上的展开</li>
+<li><strong><a class="xref" href="VER-04.html">VER-04</a> 故障定位纪律</strong>——模型行为异常时，怎么把「假设」与「观测」分开，避免修不存在的 bug</li>
+<li><strong><a class="xref" href="DIS-02.html">DIS-02</a> 三道焊缝</strong>——为什么要让检查吐判定标量；BLD-04.3 第 4 档就是这里说的「闸门」</li>
+<li><strong><a class="xref" href="DIS-03.html">DIS-03</a> AI 助手产出验证</strong>——本节管「让模型少犯错」，那一节管「假定它已经犯了错，怎么查出来」</li>
+<li><strong><a class="xref" href="APPX-A.html">附录 A</a> · FX-MDL-01</strong>——症状「模型不遵守明确写下的指令」的速查入口</li>
+<li><strong><a class="xref" href="APPX-B.html">附录 B</a>（本节条目待收录）</strong>——本节五项检查的可打印版本</li>
+</ul>
+</main>
+<nav class="pager"><a href="BLD-03.html">← BLD-03</a><a href="DEP-01.html">DEP-01 →</a></nav>
+<footer>案例三档强制标注 · 引文写作当轮核实 · <a href="https://github.com/libaoming/fde-handbook">GitHub 源仓库</a>（发现分档冒充或引文失实，请提 issue——那是本手册的红线）</footer>
+</body></html>

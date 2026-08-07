@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DIS-02 · 三道焊缝：把验证从自觉变成系统 · FDE 手册</title>
+<link rel="stylesheet" href="assets/style.css"></head>
+<body><header class="top">
+<a class="home" href="index.html">《FDE 手册》</a><span class="crumb">第 3 部 · 验证纪律</span>
+</header>
+<main><h1 id="dis-02-三道焊缝把验证从自觉变成系统">DIS-02 · 三道焊缝：把验证从自觉变成系统</h1>
+<p><strong>目的</strong>　选择用哪一档手段来保证一项验证<strong>真的会被执行</strong>。本节给出三档强度递增的机制、各自的失效方式，以及一条选择判据：<strong>这项验证漏掉一次的代价有多大，就用第几档。</strong></p>
+<p><strong>前置条件</strong> - 你已经知道这项验证要取什么证据（见 <a class="xref" href="DIS-01.html">DIS-01</a>） - 你能判断这项验证<strong>漏掉一次</strong>的后果：自己多花半小时，还是客户侧发生事故</p>
+<hr />
+<h2 id="规程">规程</h2>
+<h3 id="dis-02.1-认清三档的强度差">DIS-02.1　认清三档的强度差</h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>档</th>
+<th>机制</th>
+<th>靠什么生效</th>
+<th>典型失效方式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>一 · <strong>回读</strong></td>
+<td>声明完成之前，先对目标跑一条读取命令，拿真实输出当证据</td>
+<td><strong>人的自觉</strong></td>
+<td>赶时间就跳过；疲劳时自我豁免；换个人就没了</td>
+</tr>
+<tr>
+<td>二 · <strong>判定标量</strong></td>
+<td>让命令自己吐出无法含糊的结论（<code>VERDICT=SWITCHED</code>、退出码、HTTP 状态码）</td>
+<td><strong>设计</strong></td>
+<td>有人不看那一行；判据本身写错</td>
+</tr>
+<tr>
+<td>三 · <strong>闸门</strong></td>
+<td>把验证做成流程里绕不开的关卡（hook、CI 检查、harness、评测）</td>
+<td><strong>系统</strong></td>
+<td>闸门本身有 bug 却无人知晓；覆盖面有缺口</td>
+</tr>
+</tbody>
+</table>
+<p><strong>判据：一档靠人记得，二档靠人看见，三档不需要人。</strong></p>
+<p>这个强度差在工具侧有一个现成的例子——Anthropic 的 Claude Code 文档把它说得很直接：</p>
+<blockquote>
+<p>「Unlike CLAUDE.md instructions which are advisory, hooks are deterministic and guarantee the action happens.」（写进指令的是劝导，hook 才是确定性的） ——https://code.claude.com/docs/en/best-practices</p>
+<p>边界：该表述描述的是<strong>给模型的指令</strong>在 Claude Code 语境下的约束力，外推到其他工具时应表述为「同类机制」。<strong>它本身并不涉及组织流程。</strong></p>
+</blockquote>
+<p><strong>而写给人的流程要求同样只有第一档强度——这是本手册的判断，不是上述引文的结论。</strong>理由不依赖任何厂商口径：一条要求只有在「不执行就走不下去」时才具备确定性，而写在文档里的要求永远可以被跳过。</p>
+<h3 id="dis-02.2-第一档回读怎么算数">DIS-02.2　第一档：回读怎么算数</h3>
+<p>回读的最小形态：<strong>做出完成声明的同一轮里，必须有一条真跑过、其输出能支撑这句声明的读取命令。</strong></p>
+<p>三条落地要求： 1. 读的是<strong>目标本身</strong>，不是你刚才写它的那个动作的回显—— 写入操作的回显只证明「这次调用写了盘」，不证明终态如你所想； 2. 声明里出现的每一个具体值（路径、行数、条数、是否存在），都必须来自命令输出，不许凭记忆或推断填； 3. 回读结果与预期矛盾时，<strong>先改自己的记录，不要先怀疑环境</strong>（理由见 <a class="xref" href="DIS-03.html">DIS-03</a>）。</p>
+<h3 id="dis-02.3-第二档把判定权从人手里拿走">DIS-02.3　第二档：把判定权从人手里拿走</h3>
+<p><strong>不要让人去读三段输出然后自己下结论。</strong> 让脚本直接输出判定标量：</p>
+<pre><code>SERVICE_ACTIVE=yes
+VERSION_MATCH=yes
+STALE_INSTANCES=0
+VERDICT=SWITCHED</code></pre>
+<p>这样做的收益有两层：人不必解读，因此不会解读错；<strong>更重要的是，一个明确的标量很难被含糊转述</strong>——「看起来是好的」可以糊弄过去，<code>VERDICT=NOT_SWITCHED</code> 不行。</p>
+<p>设计要求： - 判定标量必须是<strong>穷尽的</strong>——每种输入都能落到一个确定值，不能有「没输出」的情况； - 无法判定时输出显式的 <code>UNKNOWN</code> 或 <code>SKIPPED</code>，<strong>不要默认输出通过</strong>（fail-closed）； - 每个标量旁边给出它<strong>排除了什么</strong>，否则读者会高估它的覆盖面。</p>
+<h3 id="dis-02.4-第三档闸门以及它一定有的缺口">DIS-02.4　第三档：闸门，以及它一定有的缺口</h3>
+<p>闸门是唯一不依赖任何人配合的档位。常见形态：提交前钩子、CI 必过检查、会话收尾钩子、发布流水线的强制关卡、自动评测。</p>
+<p><strong>但每一道闸门都有覆盖缺口，而缺口必须被写下来。</strong>一个你不知道它漏什么的闸门，比没有闸门更危险——因为它会给你安全感。</p>
+<p>对每道闸门强制回答三个问题： 1. 它<strong>拦什么</strong>？（触发条件的确切定义） 2. 它<strong>拦不住什么</strong>？（已知缺口，逐条列出） 3. 它自己<strong>怎么被验证</strong>？（闸门失效时，你怎么发现）</p>
+<p>第三条不是多余的。护栏本身可能有 bug 而「通过」了——它只是没执行（见案例 PM-07）。<strong>没有自检的闸门，等于把信任转移到了一个没人检查的地方。</strong></p>
+<h3 id="dis-02.5-按代价选档">DIS-02.5　按代价选档</h3>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>这项验证漏掉一次的后果</th>
+<th>用第几档</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>自己返工，不外溢</td>
+<td>一档（回读）足够</td>
+</tr>
+<tr>
+<td>会误导他人的判断，或写进对外交付物</td>
+<td>二档（判定标量）</td>
+</tr>
+<tr>
+<td>影响客户生产、涉及数据/资金/权限，或<strong>你已经在这上面栽过一次</strong></td>
+<td>三档（闸门）</td>
+</tr>
+</tbody>
+</table>
+<p>最后半句是关键：<strong>同一个错误犯第二次，说明它不适合靠自觉。</strong>把它升到闸门，而不是提醒自己下次注意。</p>
+<hr />
+<h2 id="常见误判">常见误判</h2>
+<p><strong>「我们已经写进规范了」</strong>写进文档的是第一档，不管文档写得多严厉。措辞强度不改变机制强度。</p>
+<p><strong>「加了检查，所以不会再漏」</strong>检查存在 ≠ 检查被执行。CI 里存在一个测试文件，和它在这次提交里真的跑过并通过，是两件事——<strong>验收锚点是那一次的执行输出，不是那个文件的存在</strong>。</p>
+<p><strong>「闸门通过了，所以没问题」</strong>闸门只证明它检查的那部分没问题。把闸门的通过读成整体的通过，是把局部覆盖当成了全覆盖——同 <a class="xref" href="VER-03.html">VER-03</a> 里「本机自测通过」的错误结构。</p>
+<p><strong>「先靠自觉，出问题再加自动化」</strong>这个顺序本身不错，但它有个前提常被忽略：<strong>你得真的记录下每次「靠自觉」的失败</strong>，否则永远等不到那个「出问题」的信号（见 <a class="xref" href="DIS-04.html">DIS-04</a> 事故台账）。</p>
+<hr />
+<h2 id="判定标准">判定标准</h2>
+<p>为一项验证选定档位后，按下表自检：</p>
+<div class="checklist"><ul><li class="cont">CHECK=&lt;这项验证的名字&gt;</li><li class="cont">COST_IF_MISSED=self | others | production</li><li class="cont">TIER=1 | 2 | 3                # 依 DIS-02.5，不得低于代价对应档</li><li class="cont">TIER_JUSTIFIED=yes            # 低于建议档位时必须写明理由</li><li class="cont">SCALAR_OUTPUT=yes | n/a       # 二档及以上：是否有明确判定标量</li><li class="cont">FAIL_MODE=closed              # 无法判定时是否默认不通过</li><li class="cont">GAPS_DOCUMENTED=yes | n/a     # 三档：已知缺口是否已写下来</li><li class="cont">GATE_SELF_CHECK=yes | n/a     # 三档：闸门自身怎么被验证</li><li class="cont">VERDICT=SUFFICIENT</li></ul></div>
+<blockquote>
+<p><strong>保守缺省</strong>：<code>COST_IF_MISSED</code> 拿不准时按更高一档处理； <code>FAIL_MODE</code> 必须是 <code>closed</code>——判不出来时输出「未通过」，绝不输出「通过」。</p>
+</blockquote>
+<hr />
+<h2 id="案例证据">案例证据</h2>
+<blockquote>
+<h3 id="案例-pm-07-公开事故复盘meta事故-2021-10-04复盘-2021-10-05">案例 PM-07 · 公开事故复盘｜Meta，事故 2021-10-04（复盘 2021-10-05）</h3>
+<p>一条本应被审计工具拦下的命令执行了下去，随后骨干网路由被撤除。</p>
+<p>官方复盘原文：「Our systems are designed to audit commands like these to prevent mistakes like this, but <strong>a bug in that audit tool prevented it from properly stopping the command.</strong>」</p>
+<p><strong>这是三档闸门的标准失效形态</strong>：闸门存在、部署到位、且「通过」了——它只是没执行。缺的是 DIS-02.4 的第三问：<strong>闸门自己怎么被验证。</strong></p>
+<p>同一次事故还留下了另一半教训：路由撤除后「it was not possible to access our data centers through our normal means because their networks were down」—— 补救通道与故障共用了链路。<strong>闸门与验证工具都不该与被保护对象共享失效域。</strong></p>
+<p>出处：https://engineering.fb.com/2021/10/05/networking-traffic/outage-details/ ｜不可外推：这是一次内部命令误发加审计工具 bug，不能据此论证 BGP 或 DNS 的设计缺陷。</p>
+</blockquote>
+<blockquote>
+<h3 id="案例-合成示例教学场景非真实事故">案例 · 合成示例（教学场景，非真实事故）</h3>
+<p>某团队要求「合并前必须跑一次端到端冒烟测试」，写在贡献指南里（一档）。半年后统计发现，紧急发布时这一步几乎总被跳过——<strong>恰恰是最需要它的时候。</strong></p>
+<p>改法不是把措辞加重，而是升档：把冒烟测试接进流水线并设为合并的必过项（三档），同时把它的缺口写在旁边——它只覆盖主流程的成功路径，不覆盖权限与配额类失败。</p>
+<p>⚠️ <strong>本例为本手册构造的教学场景，不是真实事故记录</strong>，不含任何真实读数。它要说明的是 DIS-02.5：<strong>同一类失败反复出现，说明档位选低了，不是提醒不够。</strong></p>
+</blockquote>
+<hr />
+<h2 id="相关小节">相关小节</h2>
+<ul>
+<li><strong><a class="xref" href="DIS-01.html">DIS-01</a> 证据分级</strong>——本节的上游：先知道要取什么证据，再决定用哪档机制保证它被取到</li>
+<li><strong><a class="xref" href="DIS-03.html">DIS-03</a> AI 助手产出验证</strong>——为什么在 AI 参与交付时，一档几乎必然失效</li>
+<li><strong><a class="xref" href="DIS-04.html">DIS-04</a> 事故台账</strong>——「同一个错误犯第二次」这个升档信号从哪里来</li>
+<li><strong><a class="xref" href="VER-02.html">VER-02</a> 切换验证</strong>——二档判定标量的完整实例</li>
+<li><strong><a class="xref" href="APPX-B.html">附录 B</a>（本节条目待收录）</strong>——本节自检表的可打印版本</li>
+<li><strong><a class="xref" href="APPX-C.html">附录 C</a> · 模板库（本节模板待收录）</strong>——闸门缺口登记表模板</li>
+</ul>
+</main>
+<nav class="pager"><a href="DIS-01.html">← DIS-01</a><a href="DIS-03.html">DIS-03 →</a></nav>
+<footer>案例三档强制标注 · 引文写作当轮核实 · <a href="https://github.com/libaoming/fde-handbook">GitHub 源仓库</a>（发现分档冒充或引文失实，请提 issue——那是本手册的红线）</footer>
+</body></html>

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SUR-01 · 环境与语义勘察：把「客户说的」换成「验证过的」 · FDE 手册</title>
+<link rel="stylesheet" href="assets/style.css"></head>
+<body><header class="top">
+<a class="home" href="index.html">《FDE 手册》</a><span class="crumb">第 2 部 · SUR 勘察</span>
+</header>
+<main><h1 id="sur-01-环境与语义勘察把客户说的换成验证过的">SUR-01 · 环境与语义勘察：把「客户说的」换成「验证过的」</h1>
+<p><strong>目的</strong>　在动手搭建之前，把客户环境的<strong>事实</strong>（不是客户的描述）和数据的<strong>口径</strong>（不是字段的名字）摸清并落成清单。勘察阶段省下的每一个小时，都会在 BLD 阶段以「怎么和说好的不一样」的形式加倍偿还。</p>
+<p><strong>前置条件</strong> - ENG 关口已过（承接判定与成功标准草案在手——勘察是去验证赌注的前提，不是去闲逛） - 已拿到进入环境的最小权限（拿不到 → 先回 <a class="xref" href="ROL-02.html">ROL-02</a>.4 登记为阻塞项，别用「先远程问答」凑合）</p>
+<hr />
+<h2 id="规程">规程</h2>
+<h3 id="sur-01.1-环境清单每项都要验证过标记">SUR-01.1　环境清单：每项都要「验证过」标记</h3>
+<p>逐项摸清并记录，<strong>每项标注「验证方式」</strong>——跑过的命令、看过的界面、拿到的输出。只有客户口头描述的项，标 <code>⚠️ 未验证</code>——它们不算已勘察的事实，须按本节判定标准的保守缺省处理（显式标注 + 在 BLD 设计里补防御）：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>域</th>
+<th>要摸清的</th>
+<th>最低验证动作</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>访问路径</td>
+<td>怎么进（堡垒机/VPN/物理到场）、谁批、多久</td>
+<td>亲自走通一次全程</td>
+</tr>
+<tr>
+<td>权限</td>
+<td>你的账号实际能读什么、写什么、跑什么</td>
+<td>逐项试探边界，记下第一个 403/denied</td>
+</tr>
+<tr>
+<td>网络</td>
+<td>出网能力、内部分段、代理、被拦截的域</td>
+<td>从目标机器实测（<a class="xref" href="VER-03.html">VER-03</a> 的路径覆盖思路）</td>
+</tr>
+<tr>
+<td>部署形态</td>
+<td>服务怎么起、谁管生命周期、发布怎么走</td>
+<td>看一次真实的重启/发布过程</td>
+</tr>
+<tr>
+<td>可观测性</td>
+<td>有没有日志/监控、在哪、你能不能看</td>
+<td>亲手查到一条业务日志</td>
+</tr>
+<tr>
+<td>数据</td>
+<td>数据在哪、量级、更新方式、能不能出域</td>
+<td>跑一条真实查询并记录耗时</td>
+</tr>
+</tbody>
+</table>
+<h3 id="sur-01.2-声明与实现分离文档描述形状代码才描述含义">SUR-01.2　声明与实现分离：文档描述形状，代码才描述含义</h3>
+<p><strong>客户环境里的一切文字都是声明：schema、数据字典、接口文档、字段命名、「canonical」标记。声明与实现长期漂移，且漂移不产生任何告警。</strong></p>
+<p>OpenAI 对自家数仓的一手描述（他们尚且如此）：“Schemas and query history describe a table’s shape and usage, but its true meaning lives in the code that produces it. Pipeline logic captures assumptions, freshness guarantees, and business intent that never surface in SQL or metadata.”</p>
+<p><strong>动作</strong>：对交付要依赖的每个关键对象（表、接口、配置），勘察对象必须包含<strong>生成它的那段代码或流程</strong>，不止它的描述。拿不到生成侧代码的，把该对象降级为 <code>⚠️ 仅声明可信</code>—— 后续所有基于它的设计都要多留一道运行时验证（VER）。</p>
+<blockquote>
+<p>⚠️ 边界：OpenAI 能让 agent 爬自家代码库；在客户现场，<strong>拿到 pipeline 源码本身就是要在 <a class="xref" href="ROL-02.html">ROL-02</a>.4 登记的权限项</strong>——这正是把这条写进勘察清单的原因。</p>
+</blockquote>
+<h3 id="sur-01.3-近似重复与口径清单">SUR-01.3　近似重复与口径清单</h3>
+<p>同一个业务概念在客户环境里通常有多个近似载体——几张相似的表、两个版本的接口、新旧并存的配置。它们的差别落在<strong>口径</strong>上，而口径不在 schema 里。 OpenAI 引用的内部用户原话：“We have a lot of tables that are fairly similar, and I spend tons of time trying to figure out how they’re different and which to use. Some include logged-out users, some don’t.”</p>
+<p><strong>人分辨不出的，模型同样分辨不出——但模型不会说「我分不出」，它会挑一个用。</strong></p>
+<p><strong>动作</strong>：产出「近似重复清单」：每组近似对象一行，列出各自口径（含不含某类数据、更新频率、谁在维护、哪个是权威）。<strong>问不出哪个是权威的组，整组标高危</strong>——这是 BLD 选型时的第一批雷。</p>
+<h3 id="sur-01.4-最先要的资产自然沉淀而不是请客户写文档">SUR-01.4　最先要的资产：自然沉淀，而不是「请客户写文档」</h3>
+<p>请客户为你补文档，在多数现场等于没有下文——不是不配合，是没人有产出文档的带宽（<a class="xref" href="ROL-02.html">ROL-02</a>.2）。<strong>优先索要人干活时自然沉淀的资产</strong>，它们不需要任何人额外投入：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>资产</th>
+<th>沉淀自</th>
+<th>价值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>查询历史</td>
+<td>分析师日常工作</td>
+<td>真实的高频对象与用法（Meta 用它做 agent 冷启动上下文：“Offline LLMs process every query an employee has run, generating descriptions of the tables they use…”）</td>
+</tr>
+<tr>
+<td>工单/客服记录</td>
+<td>支持流程</td>
+<td>真实的问题分布（<a class="xref" href="ENG-01.html">ENG-01</a>.2 集中度的原料）</td>
+</tr>
+<tr>
+<td>发布记录 / 变更单</td>
+<td>运维流程</td>
+<td>环境实际的变更频率与方式</td>
+</tr>
+<tr>
+<td>聊天记录里的口径讨论</td>
+<td>团队协作</td>
+<td>口径争议的一手现场（SUR-01.3 的原料）</td>
+</tr>
+</tbody>
+</table>
+<p>Meta 说明了为什么这类资产珍贵：分析师的工作 “rarely gets committed to a repository. Instead, it lives scattered across query editors and notebooks, invisible to any system that might learn from it.”——<strong>最有价值的知识恰好在最不正式的载体里。</strong></p>
+<blockquote>
+<p>⚠️ 边界：Meta 有统一查询平台可全量回捞；客户环境有没有集中的历史、你能不能拿到、拿多久——是勘察要单独确认并登记的权限项，不可假设。</p>
+</blockquote>
+<h3 id="sur-01.5-勘察产出物与关口">SUR-01.5　勘察产出物与关口</h3>
+<div class="checklist"><ul><li><span class="box">☐</span>环境清单：每项有「验证方式」，未验证项显式标注且已评估影响</li><li><span class="box">☐</span>声明降级表：仅声明可信的对象清单（SUR-01.2）</li><li><span class="box">☐</span>近似重复清单：每组含各自口径与权威判定，无权威的组标高危（SUR-01.3）</li><li><span class="box">☐</span>自然沉淀资产清单：每项标「已到手 / 已登记权限申请」（SUR-01.4）</li><li><span class="box">☐</span>非工程域阻塞项已按 <a class="xref" href="SUR-02.html">SUR-02</a> 单独勘察并登记</li><li><span class="box">☐</span><a class="xref" href="ENG-01.html">ENG-01</a> 的赌注经勘察复核仍然成立（不成立 → 走 <a class="xref" href="ROL-04.html">ROL-04</a>.3 回边，回 ENG 重议）</li></ul></div>
+<hr />
+<h2 id="常见误判">常见误判</h2>
+<p><strong>「客户给了文档，环境算摸清了」</strong>文档是声明（SUR-01.2）。以文档为准搭出来的东西，将在第一次接触真实环境时按运行时的口径被打回——只是那时它的名字叫 bug。</p>
+<p><strong>「命名和标记可信」</strong> <code>revenue</code> 字段不说明含不含退款，<code>canonical</code> 标记不说明它已被悄悄弃用。命名是<strong>人写下的意图</strong>，会随时间腐烂且腐烂无信号。以「问出口径」为准，不以读名字为准。</p>
+<p><strong>「勘察就是开几次会」</strong>会上拿到的全部是声明。本节每一项的验证动作都要求<strong>亲手跑一次</strong>—— 勘察的单位是「验证过的事实」，不是「记下来的说法」。</p>
+<p><strong>「环境太差，这活没法干」</strong>环境差是困难，不是红线（<a class="xref" href="ENG-01.html">ENG-01</a>.3 的区分）。勘察的职责是把差<strong>量化成清单</strong>（缺什么权限、少什么观测、慢多少），交回 ENG 调整范围或排期—— 而不是在情绪上给项目判死刑。</p>
+<hr />
+<h2 id="判定标准">判定标准</h2>
+<p>SUR-01.5 清单全过才出勘察关口。保守缺省：<strong>没亲手验证的按未知处理</strong>—— 未知不阻塞进入 BLD，但每个未知都必须在 BLD 的设计里有对应的防御（多一道运行时校验、多一个回退路径），<strong>不允许「假定它是好的」</strong>。</p>
+<hr />
+<h2 id="案例证据">案例证据</h2>
+<blockquote>
+<h3 id="引证-第三方声明openai-meta声明与实现的漂移自然沉淀资产">引证 · 第三方声明｜OpenAI / Meta：声明与实现的漂移、自然沉淀资产</h3>
+<p>SUR-01.2/.3 引句出自 OpenAI “Inside OpenAI’s in-house data agent” （https://openai.com/index/inside-our-in-house-data-agent/ ，全文存档 <code>cases/raw-openai-data-agent-20260806.md</code>，引句在存档第 142、20 行）； SUR-01.4 引句出自 Analytics at Meta（2026-08-07 逐句核实实存，URL 见 <a class="xref" href="ENG-01.html">ENG-01</a> 案例框）。</p>
+<p><strong>不可外推边界</strong>：两家均为 in-house 场景，代码库、查询平台的访问权是默认的；在客户现场这些恰恰是要谈的权限项——本节把他们的「默认拥有」翻译成了你的「勘察清单条目」。</p>
+</blockquote>
+<hr />
+<h2 id="相关小节">相关小节</h2>
+<ul>
+<li><strong><a class="xref" href="SUR-02.html">SUR-02</a> 非工程域阻塞项</strong>——不在任何日志里的那一半勘察</li>
+<li><strong><a class="xref" href="ENG-01.html">ENG-01</a> 承接判定</strong>——勘察证伪赌注时的回边终点</li>
+<li><strong><a class="xref" href="ROL-02.html">ROL-02</a> 相邻角色边界</strong>——权限索要与登记的工具</li>
+<li><strong><a class="xref" href="VER-03.html">VER-03</a> 可达性验证</strong>——「从目标位置实测」在网络域的完整形态</li>
+<li><strong><a class="xref" href="BLD-03.html">BLD-03</a> 链路迁移</strong>——近似重复清单在选型时的消费方</li>
+<li><strong><a class="xref" href="APPX-A.html">附录 A</a> · FX-CFG-02（待写）</strong>——本节专属入口：症状「按文档/命名做的设计，一碰真实环境就不对」</li>
+<li><strong><a class="xref" href="APPX-A.html">附录 A</a> · FX-CFG-01（待写，归 <a class="xref" href="VER-02.html">VER-02</a>.3）</strong>——症状「改了配置行为没变」与声明/实现漂移同根</li>
+</ul>
+</main>
+<nav class="pager"><a href="ENG-02.html">← ENG-02</a><a href="SUR-02.html">SUR-02 →</a></nav>
+<footer>案例三档强制标注 · 引文写作当轮核实 · <a href="https://github.com/libaoming/fde-handbook">GitHub 源仓库</a>（发现分档冒充或引文失实，请提 issue——那是本手册的红线）</footer>
+</body></html>

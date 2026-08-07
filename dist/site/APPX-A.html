@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>附录 A · 故障速查 · FDE 手册</title>
+<link rel="stylesheet" href="assets/style.css"></head>
+<body><header class="top">
+<a class="home" href="index.html">《FDE 手册》</a><span class="crumb">附录</span>
+</header>
+<main><h1 id="附录-a-故障速查">附录 A · 故障速查</h1>
+<blockquote>
+<p><strong>怎么用</strong>：按你观察到的<strong>症状</strong>找条目，不是按原因找。每条给出「怎么确认是它 → 怎么处置 → 怎么确认好了」，并指向正文的规程节。</p>
+<p>条目格式采用 GitLab 生产 runbook 的五段式： Symptoms（我该翻到这里吗）→ Pre-checks（确认是它）→ Resolution（处置）→ Post-checks（确认已解决）→ Rollback（撤销）。</p>
+<p><strong>编号</strong>：<code>FX-&lt;域&gt;-&lt;序号&gt;</code>。域 = SVC 服务状态 / NET 网络可达 / CFG 配置 / MDL 模型行为 / AGT 助手产出 / DBG 故障定位 / BLD 链路搭建 / ORG 组织与归属。</p>
+</blockquote>
+<h2 id="症状索引">症状索引</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>你观察到的现象</th>
+<th>条目</th>
+<th>正文</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>部署完了，但改动看起来没生效</td>
+<td>FX-SVC-01</td>
+<td><a class="xref" href="VER-02.html">VER-02</a></td>
+</tr>
+<tr>
+<td>服务端自测正常，用户连不上</td>
+<td>FX-NET-01</td>
+<td><a class="xref" href="VER-03.html">VER-03</a></td>
+</tr>
+<tr>
+<td>AI 助手说做完了，但产物对不上</td>
+<td>FX-AGT-01</td>
+<td><a class="xref" href="DIS-03.html">DIS-03</a></td>
+</tr>
+<tr>
+<td>模型不遵守明确写下的指令</td>
+<td>FX-MDL-01</td>
+<td><a class="xref" href="BLD-04.html">BLD-04</a></td>
+</tr>
+<tr>
+<td>一切指标都正常，只有结果不对</td>
+<td>FX-DBG-01（待写）</td>
+<td><a class="xref" href="VER-04.html">VER-04</a></td>
+</tr>
+<tr>
+<td>改完之后症状变了，但没变对</td>
+<td>FX-DBG-02（待写）</td>
+<td><a class="xref" href="VER-04.html">VER-04</a></td>
+</tr>
+<tr>
+<td>换链路后冒出多个看似独立的 bug</td>
+<td>FX-BLD-01（待写）</td>
+<td><a class="xref" href="BLD-03.html">BLD-03</a></td>
+</tr>
+<tr>
+<td>服务健康但返回旧/空数据</td>
+<td>FX-SVC-02（待写）</td>
+<td><a class="xref" href="VER-02.html">VER-02</a>.4</td>
+</tr>
+<tr>
+<td>监控安静但用户报障</td>
+<td>FX-SVC-03（待写）</td>
+<td><a class="xref" href="VER-01.html">VER-01</a></td>
+</tr>
+<tr>
+<td>改了配置文件，行为没变</td>
+<td>FX-CFG-01（待写）</td>
+<td><a class="xref" href="VER-02.html">VER-02</a>.3</td>
+</tr>
+<tr>
+<td>一件事卡住，双方都以为对方在做</td>
+<td>FX-ORG-01</td>
+<td><a class="xref" href="ROL-02.html">ROL-02</a></td>
+</tr>
+<tr>
+<td>说不清这次交付最终要留下什么</td>
+<td>FX-ORG-02（待写）</td>
+<td><a class="xref" href="ROL-03.html">ROL-03</a></td>
+</tr>
+<tr>
+<td>说不清现在处于交付的哪一步</td>
+<td>FX-ORG-03（待写）</td>
+<td><a class="xref" href="ROL-04.html">ROL-04</a></td>
+</tr>
+<tr>
+<td>什么都找你，角色被当成驻场咨询/售后</td>
+<td>FX-ORG-04（待写）</td>
+<td><a class="xref" href="ROL-01.html">ROL-01</a>、<a class="xref" href="ROL-02.html">ROL-02</a></td>
+</tr>
+<tr>
+<td>项目做到一半发现结构性做不了</td>
+<td>FX-ORG-05（待写）</td>
+<td><a class="xref" href="ENG-01.html">ENG-01</a></td>
+</tr>
+<tr>
+<td>验收全过，但客户说这不是想要的</td>
+<td>FX-ORG-06（待写）</td>
+<td><a class="xref" href="ENG-02.html">ENG-02</a></td>
+</tr>
+<tr>
+<td>按文档/命名做的设计，一碰真实环境就不对</td>
+<td>FX-CFG-02（待写）</td>
+<td><a class="xref" href="SUR-01.html">SUR-01</a></td>
+</tr>
+<tr>
+<td>技术全通了，卡在一纸审批上</td>
+<td>FX-ORG-07（待写）</td>
+<td><a class="xref" href="SUR-02.html">SUR-02</a></td>
+</tr>
+<tr>
+<td>移交完三个月，客户又全推回来了</td>
+<td>FX-ORG-08（待写）</td>
+<td><a class="xref" href="HND-01.html">HND-01</a></td>
+</tr>
+<tr>
+<td>复盘开过了，同类事故照旧发生</td>
+<td>FX-ORG-09（待写）</td>
+<td><a class="xref" href="DIS-04.html">DIS-04</a></td>
+</tr>
+<tr>
+<td>变更波及了没打算动的东西</td>
+<td>FX-CFG-03（待写）</td>
+<td><a class="xref" href="DEP-01.html">DEP-01</a></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>⚠️ 手册写作中</strong>：本表指向的正文节尚未全部成稿。已成稿：第 0 部、<a class="xref" href="ROL-01.html">ROL-01</a>~04、<a class="xref" href="ENG-01.html">ENG-01</a>、<a class="xref" href="ENG-02.html">ENG-02</a>、<a class="xref" href="SUR-01.html">SUR-01</a>、<a class="xref" href="SUR-02.html">SUR-02</a>、<a class="xref" href="BLD-03.html">BLD-03</a>、<a class="xref" href="BLD-04.html">BLD-04</a>、 <a class="xref" href="DEP-01.html">DEP-01</a>、<a class="xref" href="VER-01.html">VER-01</a><sub>05、<a class="xref" href="HND-01.html">HND-01</a>、<a class="xref" href="DIS-01.html">DIS-01</a></sub>04、<a class="xref" href="APPX-B.html">附录 B</a>（首条）、<a class="xref" href="APPX-C.html">附录 C</a>（4 份模板）。未成稿：BLD-01/02、第 4 部、附录 D~F——指向它们的引用为<strong>前向引用</strong>。</p>
+</blockquote>
+<hr />
+<h2 id="fx-svc-01-部署完了但改动看起来没生效">FX-SVC-01 · 部署完了，但改动看起来没生效</h2>
+<p><strong>Symptoms</strong> - 部署流程报告成功，但线上行为仍是旧的 - 新加的日志字段没出现；新改的文案没变；修复的 bug 仍能复现 - 服务本身可用，功能没有报错</p>
+<p><strong>Pre-checks</strong>（确认是「旧版本仍在接活」，而不是别的问题） 1. 查正在响应的实例版本标识，与本次部署的版本<strong>逐字符</strong>比对（<a class="xref" href="VER-02.html">VER-02</a>.2） → 不一致即确认命中本条。 2. 版本一致时，转查是否<strong>部分节点</strong>未更新：多节点重复采样（常见误判见 <a class="xref" href="VER-02.html">VER-02</a>）。 3. 仍一致时<strong>不是本条</strong>，转 FX-CFG-01（配置未生效）或 FX-SVC-02（返回内容错误）。</p>
+<p><strong>Resolution</strong> 1. 按 <a class="xref" href="VER-02.html">VER-02</a>.3 清理旧实例： - 进程残留 → 用服务管理器整组回收（如 <code>systemctl stop</code>，走 cgroup），<strong>不要只 kill 主进程</strong>——子进程会被 init 收养并继续接活。 - 编排环境 → 确认旧副本已终止，不只是「新副本已就绪」。 - <strong>负载均衡 → 查运行时后端表并摘除旧后端</strong>；配置文件正确不代表运行时表正确。 2. 重新执行切换。</p>
+<p><strong>Post-checks</strong> - 跑完 <a class="xref" href="VER-02.html">VER-02</a> 四项，取得 <code>VERDICT=SWITCHED</code> - 特别确认 <code><a class="xref" href="VER-02.html">VER-02</a>.4</code>：部署时间之后有<strong>真实业务事件</strong>落在新实例的日志里 - 无法验证的项按未通过处理（保守缺省）</p>
+<p><strong>Rollback</strong> - 若新版本确认有问题：回滚后<strong>重新跑一遍完整 <a class="xref" href="VER-02.html">VER-02</a></strong>—— 回滚同样是一次切换，同样会留下旧实例。未验证的回滚不计作已回滚。</p>
+<p><strong>→ 正文</strong>：<a class="xref" href="VER-02.html">VER-02</a> 切换验证 ｜ 相关：<a class="xref" href="DEP-01.html">DEP-01</a>、<a class="xref" href="VER-05.html">VER-05</a></p>
+<hr />
+<h2 id="fx-agt-01-ai-助手说做完了但产物对不上">FX-AGT-01 · AI 助手说做完了，但产物对不上</h2>
+<p><strong>Symptoms</strong> - 助手报告了执行结果（退出码、字节数、「三个文件均正常」），而目标文件/变更不存在 - 助手随后把矛盾解释为「环境不可信」「回显被污染」「命令时灵时不灵」 - 高发位：会话被中断（报错、断连、上下文压缩）或被催促之后的<strong>第一条消息</strong></p>
+<p><strong>Pre-checks</strong>（确认是「执行未发生」，而不是「执行了但失败」） 1. 走独立通道回读产物：<code>test -f</code> / 校验和 / 控制台（<a class="xref" href="DIS-03.html">DIS-03</a>.2） → 产物缺失，继续第 2 步。 2. 在<strong>本轮</strong>原始调用记录里查找产生那个结果标量的工具调用（<a class="xref" href="DIS-03.html">DIS-03</a>.3） → <strong>零次相应调用即确认命中本条</strong>（伪报，不是执行失败）。 3. 找得到调用、且有真实错误输出 → <strong>不是本条</strong>，属正常的执行失败，按该错误排查。 4. 记录不可访问 → <strong>记为未验证</strong>，按保守缺省当作未通过处理（<strong>不等于已确认是伪报</strong>）。</p>
+<p><strong>Resolution</strong> 1. 把该动作标记为<strong>未执行</strong>，就地重跑那一条（<a class="xref" href="DIS-03.html">DIS-03</a>.6）——不外推成「工具链失效」。 2. 助手已给出环境指控时，要求出示那条异常输出的原文；拿不出即判定为想象（<a class="xref" href="DIS-03.html">DIS-03</a>.5）。 3. <strong>不要用追问代替验证</strong>：同一个生成过程无法为自己作证。 4. 后续所有基于该结果的分析一并作废重来——包括「看起来很专业」的那些。</p>
+<p><strong>Post-checks</strong> - 跑完 <a class="xref" href="DIS-03.html">DIS-03</a> 判定表，取得 <code>VERDICT=EXECUTION_CONFIRMED</code> - 特别确认 <code>UNBACKED_SCALARS=0</code> 与 <code>ENV_BLAME_WITHOUT_EVIDENCE=0</code> - 未取得 <code>EXECUTION_CONFIRMED</code> 前，不得进入 <a class="xref" href="VER-05.html">VER-05</a> 验收</p>
+<p><strong>Rollback</strong> - 若已在虚假前提上做过改动：逐条回退，然后从最后一次<strong>有调用记录支撑</strong>的状态重来。</p>
+<p><strong>→ 正文</strong>：<a class="xref" href="DIS-03.html">DIS-03</a> AI 助手产出验证 ｜ 相关：<a class="xref" href="DIS-01.html">DIS-01</a>、<a class="xref" href="DIS-02.html">DIS-02</a>、<a class="xref" href="BLD-04.html">BLD-04</a></p>
+<hr />
+<h2 id="fx-net-01-服务端自测正常用户连不上">FX-NET-01 · 服务端自测正常，用户连不上</h2>
+<p><strong>Symptoms</strong> - 在服务器本机或同一内网里测，一切正常（握手成功、状态码正常） - 用户侧连接失败、超时、或握手中途断开 - 报错常落在你最熟悉的那一层（证书、协议版本、握手），诱使你去改它</p>
+<p><strong>Pre-checks</strong>（确认是「路上被拦」，而不是服务端真的坏了） 1. 先把自测的<strong>路径覆盖范围</strong>写出来：这次请求从哪个位置发起、经过了哪几段。若答案是「服务器 → 自己」（hairpin），它覆盖不到用户与你之间的任何一段（<a class="xref" href="VER-03.html">VER-03</a>）。 2. 换一个<strong>真正在用户网络位置</strong>的观测点重测（移动网络、不同地域、不同运营商）。两个位置结论不一致 → 命中本条。 3. TCP 通但 TLS 握手中途失败，是中间设备的典型形态，不是证书或协议协商的形态。 4. 若各位置结论一致且都失败，<strong>不是本条</strong>，回 <a class="xref" href="VER-02.html">VER-02</a> 查服务本身。</p>
+<p><strong>Resolution</strong> 1. 定位被哪一段拦下：逐段（本机 → 出口 → 中间链路 → 目标）缩小范围。 2. <strong>同时排查非工程域根因</strong>——这类原因不出现在任何日志里，但能让整条链路失效：域名备案与合规状态、账号权限与配额、商品/能力的授权范围、合同与计费状态。 3. 属于非工程域的，<strong>正确动作往往是什么都不做</strong>（等审批/等生效），而不是继续改配置——错误的修复会比它试图解决的问题活得更久。</p>
+<p><strong>Post-checks</strong> - 从<strong>用户所在的网络位置</strong>复测通过，而不是从服务端复测 - 明确记录本次结论的覆盖范围：写「从某位置发起的请求正常」，不写「服务端正常」 - 排查期间做过的配置改动，逐条评估是否该回退（见 Rollback）</p>
+<p><strong>Rollback</strong> - 沿错误方向做过的改动（换证书、降协议版本、改超时）<strong>全部回退</strong>并记录原因，否则它们会在半年后变成没人解释得清的历史配置。</p>
+<p><strong>→ 正文</strong>：<a class="xref" href="VER-03.html">VER-03</a> 可达性验证 ｜ 相关：<a class="xref" href="VER-02.html">VER-02</a>、<a class="xref" href="DIS-01.html">DIS-01</a></p>
+<hr />
+<h2 id="fx-mdl-01-模型不遵守明确写下的指令">FX-MDL-01 · 模型不遵守明确写下的指令</h2>
+<p><strong>Symptoms</strong> - 提示词里写了「必须」「禁止」，模型仍然不照做 - 加强措辞后没有改善，或只在部分场景改善 - 模型输出了上下文里提供的某个候选项，而该项并非用户真实所指 - 模型在信息不足时猜了一个，而不是承认不确定</p>
+<p><strong>Pre-checks</strong> 1. 这条要求是「要它<strong>识别</strong>」还是「要它<strong>照做</strong>」？给识别任务喂候选清单 = 同时给了它编造的原料（<a class="xref" href="BLD-04.html">BLD-04</a>）。 2. 指令里有没有给出<strong>不确定时的合法出路</strong>（反问、声明不知道、转人工）及具体话术？没有 → 模型会优先用手边的东西而不是承认不足。 3. 当前行为是否是某种<strong>训练先验的自然结果</strong>（例如格式惯例、话轮惯例）？是 → 加强措辞几乎必然无效。 4. 这份指令是否从别的链路/别的消费者那里迁移过来？ → 转 <a class="xref" href="BLD-04.html">BLD-04</a>.4 逐项审隐性约定（标点、格式、顺序、字段名）。</p>
+<p><strong>Resolution</strong> 1. <strong>不要靠加重措辞。</strong> 改用结构性手段：改变数据形状、约束输出格式、移除不该给的候选集、显式提供出路话术。 2. 需要<strong>确定性</strong>保证的，把约束移到模型之外——输出校验、schema 校验、拒绝不合规输出的闸门。写进提示词的是劝导，闸门才是确定的（<a class="xref" href="BLD-04.html">BLD-04</a>、<a class="xref" href="DIS-02.html">DIS-02</a>）。 3. 存在多条互相冲突的局部补丁时，登记冲突并显式声明优先级，不要把仲裁推给模型。</p>
+<p><strong>Post-checks</strong> - 用<strong>固定输入集</strong>重跑，统计违规率，而不是抽查一次就下结论 - 确认新加的约束没有把另一个场景改坏（补丁之间的张力） - 若改动是加了闸门：确认闸门自身有验证（<a class="xref" href="DIS-02.html">DIS-02</a>.4）</p>
+<p><strong>Rollback</strong> - 措辞类改动可直接回退；结构类改动回退前先确认没有下游依赖新格式。</p>
+<p><strong>→ 正文</strong>：<a class="xref" href="BLD-04.html">BLD-04</a> 模型行为约束 ｜ 相关：<a class="xref" href="BLD-03.html">BLD-03</a>、<a class="xref" href="DIS-03.html">DIS-03</a></p>
+<hr />
+<h2 id="fx-org-01-一件事卡住双方都以为对方在做">FX-ORG-01 · 一件事卡住，双方都以为对方在做</h2>
+<p><strong>Symptoms</strong> - 某个事项停在原地数天，追进度时每一方都说「在等对方」或「以为对方在办」 - 高发于<strong>非工程域事项</strong>：域名备案、账号审批、合同盖章、合规评估—— 它们不出现在任何监控里，不产生任何技术告警 - 事发前各方的工作清单都是全绿的</p>
+<p><strong>Pre-checks</strong>（确认是「无主」，而不是「有主但慢」） 1. 对该事项跑 <a class="xref" href="ROL-02.html">ROL-02</a>.3 归属三问：谁有权限改／谁背验收／合同结束后谁维护。三问答不出、或答案互相矛盾 → <strong>命中本条</strong>。 2. 三问指向同一个明确的人、且对方确认在办 → <strong>不是本条</strong>，属进度问题：要预计完成时间与阻塞依赖，按普通排期跟进。 3. 三问指向某个<strong>部门</strong>而落不到人名 → 仍算命中——部门不是 owner。</p>
+<p><strong>Resolution</strong> 1. 现场指定唯一 owner：<strong>一个名字，不是一个部门</strong>，并请对方当场复述确认 ——沉默不是认领（<a class="xref" href="ROL-02.html">ROL-02</a> 常见误判）。 2. 按 <a class="xref" href="ROL-02.html">ROL-02</a>.4 登记进边界登记表，补上预计完成时间与升级路径两个字段。 3. 事项属客户侧审批流的，把法定/流程时长问到手并计入排期—— <strong>正确动作可能是等待并调整计划，而不是绕开流程</strong>（同 FX-NET-01 Resolution）。 4. 顺手全查：对登记表其余事项跑一遍三问，无主事项通常不止一件。</p>
+<p><strong>Post-checks</strong> - 该事项在登记表中有唯一 owner、预计完成时间、升级路径三字段齐 - 下一次同步会上，该事项能报出<strong>状态变化</strong>（不是再次「在推进中」） - 登记表中无其他三问不一致项</p>
+<p><strong>Rollback</strong> - 不适用：本条是归属修复，无技术改动可回退。但若停摆期间有人为「绕开流程」做过技术改动（换域名、走临时通道），逐条评估回退——参照 FX-NET-01 的 Rollback 原则。</p>
+<p><strong>→ 正文</strong>：<a class="xref" href="ROL-02.html">ROL-02</a> 相邻角色边界 ｜ 相关：<a class="xref" href="ROL-03.html">ROL-03</a>、<a class="xref" href="ROL-04.html">ROL-04</a>、<a class="xref" href="VER-03.html">VER-03</a></p>
+<hr />
+<h2 id="待写条目">待写条目</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>条目</th>
+<th>症状</th>
+<th>依赖正文节</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FX-SVC-02</td>
+<td>服务健康但返回旧/空数据</td>
+<td><a class="xref" href="VER-02.html">VER-02</a>.4（可用 PM-03 Monzo 案例）</td>
+</tr>
+<tr>
+<td>FX-SVC-03</td>
+<td>监控安静但用户报障</td>
+<td><a class="xref" href="VER-01.html">VER-01</a>（可用 PM-04 Roblox、PM-10/11 AWS）</td>
+</tr>
+<tr>
+<td>FX-CFG-01</td>
+<td>改了配置，行为没变</td>
+<td><a class="xref" href="VER-02.html">VER-02</a>.3（可用 PM-01 Slack、PM-05 Datadog）</td>
+</tr>
+<tr>
+<td>FX-DBG-01</td>
+<td>一切指标都正常，只有结果不对</td>
+<td><a class="xref" href="VER-04.html">VER-04</a>.1~.3（可用 PM-03 Monzo）</td>
+</tr>
+<tr>
+<td>FX-DBG-02</td>
+<td>改完之后症状变了，但没变对</td>
+<td><a class="xref" href="VER-04.html">VER-04</a>.4（可用 PM-02 Cloudflare）</td>
+</tr>
+<tr>
+<td>FX-BLD-01</td>
+<td>换链路后冒出多个看似独立的 bug</td>
+<td><a class="xref" href="BLD-03.html">BLD-03</a>.3（共用件原样交给新消费者；证据用 <a class="xref" href="BLD-03.html">BLD-03</a> 的合成示例，<strong>非</strong> PM-08——那条支撑的是 <a class="xref" href="BLD-03.html">BLD-03</a>.6 回滚演练）</td>
+</tr>
+<tr>
+<td>FX-ORG-02</td>
+<td>说不清这次交付最终要留下什么</td>
+<td><a class="xref" href="ROL-03.html">ROL-03</a>（四类交付物对账）</td>
+</tr>
+<tr>
+<td>FX-ORG-03</td>
+<td>说不清现在处于交付的哪一步</td>
+<td><a class="xref" href="ROL-04.html">ROL-04</a>（三问自检）</td>
+</tr>
+<tr>
+<td>FX-ORG-04</td>
+<td>什么都找你，角色被当成驻场咨询/售后</td>
+<td><a class="xref" href="ROL-01.html">ROL-01</a>（两问判定）、<a class="xref" href="ROL-02.html">ROL-02</a>（范围以 ENG 成功标准为准）</td>
+</tr>
+<tr>
+<td>FX-ORG-05</td>
+<td>项目做到一半发现结构性做不了</td>
+<td><a class="xref" href="ENG-01.html">ENG-01</a>.3（红线清单；回边走 <a class="xref" href="ROL-04.html">ROL-04</a>.3 SUR→ENG）</td>
+</tr>
+<tr>
+<td>FX-ORG-06</td>
+<td>验收全过，但客户说这不是想要的</td>
+<td><a class="xref" href="ENG-02.html">ENG-02</a>.4（判据表双方签字冻结；合成示例即此形态）</td>
+</tr>
+<tr>
+<td>FX-CFG-02</td>
+<td>按文档/命名做的设计，一碰真实环境就不对</td>
+<td><a class="xref" href="SUR-01.html">SUR-01</a>.2/.3（声明与实现分离、近似重复口径清单）</td>
+</tr>
+<tr>
+<td>FX-ORG-07</td>
+<td>技术全通了，卡在一纸审批上</td>
+<td><a class="xref" href="SUR-02.html">SUR-02</a>（六域勘察 + 等待纪律）</td>
+</tr>
+<tr>
+<td>FX-ORG-08</td>
+<td>移交完三个月，客户又全推回来了</td>
+<td><a class="xref" href="HND-01.html">HND-01</a>（runbook 演练判据、支持窗口、纠错通道）</td>
+</tr>
+<tr>
+<td>FX-ORG-09</td>
+<td>复盘开过了，同类事故照旧发生</td>
+<td><a class="xref" href="DIS-04.html">DIS-04</a>.4（行动项终态与闸门验证）</td>
+</tr>
+<tr>
+<td>FX-CFG-03</td>
+<td>变更波及了没打算动的东西</td>
+<td><a class="xref" href="DEP-01.html">DEP-01</a>.1（影响清单先行；PM-06 形态）</td>
+</tr>
+</tbody>
+</table>
+</main>
+<nav class="pager"><a href="DIS-04.html">← DIS-04</a><a href="APPX-B.html">APPX-B →</a></nav>
+<footer>案例三档强制标注 · 引文写作当轮核实 · <a href="https://github.com/libaoming/fde-handbook">GitHub 源仓库</a>（发现分档冒充或引文失实，请提 issue——那是本手册的红线）</footer>
+</body></html>

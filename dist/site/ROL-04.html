@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ROL-04 · 全景图：六阶段与关口 · FDE 手册</title>
+<link rel="stylesheet" href="assets/style.css"></head>
+<body><header class="top">
+<a class="home" href="index.html">《FDE 手册》</a><span class="crumb">第 1 部 · 这份工作</span>
+</header>
+<main><h1 id="rol-04-全景图六阶段与关口">ROL-04 · 全景图：六阶段与关口</h1>
+<p><strong>目的</strong>　给整本手册的主线入口一张图：交付分哪六个阶段、阶段之间的关口各要什么。读完本节你应该能随时回答三个问题：<strong>我在哪个阶段；上个关口的判定输出在哪；下个关口需要什么。</strong>——答不出其中任何一个，你就不在你以为的阶段里。</p>
+<p><strong>前置条件</strong> - 无。本节与 <a class="xref" href="ROL-01.html">ROL-01</a> 同为全书入口。</p>
+<blockquote>
+<h3 id="框架声明诚实条款删掉它等于给框架伪造出处">⚠️ 框架声明（诚实条款，删掉它等于给框架伪造出处）</h3>
+<p><strong>六阶段是本手册的自建框架，不是行业标准。</strong> Palantir 的公开材料只给出角色定义；本手册写作时逐句核实过其 “Dev versus Delta” 原文——文中描述工作内容用的是活动词（scoping、monitoring、debugging、deploying、configuring），<strong>没有任何阶段化的交付生命周期</strong>。也没有找到其他可引用的行业标准划分。</p>
+<p>自建框架的价值不在「它是对的」，在于<strong>给关口、交付物和检查项一个不漂移的挂点</strong>（编号体系见第 0 部）。你的组织已有自己的阶段划分时，不必换掉它—— 把本手册各节映射到你的阶段名下用，检查项本身不依赖阶段叫什么。</p>
+</blockquote>
+<hr />
+<h2 id="规程">规程</h2>
+<h3 id="rol-04.1-六阶段总表">ROL-04.1　六阶段总表</h3>
+<figure class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 520" role="img" aria-label="交付生命周期六阶段：承接、勘察、搭建、上线、签收、移交，阶段间是需要判定输出的关口；验证纪律贯穿全程；三条回边：勘察发现红线回承接、签收不过回搭建上线、移交无人可交回承接">
+<style>
+  :root{ --paper:#ffffff; --ink:#17181a; --muted:#6b6f76; --faint:#b9b9b3; --danger:#a8321f; }
+  @media (prefers-color-scheme: dark){
+    :root{ --paper:#131416; --ink:#e9eaec; --muted:#979ba2; --faint:#4a4d53; --danger:#e0785e; }
+  }
+  text{ font-family:"PingFang SC","Noto Sans CJK SC","Hiragino Sans GB",system-ui,sans-serif }
+  .bg{ fill:var(--paper) }
+  .node{ fill:none; stroke:var(--ink); stroke-width:1.5 }
+  .node-key{ stroke-width:3 }
+  .node-ghost{ stroke:var(--faint); stroke-dasharray:5 4 }
+  .lbl{ fill:var(--ink); font-size:14px; font-weight:600 }
+  .sub{ fill:var(--muted); font-size:11.5px }
+  .edge{ stroke:var(--ink); stroke-width:1.6; fill:none }
+  .edge-ghost{ stroke:var(--faint); stroke-width:1.4; fill:none; stroke-dasharray:6 5 }
+  .guide{ stroke:var(--faint); stroke-width:1; stroke-dasharray:3 4 }
+  .etxt{ fill:var(--muted); font-size:12px }
+  .etxt-ink{ fill:var(--ink); font-size:12px; font-weight:600 }
+  .lane{ fill:var(--muted); font-size:11px; letter-spacing:.18em }
+  .ah{ fill:var(--ink) } .ahg{ fill:var(--faint) }
+</style>
+<defs>
+  <marker id="lc-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path class="ah" d="M0,0 L10,5 L0,10 z"/>
+  </marker>
+  <marker id="lc-ghost" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path class="ahg" d="M0,0 L10,5 L0,10 z"/>
+  </marker>
+</defs>
+<rect class="bg" x="0" y="0" width="1000" height="520"/>
+
+<!-- 回边（上方三条弧） -->
+<path class="edge-ghost" d="M255,180 C240,110 110,110 100,174" marker-end="url(#lc-ghost)"/>
+<text class="etxt" x="120" y="118">发现红线 → 回承接重议</text>
+<path class="edge-ghost" d="M740,180 C720,80 400,80 385,174" marker-end="url(#lc-ghost)"/>
+<text class="etxt" x="455" y="88">签收不过 → 回搭建/上线，重跑全部相关判据</text>
+<path class="edge-ghost" d="M905,180 C930,40 90,36 70,174" marker-end="url(#lc-ghost)"/>
+<text class="etxt" x="330" y="46">无人可交 → 回承接补干系人</text>
+
+<!-- 六阶段 -->
+<rect class="node" x="30" y="186" width="130" height="66" rx="6"/>
+<text class="lbl" x="46" y="213">ENG 承接</text>
+<text class="sub" x="46" y="234">能不能接 · 判据</text>
+
+<rect class="node" x="192" y="186" width="130" height="66" rx="6"/>
+<text class="lbl" x="208" y="213">SUR 勘察</text>
+<text class="sub" x="208" y="234">环境 · 阻塞项</text>
+
+<rect class="node" x="354" y="186" width="130" height="66" rx="6"/>
+<text class="lbl" x="370" y="213">BLD 搭建</text>
+<text class="sub" x="370" y="234">最小可用链路</text>
+
+<rect class="node" x="516" y="186" width="130" height="66" rx="6"/>
+<text class="lbl" x="532" y="213">DEP 上线</text>
+<text class="sub" x="532" y="234">影响面 · 回退</text>
+
+<rect class="node node-key" x="678" y="186" width="130" height="66" rx="6"/>
+<text class="lbl" x="694" y="213">VER 签收</text>
+<text class="sub" x="694" y="234">证据链 · 重心</text>
+
+<rect class="node" x="840" y="186" width="130" height="66" rx="6"/>
+<text class="lbl" x="856" y="213">HND 移交</text>
+<text class="sub" x="856" y="234">能力转移</text>
+
+<!-- 阶段间关口箭头 -->
+<path class="edge" d="M160,219 L186,219" marker-end="url(#lc-ink)"/>
+<path class="edge" d="M322,219 L348,219" marker-end="url(#lc-ink)"/>
+<path class="edge" d="M484,219 L510,219" marker-end="url(#lc-ink)"/>
+<path class="edge" d="M646,219 L672,219" marker-end="url(#lc-ink)"/>
+<path class="edge" d="M808,219 L834,219" marker-end="url(#lc-ink)"/>
+
+<!-- 关口标注 -->
+<text class="etxt-ink" x="30" y="290">每道关口 = 上一阶段退出条件逐项核对 + 可粘贴的判定输出（不是「我觉得可以了」）</text>
+
+<!-- 验证纪律横切带 -->
+<rect class="node node-ghost" x="30" y="316" width="940" height="70" rx="6"/>
+<text class="lbl" x="48" y="344">第 3 部 · 验证纪律（<a class="xref" href="DIS-01.html">DIS-01</a>~04）</text>
+<text class="sub" x="48" y="366">证据分级 · 判定标量 · AI 助手产出验证 · 事故台账 —— 不属于任何单一阶段，作用在每一道关口上</text>
+<path class="edge-ghost" d="M173,316 L173,258"/>
+<path class="edge-ghost" d="M335,316 L335,258"/>
+<path class="edge-ghost" d="M497,316 L497,258"/>
+<path class="edge-ghost" d="M659,316 L659,258"/>
+<path class="edge-ghost" d="M821,316 L821,258"/>
+
+<!-- 底注 -->
+<line class="guide" x1="30" y1="418" x2="970" y2="418"/>
+<text class="sub" x="30" y="448">⚠️ 六阶段是本手册自建框架，不是行业标准（声明见 ROL-04）。它的价值是给关口、交付物、检查项</text>
+<text class="sub" x="30" y="468">一个不漂移的挂点；你的组织已有阶段划分时，把各节映射过去用——检查项不依赖阶段叫什么。</text>
+<text class="sub" x="30" y="496">虚线回边是常态而非例外；区别专业与否的不是「有没有回去」，而是回去时走不走关口（ROL-04.3）。</text>
+</svg>
+<figcaption>六阶段与关口：ENG→SUR→BLD→DEP→VER→HND，验证纪律横切全部关口，三条虚线回边（发现红线回承接、签收不过回搭建上线、无人可交回承接）</figcaption></figure>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th>阶段</th>
+<th>核心问题</th>
+<th>进入条件</th>
+<th>退出条件（关口）</th>
+<th>已成稿节</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>ENG 承接</strong></td>
+<td>这活能不能接？红线在哪？成功标准怎么定义？</td>
+<td>有明确的对手方与诉求</td>
+<td>成功标准与红线双方书面认可；交付物清单（<a class="xref" href="ROL-03.html">ROL-03</a>）建立</td>
+<td><a class="xref" href="ENG-01.html">ENG-01</a>、<a class="xref" href="ENG-02.html">ENG-02</a></td>
+</tr>
+<tr>
+<td><strong>SUR 勘察</strong></td>
+<td>现场环境、约束、依赖、不在工程域里的阻塞项各是什么？</td>
+<td>ENG 关口已过</td>
+<td>环境清单、依赖清单、阻塞项登记表（<a class="xref" href="ROL-02.html">ROL-02</a>.4）齐</td>
+<td><a class="xref" href="SUR-01.html">SUR-01</a>、<a class="xref" href="SUR-02.html">SUR-02</a></td>
+</tr>
+<tr>
+<td><strong>BLD 搭建</strong></td>
+<td>最小可用链路怎么搭？换链路丢了什么能力？</td>
+<td>SUR 关口已过</td>
+<td>链路在客户环境跑通，丢失能力清单确认</td>
+<td><a class="xref" href="BLD-03.html">BLD-03</a>、<a class="xref" href="BLD-04.html">BLD-04</a></td>
+</tr>
+<tr>
+<td><strong>DEP 上线</strong></td>
+<td>怎么部署、切换、灰度？回滚预案是什么？</td>
+<td>BLD 关口已过</td>
+<td>回滚预案演练过；切换动作执行完且 <a class="xref" href="VER-02.html">VER-02</a> 判定 <code>SWITCHED</code></td>
+<td><a class="xref" href="DEP-01.html">DEP-01</a></td>
+</tr>
+<tr>
+<td><strong>VER 签收</strong></td>
+<td>什么算做完了？证据链怎么留？</td>
+<td>DEP 关口已过</td>
+<td>全部签收判据通过并留档（<strong>本手册的重心</strong>）</td>
+<td><a class="xref" href="VER-01.html">VER-01</a>~05</td>
+</tr>
+<tr>
+<td><strong>HND 移交</strong></td>
+<td>运维、监控、责任怎么交出去？</td>
+<td>VER 关口已过</td>
+<td>客户按移交资产独立运行过（<a class="xref" href="ROL-03.html">ROL-03</a>.1）</td>
+<td><a class="xref" href="HND-01.html">HND-01</a></td>
+</tr>
+</tbody>
+</table>
+<h3 id="rol-04.2-关口规则">ROL-04.2　关口规则</h3>
+<p>阶段之间的过渡必须有<strong>可粘贴的判定输出</strong>，不是一句「我觉得可以进入下一阶段了」：</p>
+<ol type="1">
+<li>上一阶段的退出条件逐项核对，每项有可观察的证据（判定标量的形态见 <a class="xref" href="DIS-02.html">DIS-02</a>）；</li>
+<li>判定输出粘进过程资产（<a class="xref" href="ROL-03.html">ROL-03</a>.1 第四类），关口日期与输出一起留档；</li>
+<li><strong>退出条件不满足就进入下一阶段 = 把缺口带进定义更模糊的地方</strong>—— ENG 没定成功标准，VER 就没有判据可执行；SUR 没登记阻塞项，DEP 就会撞上不产生任何技术信号的停摆（<a class="xref" href="ROL-02.html">ROL-02</a> 案例框那种形态）。缺口不会消失，只会改名。</li>
+</ol>
+<h3 id="rol-04.3-回环线性图只是主干">ROL-04.3　回环：线性图只是主干</h3>
+<p>六阶段按顺序画，但三条回边是常态而非例外：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>回边</th>
+<th>触发</th>
+<th>动作</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>VER → BLD/DEP</td>
+<td>签收判据不过</td>
+<td>修复后<strong>重跑全部相关判据</strong>，不是只补挂掉的那条（回滚也是一次切换，见 FX-SVC-01 Rollback）</td>
+</tr>
+<tr>
+<td>SUR → ENG</td>
+<td>勘察发现红线（做不了、不该做、成本远超预估）</td>
+<td>回 ENG 重议范围或退出——<strong>勘察的价值一半在于此</strong>，别把它当走过场</td>
+</tr>
+<tr>
+<td>HND → ENG</td>
+<td>发现无人可交（客户侧没有承接角色）</td>
+<td>回 ENG 的干系人表补角色；这说明 ENG 关口当时就漏了</td>
+</tr>
+<tr>
+<td><strong>不存在的回边</strong></td>
+<td>「跳过 SUR 直接 BLD，出问题再回来勘察」</td>
+<td>这不是回边，是把 SUR 的成本换成 DEP/VER 的事故——一笔代价大得多的置换</td>
+</tr>
+</tbody>
+</table>
+<h3 id="rol-04.4-验证纪律不是一个阶段">ROL-04.4　验证纪律不是一个阶段</h3>
+<p>第 3 部（<a class="xref" href="DIS-01.html">DIS-01</a>~04）不出现在六阶段序列里，因为它<strong>贯穿每个关口</strong>：每个关口的判定输出都用 <a class="xref" href="DIS-02.html">DIS-02</a> 的形态（判定标量，不是三段描述），每份证据按 <a class="xref" href="DIS-01.html">DIS-01</a> 分级，用 AI 助手干活的每一步受 <a class="xref" href="DIS-03.html">DIS-03</a> 约束。 <strong>VER 是集中签收的阶段，不是验证唯一发生的阶段</strong>——把验证推迟到 VER 才开始做，等于让缺陷带息滚存四个阶段。</p>
+<hr />
+<h2 id="常见误判">常见误判</h2>
+<p><strong>「阶段是线性的，走完一个就不回头」</strong>回边是常态（ROL-04.3）。区别专业与否的不是「有没有回去」，而是回去时<strong>走不走关口</strong>——带着判定输出回去重议，和「悄悄回去改改」是两回事。</p>
+<p><strong>「验证是 VER 阶段的事」</strong> VER 只是集中签收（ROL-04.4）。每个阶段的退出条件本身就是验证；第 3 部的纪律从 ENG 第一天就生效。</p>
+<p><strong>「跳过 ENG/SUR 能省时间」</strong>省下的是<strong>定义问题的时间</strong>，代价是后面每个阶段都在一个没有成功标准、没有环境清单的空间里工作——每个判断都要现场重新发明依据。本手册对此不给弹性：ENG/SUR 的退出条件没有「可选」标记。</p>
+<p><strong>「框架是标准的，照着走就有背书」</strong>没有背书，见开头的框架声明。框架给你的是挂点和检查项，「走了流程」本身不构成任何证据——证据只来自每个关口的判定输出。</p>
+<hr />
+<h2 id="判定标准">判定标准</h2>
+<p>任一时刻抽查，三问自检：</p>
+<div class="checklist"><ul><li><span class="box">☐</span>我能说出当前处于哪个阶段（以及依据：上个关口的判定输出在哪份过程资产里）</li><li><span class="box">☐</span>我能列出下个关口的退出条件，且每条知道将用什么证据满足</li><li><span class="box">☐</span>当前阶段之外的活动（提前搭链路、提前谈移交）已显式标记为预研，不冒充关口已过</li></ul></div>
+<p>三问全过才算「在框架内」。第三问防的是最隐蔽的漂移：提前做下阶段的事不是错，<strong>把「提前做了」当成「关口过了」才是</strong>。</p>
+<hr />
+<h2 id="案例证据">案例证据</h2>
+<blockquote>
+<h3 id="说明-本节不单独配案例">说明 · 本节不单独配案例</h3>
+<p>本节是框架页；框架自身的有效性不靠单个案例背书（也背不动—— 见框架声明：它是自建的）。框架中各关口的证据由对应规程节分别支撑：</p>
+<ul>
+<li>VER 关口为什么要判定标量：<a class="xref" href="VER-02.html">VER-02</a> 案例 PM-01（Slack，配置正确但运行时状态陈旧）</li>
+<li>SUR 为什么要登记非工程域阻塞项：<a class="xref" href="ROL-02.html">ROL-02</a> 合成示例（备案停摆）与 <a class="xref" href="VER-03.html">VER-03</a></li>
+<li>「跳关口的缺口不会消失，只会改名」：<a class="xref" href="BLD-03.html">BLD-03</a> 的丢失能力清单机理</li>
+</ul>
+<p>各节案例均按案例律标注档位；本节自身没有需要标注的事实性声明—— 唯一的例外是框架声明里「Palantir 原文无阶段划分」这一条，其核实记录见 <a class="xref" href="ROL-01.html">ROL-01</a> 案例框（2026-08-06 逐句核实）。</p>
+</blockquote>
+<hr />
+<h2 id="相关小节">相关小节</h2>
+<ul>
+<li><strong><a class="xref" href="ROL-01.html">ROL-01</a> 角色定义</strong>——谁在这张图里工作</li>
+<li><strong><a class="xref" href="ROL-02.html">ROL-02</a> 相邻角色边界</strong>——ENG/HND 关口消费的登记表</li>
+<li><strong><a class="xref" href="ROL-03.html">ROL-03</a> 交付物清单</strong>——各关口验收的四类资产</li>
+<li><strong><a class="xref" href="DIS-01.html">DIS-01</a> / <a class="xref" href="DIS-02.html">DIS-02</a></strong>——关口判定输出的形态与证据分级</li>
+<li><strong><a class="xref" href="VER-02.html">VER-02</a> 切换验证</strong>——「关口要可粘贴判定输出」在 DEP→VER 之间的具体形态</li>
+<li><strong><a class="xref" href="APPX-A.html">附录 A</a> · FX-ORG-03（待写）</strong>——症状「说不清现在处于交付的哪一步」的速查入口</li>
+</ul>
+<section class="quiz" data-quiz="[{&quot;q&quot;: &quot;本手册的六阶段划分，出处是？&quot;, &quot;opts&quot;: [&quot;本手册自建，并非行业标准&quot;, &quot;帕兰提尔官方的交付流程图&quot;, &quot;谷歌SRE手册的阶段化模型&quot;], &quot;answer&quot;: 0, &quot;why&quot;: &quot;ROL-04 框架声明——Palantir 原文只有活动词，没有阶段化生命周期；自建框架的价值是给检查项一个不漂移的挂点。&quot;}, {&quot;q&quot;: &quot;「提前做了下阶段的事」和「关口已过」是什么关系？&quot;, &quot;opts&quot;: [&quot;两回事：预研不冒充过关口&quot;, &quot;一回事：做了就等于过了关&quot;, &quot;看情况：项目紧就算过关口&quot;], &quot;answer&quot;: 0, &quot;why&quot;: &quot;ROL-04 判定标准第三问——提前做不是错，把「提前做了」当成「关口过了」才是最隐蔽的漂移。&quot;}, {&quot;q&quot;: &quot;验证在生命周期里的位置是？&quot;, &quot;opts&quot;: [&quot;贯穿全程，签收只是集中点&quot;, &quot;只在签收阶段，其余不需要&quot;, &quot;只在上线之前，签收后结束&quot;], &quot;answer&quot;: 0, &quot;why&quot;: &quot;ROL-04.4——把验证推迟到 VER 才开始做，等于让缺陷带息滚存四个阶段。&quot;}]"><h2>自测：先作答，再回看正文</h2><p class="quiz-note">检索式练习——凭记忆答，答错的那条就是该重读的小节。</p><div class="quiz-body"></div></section><script src="assets/quiz.js"></script></main>
+<nav class="pager"><a href="ROL-03.html">← ROL-03</a><a href="ENG-01.html">ENG-01 →</a></nav>
+<footer>案例三档强制标注 · 引文写作当轮核实 · <a href="https://github.com/libaoming/fde-handbook">GitHub 源仓库</a>（发现分档冒充或引文失实，请提 issue——那是本手册的红线）</footer>
+</body></html>

@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VER-02 · 切换验证：确认接活的是新版本 · FDE 手册</title>
+<link rel="stylesheet" href="assets/style.css"></head>
+<body><header class="top">
+<a class="home" href="index.html">《FDE 手册》</a><span class="crumb">第 2 部 · VER 签收</span>
+</header>
+<main><h1 id="ver-02-切换验证确认接活的是新版本">VER-02 · 切换验证：确认接活的是新版本</h1>
+<p><strong>目的</strong>　部署动作执行完之后，判断这次切换是否真的完成——即确认<strong>正在处理真实流量的，就是你刚部署的那个版本</strong>。本节给出四项检查与一个可粘贴的判定输出。</p>
+<p><strong>前置条件</strong> - 部署或切换动作已执行（本节不负责部署本身，见 <a class="xref" href="DEP-01.html">DEP-01</a>） - 你能访问服务管理器或编排器（systemd / Kubernetes / 进程管理器 / 负载均衡器管理接口） - 目标服务的日志可读，且日志里能区分「启动事件」与「业务事件」 - 已知本次部署的版本标识（构建号、镜像摘要、commit 短哈希，任选其一但必须唯一）</p>
+<hr />
+<h2 id="规程">规程</h2>
+<p>四项检查全部通过才算切换完成。<strong>任何一项不通过，本次切换按未完成处理。</strong></p>
+<figure class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 430" role="img" aria-label="VER-02 四项检查的判定流：四项依次通过才输出 SWITCHED；任何一项不通过输出 NOT_SWITCHED；任何一项没做或测不出输出 INDETERMINATE，按未通过处理">
+<style>
+  :root{ --paper:#ffffff; --ink:#17181a; --muted:#6b6f76; --faint:#b9b9b3; --danger:#a8321f; }
+  @media (prefers-color-scheme: dark){
+    :root{ --paper:#131416; --ink:#e9eaec; --muted:#979ba2; --faint:#4a4d53; --danger:#e0785e; }
+  }
+  text{ font-family:"PingFang SC","Noto Sans CJK SC","Hiragino Sans GB",system-ui,sans-serif }
+  .bg{ fill:var(--paper) }
+  .node{ fill:none; stroke:var(--ink); stroke-width:1.5 }
+  .node-key{ stroke-width:3 }
+  .node-ghost{ stroke:var(--faint); stroke-dasharray:5 4 }
+  .lbl{ fill:var(--ink); font-size:14px; font-weight:600 }
+  .sub{ fill:var(--muted); font-size:11.5px }
+  .edge{ stroke:var(--ink); stroke-width:1.6; fill:none }
+  .edge-ghost{ stroke:var(--faint); stroke-width:1.4; fill:none; stroke-dasharray:6 5 }
+  .guide{ stroke:var(--faint); stroke-width:1; stroke-dasharray:3 4 }
+  .etxt{ fill:var(--muted); font-size:12px }
+  .etxt-ink{ fill:var(--ink); font-size:12px; font-weight:600 }
+  .ah{ fill:var(--ink) } .ahg{ fill:var(--faint) }
+</style>
+<defs>
+  <marker id="f-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path class="ah" d="M0,0 L10,5 L0,10 z"/>
+  </marker>
+  <marker id="f-ghost" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path class="ahg" d="M0,0 L10,5 L0,10 z"/>
+  </marker>
+</defs>
+<rect class="bg" x="0" y="0" width="1000" height="430"/>
+
+<!-- 四项检查 -->
+<rect class="node" x="30" y="60" width="200" height="72" rx="6"/>
+<text class="lbl" x="46" y="88">服务在运行？</text>
+<text class="sub" x="46" y="110">VER-02.1 · systemctl / kubectl</text>
+
+<rect class="node" x="278" y="60" width="200" height="72" rx="6"/>
+<text class="lbl" x="294" y="88">版本对得上？</text>
+<text class="sub" x="294" y="110">VER-02.2 · 不可变标识逐字符</text>
+
+<rect class="node" x="526" y="60" width="200" height="72" rx="6"/>
+<text class="lbl" x="542" y="88">旧实例清干净？</text>
+<text class="sub" x="542" y="110">VER-02.3 · 进程 · 副本 · LB 运行时表</text>
+
+<rect class="node" x="774" y="60" width="200" height="72" rx="6"/>
+<text class="lbl" x="790" y="88">真的干过活？</text>
+<text class="sub" x="790" y="110">VER-02.4 · 唯一标识 grep 命中</text>
+
+<!-- 是 → 链 -->
+<path class="edge" d="M230,96 L272,96" marker-end="url(#f-ink)"/>
+<text class="etxt-ink" x="240" y="86">是</text>
+<path class="edge" d="M478,96 L520,96" marker-end="url(#f-ink)"/>
+<text class="etxt-ink" x="488" y="86">是</text>
+<path class="edge" d="M726,96 L768,96" marker-end="url(#f-ink)"/>
+<text class="etxt-ink" x="736" y="86">是</text>
+
+<!-- SWITCHED（主角） -->
+<rect class="node node-key" x="784" y="208" width="180" height="60" rx="6"/>
+<text class="lbl" x="802" y="234">SWITCHED</text>
+<text class="sub" x="802" y="254">才可进入 <a class="xref" href="VER-05.html">VER-05</a> 验收</text>
+<path class="edge" d="M874,132 L874,202" marker-end="url(#f-ink)"/>
+<text class="etxt-ink" x="882" y="172">四项全是</text>
+
+<!-- NOT_SWITCHED 汇流条 -->
+<rect class="node" x="30" y="208" width="620" height="60" rx="6"/>
+<text class="lbl" x="48" y="234">NOT_SWITCHED</text>
+<text class="sub" x="48" y="254">按未完成处理 · 修复后重跑全部四项（不是只补挂掉的那条）</text>
+
+<path class="edge" d="M130,132 L130,202" marker-end="url(#f-ink)"/>
+<text class="etxt" x="138" y="172">否</text>
+<path class="edge" d="M378,132 L378,202" marker-end="url(#f-ink)"/>
+<text class="etxt" x="386" y="172">否</text>
+<path class="edge" d="M626,132 L626,202" marker-end="url(#f-ink)"/>
+<text class="etxt" x="634" y="172">否</text>
+<path class="edge" d="M800,132 C800,168 700,178 656,205" marker-end="url(#f-ink)"/>
+<text class="etxt" x="742" y="172">否</text>
+
+<!-- fail-closed 泳道 -->
+<line class="guide" x1="30" y1="300" x2="970" y2="300"/>
+<rect class="node node-ghost" x="30" y="322" width="620" height="60" rx="6"/>
+<text class="lbl" x="48" y="348">INDETERMINATE_*</text>
+<text class="sub" x="48" y="368">任一项没做或测不出（权限不足 · 日志缺失 · 未传参数）→ 一律按未通过处理</text>
+<path class="edge-ghost" d="M340,270 L340,316" marker-end="url(#f-ghost)"/>
+<text class="etxt" x="350" y="296">保守缺省 · fail-closed：「没测」≠「测了是好的」</text>
+</svg>
+<figcaption>四项检查的判定流：四项全是才输出 SWITCHED；任一项为否输出 NOT_SWITCHED；任一项没做或测不出输出 INDETERMINATE，按未通过处理</figcaption></figure>
+<h3 id="ver-02.1-服务管理器认为它在运行">VER-02.1　服务管理器认为它在运行</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>环境</th>
+<th>命令</th>
+<th>通过判据</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>systemd</td>
+<td><code>systemctl is-active &lt;svc&gt;</code></td>
+<td>输出 <code>active</code>，退出码 0</td>
+</tr>
+<tr>
+<td>Kubernetes</td>
+<td><code>kubectl get pods -l app=&lt;svc&gt;</code></td>
+<td>目标 Pod <code>Running</code> 且 <code>READY</code> 分子=分母</td>
+</tr>
+<tr>
+<td>容器</td>
+<td><code>docker ps --filter name=&lt;svc&gt;</code></td>
+<td>容器在列且状态为 <code>Up</code></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><code>systemctl is-active</code> 在至少一个单元处于活动状态时返回退出码 0，否则返回非零（<code>systemctl(1)</code>，man7.org 官方手册镜像： https://man7.org/linux/man-pages/man1/systemctl.1.html ）。</p>
+</blockquote>
+<p><strong>这一项排除的是</strong>：以为启动了、其实启动失败。<strong>它不能证明任何别的事。</strong></p>
+<h3 id="ver-02.2-正在响应的实例版本对得上">VER-02.2　正在响应的实例，版本对得上</h3>
+<p>不要问「服务活着吗」，要问「<strong>回答我的这个东西，是哪个版本</strong>」。</p>
+<ul>
+<li>让服务暴露一个版本端点（<code>/version</code> 返回构建号或 commit 哈希），部署后直接查；</li>
+<li>没有版本端点时，退而查进程或镜像：容器看镜像摘要（digest，不是 tag——tag 会被覆盖），进程看启动时间与命令行。</li>
+</ul>
+<p><strong>通过判据</strong>：查到的版本标识 == 本次部署的版本标识，<strong>逐字符相等</strong>。</p>
+<blockquote>
+<p>⚠️ 用镜像 tag（如 <code>:latest</code>、<code>:prod</code>）核对<strong>不成立</strong>——同一个 tag 可以指向不同镜像。必须用不可变标识（digest / 构建号 / commit 哈希）。</p>
+<p>⚠️ <strong>Web 交付另有一层</strong>：你查到的版本来自源站还是边缘节点？ CDN 与浏览器缓存持有旧资源，是「部署完了改动没生效」在 Web 场景的头号原因。带 cache-busting 参数查一次、直连源站再查一次，两次都要对上。</p>
+</blockquote>
+<h3 id="ver-02.3-旧实例已经清干净">VER-02.3　旧实例已经清干净</h3>
+<p><strong>这是最常被跳过、也最常出事的一项。</strong> 「新的起来了」和「旧的死透了」是两件独立的事，两者都为真才叫切换。</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>环境</th>
+<th>检查</th>
+<th>通过判据</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>进程</td>
+<td>列出同类进程，核对父进程与启动时间</td>
+<td>无「父进程为 1（被 init 收养）且早于本次部署」的残留</td>
+</tr>
+<tr>
+<td>容器/编排</td>
+<td>列出全部副本</td>
+<td>无旧版本副本处于 Running</td>
+</tr>
+<tr>
+<td>负载均衡</td>
+<td><strong>查运行时后端表</strong>，见下表</td>
+<td>后端列表中无旧实例地址</td>
+</tr>
+</tbody>
+</table>
+<p><strong>负载均衡这一项必须单独给命令</strong>，因为它是本节最容易出事、也最容易被「看配置文件」蒙混过去的一项：</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>LB</th>
+<th>读运行时状态的命令</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>HAProxy</td>
+<td><code>echo "show servers state" \| socat stdio /var/run/haproxy.sock</code></td>
+</tr>
+<tr>
+<td>Envoy</td>
+<td><code>curl -s localhost:15000/clusters</code></td>
+</tr>
+<tr>
+<td>Nginx Plus</td>
+<td><code>curl -s http://127.0.0.1/api/*/http/upstreams</code></td>
+</tr>
+<tr>
+<td>Kubernetes</td>
+<td><code>kubectl get endpointslices -l kubernetes.io/service-name=&lt;svc&gt;</code></td>
+</tr>
+<tr>
+<td>开源 Nginx</td>
+<td>⚠️ 无运行时查询接口。<code>nginx -T</code> 读的是<strong>配置</strong>不是运行时状态——正是本项要防的东西。只能靠「重载后核对 worker 进程启动时间」间接判断</td>
+</tr>
+</tbody>
+</table>
+<p><strong>你的 LB 不在此列时，只需问一句：这个接口读的是磁盘，还是内存？</strong>读磁盘的一律不算数。配置文件是「期望」，运行时表才是「事实」，两者可以长期不一致而不报任何错——本节案例 PM-01 正是这个形态：</p>
+<figure class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 470" role="img" aria-label="磁盘上的配置正确，但负载均衡进程内存中的后端表停在旧状态，流量仍流向旧实例，新实例从未接到流量；只有查运行时表的检查能发现">
+<style>
+  :root{ --paper:#ffffff; --ink:#17181a; --muted:#6b6f76; --faint:#b9b9b3; --danger:#a8321f; }
+  @media (prefers-color-scheme: dark){
+    :root{ --paper:#131416; --ink:#e9eaec; --muted:#979ba2; --faint:#4a4d53; --danger:#e0785e; }
+  }
+  text{ font-family:"PingFang SC","Noto Sans CJK SC","Hiragino Sans GB",system-ui,sans-serif }
+  .bg{ fill:var(--paper) }
+  .node{ fill:none; stroke:var(--ink); stroke-width:1.5 }
+  .node-key{ stroke-width:3 }
+  .node-ghost{ stroke:var(--faint); stroke-dasharray:5 4 }
+  .lbl{ fill:var(--ink); font-size:14px; font-weight:600 }
+  .sub{ fill:var(--muted); font-size:11.5px }
+  .edge{ stroke:var(--ink); stroke-width:1.6; fill:none }
+  .edge-ghost{ stroke:var(--faint); stroke-width:1.4; fill:none; stroke-dasharray:6 5 }
+  .guide{ stroke:var(--faint); stroke-width:1; stroke-dasharray:3 4 }
+  .etxt{ fill:var(--muted); font-size:12px }
+  .etxt-ink{ fill:var(--ink); font-size:12px; font-weight:600 }
+  .lane{ fill:var(--muted); font-size:11px; letter-spacing:.18em }
+  .bad{ fill:var(--danger); font-size:12px; font-weight:600 }
+  .badstroke{ stroke:var(--danger); stroke-width:2; fill:none }
+  .ah{ fill:var(--ink) } .ahg{ fill:var(--faint) }
+</style>
+<defs>
+  <marker id="m-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path class="ah" d="M0,0 L10,5 L0,10 z"/>
+  </marker>
+  <marker id="m-ghost" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path class="ahg" d="M0,0 L10,5 L0,10 z"/>
+  </marker>
+</defs>
+<rect class="bg" x="0" y="0" width="1000" height="470"/>
+
+<!-- 泳道标签与分隔 -->
+<text class="lane" x="50" y="42">磁盘 · 期望</text>
+<text class="lane" x="415" y="42">内存 · 事实</text>
+<text class="lane" x="765" y="42">后端 · 流量去向</text>
+<line class="guide" x1="365" y1="30" x2="365" y2="330"/>
+<line class="guide" x1="720" y1="30" x2="720" y2="330"/>
+
+<!-- 磁盘：配置文件（期望，虚线） -->
+<rect class="node node-ghost" x="50" y="80" width="260" height="70" rx="6"/>
+<text class="lbl" x="70" y="110">配置文件</text>
+<text class="sub" x="70" y="132">渲染产物 · 主机列表 · 内容完全正确</text>
+
+<!-- 内存：负载均衡进程（主角，粗框） -->
+<rect class="node node-key" x="410" y="80" width="260" height="70" rx="6"/>
+<text class="lbl" x="430" y="110">负载均衡进程</text>
+<text class="sub" x="430" y="132">内存中的后端表 · 运行时状态 · 停在旧值</text>
+
+<!-- 后端：旧实例 / 新实例 -->
+<rect class="node" x="765" y="72" width="185" height="62" rx="6"/>
+<text class="lbl" x="783" y="99">旧实例</text>
+<text class="sub" x="783" y="119">上一版 · 本应已下线</text>
+
+<rect class="node" x="765" y="212" width="185" height="62" rx="6"/>
+<text class="lbl" x="783" y="239">新实例</text>
+<text class="sub" x="783" y="259">本次部署 · 等着接活</text>
+
+<!-- ① 同步/重载（可能失败且不报错） -->
+<path class="edge-ghost" d="M310,115 L404,115" marker-end="url(#m-ghost)"/>
+<text class="etxt" x="318" y="103">① 同步 / 重载</text>
+<text class="etxt" x="318" y="140">可能失败且不报错</text>
+
+<!-- ② 流量仍流向旧实例 -->
+<path class="edge" d="M670,103 L759,103" marker-end="url(#m-ink)"/>
+<text class="etxt-ink" x="676" y="91">② 流量仍流向这里</text>
+
+<!-- ③ 新实例从未接到流量 -->
+<path class="edge-ghost" d="M670,140 C720,180 726,225 759,240" marker-end="url(#m-ghost)"/>
+<path class="badstroke" d="M714,196 L734,216 M734,196 L714,216"/>
+<text class="bad" x="744" y="188">③ 从未接到流量</text>
+
+<!-- 两种检查 -->
+<rect class="node node-ghost" x="50" y="250" width="260" height="62" rx="6"/>
+<text class="lbl" x="70" y="277">读磁盘的检查</text>
+<text class="sub" x="70" y="297">cat / nginx -T · 「配置是对的」→ 假绿灯</text>
+<path class="edge-ghost" d="M180,250 L180,156" marker-end="url(#m-ghost)"/>
+
+<rect class="node" x="410" y="250" width="260" height="62" rx="6"/>
+<text class="lbl" x="430" y="277">查运行时表的检查</text>
+<text class="sub" x="430" y="297">show servers state · 唯一能看见 ③ 的位置</text>
+<path class="edge" d="M540,250 L540,156" marker-end="url(#m-ink)"/>
+
+<!-- 底注 -->
+<line class="guide" x1="50" y1="352" x2="950" y2="352"/>
+<text class="sub" x="50" y="382">这张图是案例 PM-01（Slack，2020）的形态：磁盘正确 + 进程健康 + 功能正常，三者同时成立，</text>
+<text class="sub" x="50" y="402">新实例却一个请求都没接到。「期望」与「事实」可以长期不一致而不报任何错——</text>
+<text class="sub" x="50" y="422">所以 VER-02.3 规定：读磁盘的接口一律不算数，只认运行时表。</text>
+</svg>
+<figcaption>磁盘上的配置正确，但进程内存里的后端表停在旧值：流量仍流向旧实例，新实例从未接到流量。读磁盘的检查给假绿灯，只有查运行时表能看见</figcaption></figure>
+<blockquote>
+<p><strong>为什么旧进程会活下来</strong>：杀掉父进程，子进程不会跟着死。POSIX 规定，进程退出后它的子进程与僵尸进程的父进程 ID「shall be set to the process ID of an implementation-defined system process」——也就是被 init/systemd 收养后继续运行。（POSIX.1-2017 <code>_exit()</code>：https://pubs.opengroup.org/onlinepubs/9699919799/functions/_exit.html ）</p>
+<p>systemd 手册对只杀主进程（<code>KillMode=process</code>）的评语是一个带感叹号的「不推荐」：这会让进程「escape the service manager’s lifecycle and resource management, and to remain running <strong>even while their service is considered stopped</strong>」—— <strong>服务被认为已停止，不等于进程都死了。</strong>（<code>systemd.kill(5)</code>，man7.org 官方手册镜像： https://man7.org/linux/man-pages/man5/systemd.kill.5.html ——freedesktop.org 原站拒绝抓取，内容同源）</p>
+</blockquote>
+<h3 id="ver-02.4-它真的干过活">VER-02.4　它真的干过活</h3>
+<p>前三项只证明「它站起来了」，这一项证明「<strong>活落在了它头上</strong>」。</p>
+<p><strong>通过判据</strong>：主动打一次带<strong>唯一标识</strong>的真实业务请求，然后在服务日志中 grep 该标识，命中即通过。标识可以是随机 request-id、订单号，或本次部署的短哈希—— 关键是它<strong>不可能来自上一次</strong>。</p>
+<p>不要用「日志里有业务事件」这种判据：在一套你不熟的服务日志里，你分不清哪一行是业务事件、哪一行是健康检查。<strong>用一个只属于这一次的标识把它钉死</strong>，判断就从「主观识别」变成了「grep 命中与否」。（同一手法在 <a class="xref" href="DIS-03.html">DIS-03</a>.2 有更一般的表述。）</p>
+<hr />
+<h2 id="常见误判">常见误判</h2>
+<p><strong>「功能能用，所以切换成功了」</strong>功能能用只证明有某个东西在响应，不证明响应的是你刚部署的那个。用户视角的黑盒验证与「哪个版本在服务」的白盒问题，是两类不同的证据 ——Google SRE 把这两类监控明确分开：黑盒是「以用户所见的方式测试外部可见行为」，白盒是「基于系统内部暴露的指标」（<em>Site Reliability Engineering</em>, Ch.6：https://sre.google/sre-book/monitoring-distributed-systems/ ）。<strong>拿黑盒的答案回答白盒的问题，是这类事故的标准起点。</strong></p>
+<blockquote>
+<p>边界：SRE 书主张两类监控<strong>互补</strong>，不是黑盒无用。本节只借它区分证据类型，不构成「黑盒验证可以省略」的主张。</p>
+</blockquote>
+<p><strong>「配置文件是对的，所以生效的配置是对的」</strong>磁盘上的内容是期望值，运行时加载的才是事实。两者可以静默地长期不一致（PM-01）。</p>
+<p><strong>「探测了一次，通过了」</strong>配置与镜像的分发通常是渐进的，同一时刻不同节点可能跑着不同版本。单点单次探测可能恰好命中已完成的那部分，给出「已恢复」的假信号（PM-02）。<strong>多节点、重复采样</strong>——覆盖判据是两个问题：横向，采样是否覆盖了全部节点（或至少每个分组各有样本）；纵向，采样是否横跨了<strong>至少一个完整的下发周期</strong>。 PM-02 里那个周期是 5 分钟，你的系统的周期是多少，要先问出来—— 在下发周期内做的任何次数的采样，都只是同一时刻的重复。</p>
+<p><strong>「在新环境验证过了」</strong>全新节点的启动顺序与存量节点不同，某些故障<strong>只在存量节点重启时才显现</strong>—— 这意味着新环境的绿灯对存量环境没有证明力（PM-05）。<strong>验证必须在存量运行节点上做。</strong></p>
+<p><strong>「监控没报警，所以没问题」</strong>如果监控与被监控系统共享依赖，故障发生时验证手段会和故障一起消失—— 此时的沉默不是绿灯（PM-04）。</p>
+<hr />
+<h2 id="判定标准">判定标准</h2>
+<p>四项全部通过才输出 <code>SWITCHED</code>。建议让脚本直接吐出判定标量，而不是让人读三段输出自己下结论（理由见 <a class="xref" href="DIS-02.html">DIS-02</a>）：</p>
+<pre><code>SERVICE_ACTIVE=yes                # VER-02.1
+VERSION_MATCH=yes                 # VER-02.2  部署版本 == 响应版本
+STALE_INSTANCES=0                 # VER-02.3  进程/副本残留数
+BUSINESS_EVENT_SINCE_DEPLOY=yes   # VER-02.4  唯一标识已在日志中命中
+VERDICT=SWITCHED</code></pre>
+<p>任一项为否 → <code>VERDICT=NOT_SWITCHED</code>，<strong>不得进入 <a class="xref" href="VER-05.html">VER-05</a> 验收</strong>。</p>
+<p><strong>参考实现</strong>：<code>kit/verify-switch.sh</code>（systemd 场景，含 29 条自测用例）。用法与覆盖范围必须说清楚，否则它就成了本节自己批评的那种「给假绿灯的闸门」：</p>
+<pre><code>./verify-switch.sh &lt;service&gt; --pattern &lt;进程匹配串&gt; \
+    --expect-version &lt;本次版本标识&gt; --version-cmd &lt;取版本的命令&gt; \
+    --event &lt;本次唯一标识&gt;</code></pre>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>检查项</th>
+<th>脚本是否覆盖</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>VER-02.1 服务活着</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>VER-02.2 版本对得上</td>
+<td>✅ 需传 <code>--expect-version</code> 与 <code>--version-cmd</code>（缺一即用法错误）</td>
+</tr>
+<tr>
+<td>VER-02.3 残留清零</td>
+<td>⚠️ <strong>仅覆盖进程残留</strong>；<strong>负载均衡器的运行时后端表脚本读不到</strong>，必须按上面的命令表人工执行。脚本会输出 <code>NOTE=lb_backend_table_not_covered_check_manually</code> 提醒</td>
+</tr>
+<tr>
+<td>VER-02.4 它干过活</td>
+<td>✅ 需传 <code>--event</code></td>
+</tr>
+</tbody>
+</table>
+<p>退出码：<code>0</code>=SWITCHED，<code>1</code>=NOT_SWITCHED，<code>4</code>=测不出（<code>INDETERMINATE_*</code>），<code>2</code>=用法错误。</p>
+<blockquote>
+<p><strong>保守缺省</strong>：四项中任何一项<strong>没做</strong>或<strong>测不出</strong>（工具不可用、权限不足、日志缺失、未传对应参数），一律按<strong>未通过</strong>处理。脚本对此是 fail-closed 的—— 没传版本参数会得到 <code>VERDICT=INDETERMINATE_NO_VERSION_CHECK</code> 并以退出码 4 结束，<strong>不会</strong>因为「没检查」而输出 <code>SWITCHED</code>。</p>
+<p>这条缺省与一条业界通行的分级原则同构：拿不准时按更坏的情况走，事后复盘再降级 ——PagerDuty 事故响应手册把它写作 <strong>“Always Assume The Worst”</strong> （https://response.pagerduty.com/before/severity_levels/ ）。该原则原本用于事故严重度分级，这里是<strong>类比借用</strong>，不是它的原始适用范围。</p>
+</blockquote>
+<hr />
+<h2 id="示例走查一次完整执行">示例走查：一次完整执行</h2>
+<blockquote>
+<p>本节是<strong>操作走查</strong>，不是事故记录：按顺序列出你在一次真实切换后要跑的命令、每条命令回答哪一问、以及判定输出的三种形态。命令是可直接抄的；判定输出的字段与取值由 <code>kit/verify-switch.sh</code> 定义（见文末真实自测输出）。</p>
+</blockquote>
+<p>设定：你刚在一台 systemd 机器上部署了 <code>orders-api</code> 服务，本次构建号 <code>build-4187</code>，服务暴露 <code>/version</code> 端点。逐项走查：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>步骤</th>
+<th>命令</th>
+<th>它回答哪一问</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>systemctl is-active orders-api</code></td>
+<td>VER-02.1：服务管理器认为它在运行吗</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>curl -s localhost:8080/version</code></td>
+<td>VER-02.2：<strong>回答我的这个东西</strong>是 <code>build-4187</code> 吗（逐字符比对）</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>ps -eo ppid,pid,cmd \| grep orders-api</code></td>
+<td>VER-02.3a：有没有「父进程为 1 且早于本次部署」的残留</td>
+</tr>
+<tr>
+<td>4</td>
+<td>按 VER-02.3 命令表查 LB 运行时后端表</td>
+<td>VER-02.3b：后端表里还有没有旧实例地址（<strong>脚本覆盖不到，必须人工</strong>）</td>
+</tr>
+<tr>
+<td>5</td>
+<td>发一笔带唯一标识的真实请求，再 <code>grep &lt;标识&gt; 日志</code></td>
+<td>VER-02.4：活真的落在了它头上吗</td>
+</tr>
+</tbody>
+</table>
+<p>五步合成一条命令（第 4 步除外）：</p>
+<pre><code>./kit/verify-switch.sh orders-api --pattern orders-api \
+    --expect-version build-4187 \
+    --version-cmd &quot;curl -s localhost:8080/version&quot; \
+    --event &quot;req-$(date +%s)-$RANDOM&quot;</code></pre>
+<p><strong>判定输出的三种形态</strong>（字段名与本节检查项一一对应）：</p>
+<ul>
+<li><p>四项全过——退出码 0，可进入 <a class="xref" href="VER-05.html">VER-05</a>：</p>
+<pre><code>SERVICE_ACTIVE=yes
+VERSION_MATCH=yes
+STALE_INSTANCES=0
+BUSINESS_EVENT_SINCE_DEPLOY=yes
+VERDICT=SWITCHED
+NOTE=lb_backend_table_not_covered_check_manually</code></pre>
+<p>注意最后一行：即使 <code>SWITCHED</code>，脚本也会提醒 LB 后端表未覆盖—— 第 4 步没做完，这个 <code>SWITCHED</code> 就还不完整。</p></li>
+<li><p>旧实例有残留——退出码 1，回去清理后<strong>重跑全部四项</strong>：</p>
+<pre><code>STALE_INSTANCES=2
+VERDICT=NOT_SWITCHED</code></pre></li>
+<li><p>忘了传版本参数——退出码 4，<strong>不会</strong>因为「没检查」而放行：</p>
+<pre><code>VERSION_MATCH=unchecked
+VERDICT=INDETERMINATE_NO_VERSION_CHECK</code></pre>
+<p>这是 fail-closed 的含义：「没测」与「测了是好的」在输出上必须可区分。</p></li>
+</ul>
+<p><strong>脚本自身的可信度</strong>：它带 29 条自测用例，覆盖判定逻辑与 fail-closed 缺省。以下为 2026-08-07 在本手册仓库实跑 <code>bash kit/verify-switch.sh --self-test</code> 的输出摘录（<code>reproducible</code> 档：读者可自行复跑）：</p>
+<pre><code>self-test: adjudicate_verdict（四项全对才通过）
+  ok   四项全对
+  ok   有残留→不算
+  ok   服务没起→不算
+  ok   版本对不上→不算
+  ok   起了但没干活→不算
+self-test: fail-closed（没做的检查不得算通过）
+  ok   没做版本核对→测不出
+  ok   没做业务事件→测不出
+  ok   两项都没做→测不出
+  ok   进程数据缺失优先报
+
+SELF_TEST_PASS=29
+SELF_TEST_FAIL=0
+VERDICT=SELF_TEST_OK</code></pre>
+<hr />
+<h2 id="案例证据">案例证据</h2>
+<blockquote>
+<h3 id="案例-pm-01-公开事故复盘slack2020">案例 PM-01 · 公开事故复盘｜Slack，2020</h3>
+<p>一次容量伸缩后，负载均衡器上的<strong>新实例始终没有接到流量</strong>。</p>
+<p>官方复盘原文：同步程序「always attempted to find a slot for new webapp instances before it freed slots taken up by old webapp instances that were no longer running. This program began to fail and exit early because it was unable to find any empty slots, meaning that the running HAProxy instances weren’t getting their state updated.」</p>
+<p><strong>它验证了 VER-02.3 为什么必须查运行时后端表</strong>：consul-template 渲染出的主机列表完全正确，任何「看配置文件」的检查都会通过；而 HAProxy 进程内存里的后端表停在旧状态。磁盘正确 + 进程健康 + 流量正常，三者同时成立，新实例却一个请求都没接到。</p>
+<p>出处：https://slack.engineering/a-terrible-horrible-no-good-very-bad-day-at-slack/ ｜不可外推：这是 HAProxy Runtime API 特定的槽位复用逻辑，不能据此论断所有 LB 都会静默保留旧后端。</p>
+</blockquote>
+<blockquote>
+<h3 id="案例-pm-05-公开事故复盘datadog2023">案例 PM-05 · 公开事故复盘｜Datadog，2023</h3>
+<p>一次多区域网络故障，根因是一个<strong>装上之后没有立刻生效</strong>的更新： “a security update to systemd was automatically applied to a number of VMs, which caused a latent adverse interaction in the network stack (on Ubuntu 22.04 via systemd v249) to manifest upon systemd-networkd restarting.”——磁盘上的包版本与运行中进程的版本长期不一致，故障要等进程重启那一刻才显现。</p>
+<p>更关键的是官方复盘对「为什么测试没拦住」的解释： “neither a fresh node nor a rebooted node exhibit this behavior because during a normal boot sequence systemd-networkd always starts before routing rules are installed by the CNI plugin.”——<strong>全新节点与重启节点的启动顺序不同，故障只在存量运行节点上显现</strong>。任何在新环境做的验证都必然通过，且这份「通过」对存量环境毫无证明力。</p>
+<p><strong>它验证了本节两条规矩</strong>：VER-02.2 的「安装 ≠ 生效」（版本核对必须问运行中的进程，不是磁盘上的包），以及常见误判里的「验证必须在存量运行节点上做」。</p>
+<p>出处：https://www.datadoghq.com/blog/2023-03-08-multiregion-infrastructure-connectivity-issue/ ｜不可外推：绑定 Ubuntu 22.04 + systemd v249 + CNI 的具体组合，不能写成「自动安全更新普遍危险」。</p>
+</blockquote>
+<blockquote>
+<h3 id="案例-pm-02-公开事故复盘cloudflare2025">案例 PM-02 · 公开事故复盘｜Cloudflare，2025</h3>
+<p>一次全网故障中，一个特征文件由数据库集群每 5 分钟生成一次，而集群正在灰度升级： “every five minutes there was a chance of either a good or a bad set of configuration files being generated and rapidly propagated across the network. This fluctuation made it unclear what was happening as the entire system would recover and then fail again”—— 系统在恢复与崩溃之间横跳，且 “Initially, this led us to believe this might be caused by an attack.”</p>
+<p><strong>它验证了「探测了一次，通过了」为什么是误判</strong>：分发是渐进的，单点单次采样有相当概率恰好命中好的那一批，给出「已恢复」的假信号——并把排查引向完全错误的方向（误判为攻击）。采样必须覆盖多节点、横跨至少一个完整下发周期。</p>
+<p>出处：https://blog.cloudflare.com/18-november-2025-outage/ ｜不可外推：波动源于上游权限变更的特定 bug，不能用来论证「配置灰度本身有害」。</p>
+</blockquote>
+<blockquote>
+<h3 id="案例-pm-09-公开事故复盘gitlab2017">案例 PM-09 · 公开事故复盘｜GitLab，2017</h3>
+<p>数据库事故后需要恢复备份时才发现： “The standard backup procedure uses pg_dump to perform a logical backup of the database. This procedure failed silently.”——备份任务天天在跑，产物一直是空的。失败通知也没送到：“Unfortunately DMARC was not enabled for the cronjob emails, resulting in them being rejected by the receiver. This means we were never aware of the backups failing, until it was too late.”</p>
+<p><strong>它验证了 VER-02.4 的锚点选择</strong>：「任务在跑」「没收到告警」都是间接信号；自动化动作的验收锚点是<strong>产物本身</strong>（对备份：产物存在、非空、且能恢复出来）。把这条平移到切换验证：进程在跑不算数，<strong>带唯一标识的业务事件落进了新实例的日志</strong>才算数。</p>
+<p>出处：https://about.gitlab.com/blog/2017/02/10/postmortem-of-database-outage-of-january-31/ ｜不可外推：pg_dump 版本不匹配的具体故障，不可推广为「逻辑备份不可靠」。</p>
+</blockquote>
+<blockquote>
+<h3 id="案例-合成示例教学场景非真实事故">案例 · 合成示例（教学场景，非真实事故）</h3>
+<p>一次滚动更新中，编排器报告新副本 <code>Running</code> 且就绪探针通过，服务对外正常。但就绪探针只检查了进程端口是否监听，而新副本所需的配置项拉取失败，代码走了兜底分支返回缓存结果——<strong>请求全部成功，返回的却全是旧数据</strong>。</p>
+<p>本例说明 VER-02.4 为什么要断言<strong>业务事件</strong>而不是心跳：探针测的是「进程在不在」，业务事件测的是「活干得对不对」。</p>
+<p>⚠️ <strong>本例为本手册构造的教学场景，不是真实事故记录</strong>，不含任何真实读数。同类真实形态可参见 PM-03（配置服务返回合法空结果，进程健康、HTTP 200、内容是错的）。</p>
+</blockquote>
+<hr />
+<h2 id="相关小节">相关小节</h2>
+<ul>
+<li><strong><a class="xref" href="DEP-01.html">DEP-01</a> 部署与切换</strong>——本节的上游；切换动作本身怎么做</li>
+<li><strong><a class="xref" href="VER-03.html">VER-03</a> 可达性验证</strong>——用户那条路通不通（本节只回答「谁在接活」，不回答「用户到得了吗」）</li>
+<li><strong><a class="xref" href="VER-05.html">VER-05</a> 验收与签收</strong>——本节输出 <code>SWITCHED</code> 是进入验收的前置条件</li>
+<li><strong><a class="xref" href="DIS-01.html">DIS-01</a> 证据分级</strong>——「功能能用」为什么是信号而不是证据</li>
+<li><strong><a class="xref" href="DIS-02.html">DIS-02</a> 三道焊缝</strong>——为什么要让命令吐判定标量，而不是让人读输出</li>
+<li><strong><a class="xref" href="APPX-A.html">附录 A</a> · FX-SVC-01</strong>——症状「部署后改动似乎没生效」的速查入口</li>
+<li><strong><a class="xref" href="APPX-B.html">附录 B</a> · B-VER-02</strong>——本节四项检查的可打印版本</li>
+</ul>
+<section class="quiz" data-quiz="[{&quot;q&quot;: &quot;部署后 systemctl is-active 输出 active。这证明了什么？&quot;, &quot;opts&quot;: [&quot;服务管理器认为它在运行&quot;, &quot;接活的进程就是新版本了&quot;, &quot;本次切换已经可以签收了&quot;], &quot;answer&quot;: 0, &quot;why&quot;: &quot;VER-02.1 只排除「启动失败」——它不能证明任何别的事。&quot;}, {&quot;q&quot;: &quot;核对版本时，用镜像 tag（如 :prod）比对，为什么不算数？&quot;, &quot;opts&quot;: [&quot;同个标签可能指向不同镜像&quot;, &quot;标签名称会带上环境的前缀&quot;, &quot;标签只能在本地仓库里解析&quot;], &quot;answer&quot;: 0, &quot;why&quot;: &quot;VER-02.2——必须用不可变标识（digest / 构建号 / 哈希）逐字符比对。&quot;}, {&quot;q&quot;: &quot;「新副本已就绪」与「切换完成」之间还差什么？&quot;, &quot;opts&quot;: [&quot;旧实例清干净且真实干过活&quot;, &quot;再多等一个观测窗口的时间&quot;, &quot;让客户在验收单上补个签字&quot;], &quot;answer&quot;: 0, &quot;why&quot;: &quot;VER-02.3/.4——「新的起来了」和「旧的死透了」是两件独立的事，最后还要带唯一标识的业务事件把「活落在它头上」钉死。&quot;}, {&quot;q&quot;: &quot;四项检查里有一项因权限不足测不出来，正确的判定是？&quot;, &quot;opts&quot;: [&quot;按未通过处理并标记测不出&quot;, &quot;按已通过处理但备注下风险&quot;, &quot;跳过此项按其余三项来判定&quot;], &quot;answer&quot;: 0, &quot;why&quot;: &quot;保守缺省（fail-closed）——「没测」不是「测了是好的」，输出 INDETERMINATE 而非 SWITCHED。&quot;}]"><h2>自测：先作答，再回看正文</h2><p class="quiz-note">检索式练习——凭记忆答，答错的那条就是该重读的小节。</p><div class="quiz-body"></div></section><script src="assets/quiz.js"></script></main>
+<nav class="pager"><a href="VER-01.html">← VER-01</a><a href="VER-03.html">VER-03 →</a></nav>
+<footer>案例三档强制标注 · 引文写作当轮核实 · <a href="https://github.com/libaoming/fde-handbook">GitHub 源仓库</a>（发现分档冒充或引文失实，请提 issue——那是本手册的红线）</footer>
+</body></html>

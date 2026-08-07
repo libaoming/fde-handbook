@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ROL-03 · 交付物清单：一次交付要留下什么 · FDE 手册</title>
+<link rel="stylesheet" href="assets/style.css"></head>
+<body><header class="top">
+<a class="home" href="index.html">《FDE 手册》</a><span class="crumb">第 1 部 · 这份工作</span>
+</header>
+<main><h1 id="rol-03-交付物清单一次交付要留下什么">ROL-03 · 交付物清单：一次交付要留下什么</h1>
+<p><strong>目的</strong>　定义一次 FDE 交付的完整产出清单。开工前用它对齐范围（这次交付<strong>会</strong>留下什么、<strong>不会</strong>留下什么），收工前用它逐项对账。防的是那种最常见的烂尾：<strong>代码跑起来了，但除了代码什么都没留下</strong>——没人能验收、没人能运维、没人说得清当时为什么这么做。</p>
+<p><strong>前置条件</strong> - ENG 阶段已有双方认可的成功标准（<a class="xref" href="ENG-02.html">ENG-02</a>；没有时先回那里——清单的验收判据挂在成功标准上） - <a class="xref" href="ROL-02.html">ROL-02</a> 的边界登记表已建（清单里每项的 owner 从那张表来）</p>
+<hr />
+<h2 id="规程">规程</h2>
+<h3 id="rol-03.1-四类交付物">ROL-03.1　四类交付物</h3>
+<p>一次交付的产出分四类。<strong>第一类人人都记得，后三类才是烂尾的高发区。</strong></p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>类</th>
+<th>内容</th>
+<th>合格判据（什么算交付了）</th>
+<th>详见</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>运行系统</strong></td>
+<td>部署的链路、配置、基础设施变更清单</td>
+<td>通过 VER 部全部签收判据，且变更清单与实际环境一致</td>
+<td>BLD / DEP / VER</td>
+</tr>
+<tr>
+<td><strong>验证资产</strong></td>
+<td>验收判据、verify 脚本、golden 集（一组「输入 → 标准答案」对照对，用于回归检验）、判定标量定义</td>
+<td>客户方能<strong>独立执行</strong>并得到与你相同的判定输出</td>
+<td>第 3 部、<a class="xref" href="APPX-B.html">附录 B</a></td>
+</tr>
+<tr>
+<td><strong>移交资产</strong></td>
+<td>runbook（运维操作手册）、监控与告警、责任表、知识资产</td>
+<td>客户方按 runbook <strong>独立执行过至少一次且成功</strong>——文件送达不算</td>
+<td><a class="xref" href="HND-01.html">HND-01</a></td>
+</tr>
+<tr>
+<td><strong>过程资产</strong></td>
+<td>交付计划、决策记录、事故台账、声明账本</td>
+<td>第三方（新接手的人）仅凭它们能重建「为什么是现在这个样子」</td>
+<td><a class="xref" href="DIS-04.html">DIS-04</a></td>
+</tr>
+</tbody>
+</table>
+<p>注意合格判据的共同形态：<strong>都以「别人能做到什么」度量，不以「我写了什么」度量。</strong>这与 <a class="xref" href="ROL-01.html">ROL-01</a>.1 的定义同构——成功以客户侧可观察的结果计。</p>
+<h3 id="rol-03.2-方法与客户资产的分界线">ROL-03.2　方法与客户资产的分界线</h3>
+<p>清单里每一项，标注它属于哪边：</p>
+<ul>
+<li><strong>方法类</strong>：工作流、检查表、脚本骨架、分析套路——<strong>可复用到下一家客户</strong>；</li>
+<li><strong>客户资产类</strong>：这家客户特有的数据语义、业务口径、强制过滤条件、累积的纠错记录—— <strong>归客户，你不能带走</strong>。</li>
+</ul>
+<p>这条分界线借用 Meta 内部 agent 的设计原则：“Recipes define what to do (workflows, analysis steps, response formats), but not what the data means. Data definitions belong in a separate layer called Ingredients.”——<strong>方法（Recipes）与数据含义（Ingredients）分层存放</strong>。⚠️ Meta 原文只讲工程解耦，<strong>没有</strong>提归属或合同；「方法归你、语义归客户」的归属含义是<strong>本手册的引申</strong>，引用时须保留这个标注。</p>
+<p>为什么这刀非切不可：</p>
+<ol type="1">
+<li><strong>归属</strong>：合同结束时哪些带走、哪些留下，逐项清楚，不用临时谈判；</li>
+<li><strong>维护</strong>：客户资产类必须交到客户手里维护（HND），方法类的维护责任在你；</li>
+<li><strong>复用合规</strong>：不切这刀，「把上家的东西用到下家」就没有安全的边界。</li>
+</ol>
+<h3 id="rol-03.3-缺项显式化">ROL-03.3　缺项显式化</h3>
+<p>本次不交付的项，<strong>写「不交付」并写明谁承接，不许留空</strong>。</p>
+<p>空行有两种读法：「不在范围内」和「忘了」。收工时没有人能区分这两种—— 显式写「不交付（由客户 IT 承接监控告警）」的清单才可对账。这与 <a class="xref" href="VER-02.html">VER-02</a> 的保守缺省同一条原则：<strong>没写 = 没做，不是「应该做了」。</strong></p>
+<p>同理，清单在 ENG 冻结之后的增项与删项走<strong>显式变更</strong>：记录改了什么、谁提出、为什么。默默扩充与默默缩水都会让收工对账失去基准——对账的对象永远是「冻结版 + 变更记录」，不是「大家印象里的范围」。</p>
+<hr />
+<h2 id="常见误判">常见误判</h2>
+<p><strong>「demo 通过 = 交付完成」</strong> demo 是 BLD 阶段的中间产物，证明的是「链路能通」；它既不在验收判据里，也不满足任何一类合格判据（客户既不能独立执行，也没有留下可运维的东西）。以 demo 为终点的交付，四类资产只交付了半类。</p>
+<p><strong>「文档写了 = 移交完成」</strong>移交资产的合格判据是<strong>对方独立执行成功</strong>，不是文件送达（ROL-03.1 第三行）。 runbook 没被客户的手跑过一遍，你不知道它缺哪一步——写的人永远会跳过自己觉得显然的步骤。</p>
+<p><strong>「验收标准最后再补」</strong>收工时才写的验收标准，必然长成「现状的描述」——现状是什么，标准就是什么，于是永远通过。验收判据必须在 ENG 阶段挂在成功标准上冻结（<a class="xref" href="ENG-02.html">ENG-02</a>），清单在开工前就有「合格判据」这一列，原因在此。</p>
+<p><strong>「代码就是交付物，其他是官僚主义」</strong>验证资产不在清单里 → 「做完了」永远只是你的口头声明，无人能复核（<a class="xref" href="DIS-01.html">DIS-01</a>）；过程资产不在清单里 → 半年后没人解释得清任何一个配置为什么存在（FX-NET-01 的 Rollback 栏就是这种历史配置的下场）。后三类资产不是给流程交税，是让「做完了」这句话有证据。</p>
+<hr />
+<h2 id="判定标准">判定标准</h2>
+<div class="checklist"><ul><li><span class="box">☐</span>清单在 ENG 阶段建立并冻结（此后增删走变更，不走默默扩充）</li><li><span class="box">☐</span>四类资产每类都有条目，或显式写明「本次不交付 + 谁承接」</li><li><span class="box">☐</span>每项有 owner（来自 <a class="xref" href="ROL-02.html">ROL-02</a> 登记表）、合格判据、存放位置三个字段</li><li><span class="box">☐</span>每项已标注「方法类 / 客户资产类」</li><li><span class="box">☐</span>合格判据全部以「别人能做到什么」表述，无一条是「我写了什么」</li></ul></div>
+<p>收工对账时逐项打勾；任何一项三字段不全，按未交付处理——<strong>清单上没有的东西，不因为「其实做了」而算数</strong>（<a class="xref" href="DIS-01.html">DIS-01</a>：无法被复核的工作等于没做）。</p>
+<hr />
+<h2 id="案例证据">案例证据</h2>
+<blockquote>
+<h3 id="引证-第三方声明meta-recipes-ingredients-分层">引证 · 第三方声明｜Meta “Recipes / Ingredients” 分层</h3>
+<p>ROL-03.2 引句出自 Analytics at Meta, “Inside Meta’s Home Grown AI Analytics Agent”： https://medium.com/<span class="citation" data-cites="AnalyticsAtMeta/inside-metas-home-grown-ai-analytics-agent-4ea6779acfb3">@AnalyticsAtMeta/inside-metas-home-grown-ai-analytics-agent-4ea6779acfb3</span> （2026-08-06 逐句核实实存）。</p>
+<p><strong>不可外推边界</strong>：Meta 语境是内部工程解耦，原文不涉及归属、合同或交付；本节把这个分层用作归属切割线，是<strong>本手册的引申</strong>，不是 Meta 的主张。另：Meta 为自建自用场景，其分层的具体实现（Recipes/Ingredients 两层存储）不构成对交付现场的实现建议。</p>
+</blockquote>
+<blockquote>
+<h3 id="案例-合成示例教学场景非真实事故">案例 · 合成示例（教学场景，非真实事故）</h3>
+<p>一次交付验收会上，客户负责人问：「如果你们明天全员撤场，我们靠什么把系统跑下去？」交付方能拿出的只有代码仓库和一份架构图。监控是交付方自己的账号在看，验收当时是交付方操作给客户「过目」的，业务口径的解释散在聊天记录里。系统本身没有任何故障——但按 ROL-03.1 的四类对账，交付完成度是四分之一。</p>
+<p>本例说明清单为什么要在<strong>开工前</strong>建立：收工时才发现的缺项，每一项都要在合同尾声的时间压力下补做，而那正是最赶工、最不可能做好移交的时候。</p>
+<p>⚠️ <strong>本例为本手册构造的教学场景，不是真实事故记录</strong>，不含任何真实读数。</p>
+</blockquote>
+<hr />
+<h2 id="相关小节">相关小节</h2>
+<ul>
+<li><strong><a class="xref" href="ROL-02.html">ROL-02</a> 相邻角色边界</strong>——清单每项的 owner 从那张登记表来</li>
+<li><strong><a class="xref" href="ROL-04.html">ROL-04</a> 全景图</strong>——四类资产分别在哪个关口验收</li>
+<li><strong><a class="xref" href="DIS-01.html">DIS-01</a> 证据分级</strong>——「合格判据以别人能做到什么度量」的方法论依据</li>
+<li><strong><a class="xref" href="DIS-04.html">DIS-04</a> 事故台账</strong>——过程资产中台账的形态</li>
+<li><strong><a class="xref" href="HND-01.html">HND-01</a> 移交</strong>——移交资产的完整规程</li>
+<li><strong><a class="xref" href="APPX-B.html">附录 B</a> / C</strong>——检查表汇编与模板库（C-01 交付计划含本节清单骨架）</li>
+<li><strong><a class="xref" href="APPX-A.html">附录 A</a> · FX-ORG-02（待写）</strong>——症状「说不清这次交付最终要留下什么」的速查入口</li>
+</ul>
+</main>
+<nav class="pager"><a href="ROL-02.html">← ROL-02</a><a href="ROL-04.html">ROL-04 →</a></nav>
+<footer>案例三档强制标注 · 引文写作当轮核实 · <a href="https://github.com/libaoming/fde-handbook">GitHub 源仓库</a>（发现分档冒充或引文失实，请提 issue——那是本手册的红线）</footer>
+</body></html>

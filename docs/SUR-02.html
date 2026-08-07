@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SUR-02 · 非工程域勘察：不在日志里的阻塞项 · FDE 手册</title>
+<link rel="stylesheet" href="assets/style.css"></head>
+<body><header class="top">
+<a class="home" href="index.html">《FDE 手册》</a><span class="crumb">第 2 部 · SUR 勘察</span>
+</header>
+<main><h1 id="sur-02-非工程域勘察不在日志里的阻塞项">SUR-02 · 非工程域勘察：不在日志里的阻塞项</h1>
+<p><strong>目的</strong>　把<strong>不产生任何技术信号、却能让整条链路停摆</strong>的事项，在勘察阶段挖出来、问清周期、登记到人。这类事项的特点：它们不报错、不告警、不出现在任何监控里，且工程努力对它们完全无效——错过勘察窗口后，你只能在停摆中等它。</p>
+<p><strong>前置条件</strong> - <a class="xref" href="ROL-02.html">ROL-02</a> 的边界登记表已建（本节的产出全部登记进去） - 正在做 <a class="xref" href="SUR-01.html">SUR-01</a>（两节并行，本节专管工程视野之外的那一半）</p>
+<hr />
+<h2 id="规程">规程</h2>
+<h3 id="sur-02.1-六个必查域">SUR-02.1　六个必查域</h3>
+<p>逐域过一遍，<strong>每域三问：这次交付碰不碰它？周期多长？谁负责推进？</strong></p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>域</th>
+<th>典型事项</th>
+<th>特有陷阱</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>备案与合规</td>
+<td>域名备案、算法备案、数据合规评估、行业准入</td>
+<td>周期以周/月计且法定，技术手段无法缩短</td>
+</tr>
+<tr>
+<td>账号与配额</td>
+<td>云账号开通、API 配额、模型服务开通、白名单</td>
+<td>「有账号」≠「有这个能力的权限」，逐能力核</td>
+</tr>
+<tr>
+<td>授权范围</td>
+<td>采购的商品/许可证覆盖哪些能力、并发、环境</td>
+<td>销售口径 ≠ 合同条款，以合同为准</td>
+</tr>
+<tr>
+<td>合同与计费</td>
+<td>付款节点、超量计费、到期日</td>
+<td>欠费停服不提前通知的供应商真实存在</td>
+</tr>
+<tr>
+<td>数据出域</td>
+<td>数据能不能离开客户环境/地域/网络分区</td>
+<td>客户 IT 与法务的答案可能不同，两边都要问</td>
+</tr>
+<tr>
+<td>印章与流程</td>
+<td>验收单、变更单、进场许可需要谁签、走多久</td>
+<td>每一道签字都是一段日历时间，计入排期</td>
+</tr>
+</tbody>
+</table>
+<h3 id="sur-02.2-每个命中项登记四字段">SUR-02.2　每个命中项登记四字段</h3>
+<p>命中的事项进 <a class="xref" href="ROL-02.html">ROL-02</a>.4 边界登记表，四个字段缺一不可：</p>
+<div class="checklist"><ul><li><span class="box">☐</span>owner：一个名字（部门不算，见 FX-ORG-01）</li><li><span class="box">☐</span>周期：官方/流程口径的时长，问不到就要历史样本（「上次走这个流程花了多久」）</li><li><span class="box">☐</span>证据：完成时会拿到什么可核验的凭证（备案号、开通截图、盖章件）</li><li><span class="box">☐</span>排期位置：它阻塞哪些后续动作——把它画进关键路径，而不是「另一张表」</li></ul></div>
+<h3 id="sur-02.3-对等待的纪律">SUR-02.3　对「等待」的纪律</h3>
+<p>非工程域事项的正确动作经常是<strong>什么都不做地等</strong>——而这恰恰是工程师最难执行的动作。两条纪律：</p>
+<ol type="1">
+<li><strong>等待期间不绕道。</strong> 绕开审批的临时通道（换域名、借账号、走灰色代理）会活得比它解决的问题更久，并在最坏的时刻被清算（<a class="xref" href="VER-03.html">VER-03</a> 的 Rollback 教训同源）；</li>
+<li><strong>等待要有心跳。</strong> 每个等待中的事项定一个复查节奏（谁、多久问一次、向谁升级），写进登记表——「在等」和「没人管」的区别只有这一行字。</li>
+</ol>
+<hr />
+<h2 id="常见误判">常见误判</h2>
+<p><strong>「这些是商务的事，不归我管」</strong>分工上也许是，但<strong>停摆账单记在交付头上</strong>。FDE 对非工程域事项的责任不是去办，是确保每项<strong>有人办、周期已知、且在关键路径上可见</strong>（<a class="xref" href="ROL-02.html">ROL-02</a> 的归属三问）。</p>
+<p><strong>「技术都通了，剩下的是走流程」</strong>「走流程」三个字里藏着以周计的日历时间和随时可能出现的驳回。流程不是尾款，是关键路径上的一段——SUR-02.2 要求把它画进排期，原因在此。</p>
+<p><strong>「客户说没问题，就是没问题」</strong>问「有没有问题」得到的永远是「没问题」。要按 SUR-02.1 逐域问<strong>具体问题</strong>：备案办到哪一步了？配额批了多少？合同里写的是哪几个环境？具体的问题才能暴露具体的坑。</p>
+<hr />
+<h2 id="判定标准">判定标准</h2>
+<div class="checklist"><ul><li><span class="box">☐</span>六域逐一过筛，命中项全部四字段登记</li><li><span class="box">☐</span>每个命中项已画入关键路径（它阻塞什么，一眼可见）</li><li><span class="box">☐</span>等待中的事项有心跳（复查节奏 + 升级路径）</li><li><span class="box">☐</span>无任何「应该没问题」状态的项——只有「已核」与「已登记待办」两种</li></ul></div>
+<p>保守缺省：某域「大概率不涉及」但没核过 → 按涉及处理，花五分钟问掉它。这五分钟是全手册性价比最高的五分钟。</p>
+<hr />
+<h2 id="案例证据">案例证据</h2>
+<blockquote>
+<h3 id="案例证据说明">案例证据说明</h3>
+<p>本节的案例形态已在 <strong><a class="xref" href="ROL-02.html">ROL-02</a> 案例框（合成示例：备案停摆）</strong> 完整呈现—— 工程双方各自全绿、停摆无任何技术信号，正是本节六域中「备案与合规」的标准形态，此处不重复构造。真实公开事故中的同构形态见 <strong><a class="xref" href="VER-03.html">VER-03</a> / FX-NET-01</strong> 对非工程域根因的处理（「正确的动作往往是什么都不做」）。</p>
+</blockquote>
+<hr />
+<h2 id="相关小节">相关小节</h2>
+<ul>
+<li><strong><a class="xref" href="SUR-01.html">SUR-01</a> 环境与语义勘察</strong>——工程视野内的另一半勘察</li>
+<li><strong><a class="xref" href="ROL-02.html">ROL-02</a> 相邻角色边界</strong>——登记表本体与归属三问</li>
+<li><strong><a class="xref" href="ENG-01.html">ENG-01</a> 承接判定</strong>——周期长于合同期 = 红线，回边重议</li>
+<li><strong><a class="xref" href="VER-03.html">VER-03</a> 可达性验证</strong>——非工程域根因在故障排查时的形态</li>
+<li><strong><a class="xref" href="APPX-A.html">附录 A</a> · FX-ORG-07（待写）</strong>——本节专属入口：症状「技术全通了，卡在一纸审批上」</li>
+<li><strong><a class="xref" href="APPX-A.html">附录 A</a> · FX-ORG-01</strong>——症状「一件事卡住，双方都以为对方在做」</li>
+</ul>
+</main>
+<nav class="pager"><a href="SUR-01.html">← SUR-01</a><a href="BLD-03.html">BLD-03 →</a></nav>
+<footer>案例三档强制标注 · 引文写作当轮核实 · <a href="https://github.com/libaoming/fde-handbook">GitHub 源仓库</a>（发现分档冒充或引文失实，请提 issue——那是本手册的红线）</footer>
+</body></html>

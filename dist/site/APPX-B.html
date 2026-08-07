@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>附录 B · 检查表汇编 · FDE 手册</title>
+<link rel="stylesheet" href="assets/style.css"></head>
+<body><header class="top">
+<a class="home" href="index.html">《FDE 手册》</a><span class="crumb">附录</span>
+</header>
+<main><h1 id="附录-b-检查表汇编">附录 B · 检查表汇编</h1>
+<blockquote>
+<p><strong>怎么用</strong>：本附录把正文各节的检查项抽出成册，供评审、交接、上线窗口逐条打分—— 正文用于读，本册用于查（做法依据 AWS Well-Architected 的独立评审册）。每张表可单独打印；条目编号与正文一致，争议时以正文该节的判定标准为准。</p>
+<p><strong>保守缺省对全部检查表生效</strong>：任何一条<strong>没做</strong>或<strong>测不出</strong>（工具不可用、权限不足、日志缺失），按「否」处理。「没测」与「测了是好的」必须区分开。</p>
+<p>⚠️ 汇编中：正文成稿一节，本册收录一张。未收录的节见正文各自的「判定标准」栏。</p>
+</blockquote>
+<h2 id="b-ver-02-切换验证四项检查">B-<a class="xref" href="VER-02.html">VER-02</a> · 切换验证四项检查</h2>
+<p><strong>使用时机</strong>：部署或切换动作执行完之后、进入验收（<a class="xref" href="VER-05.html">VER-05</a>）之前。<strong>前置</strong>：已知本次部署的唯一版本标识（构建号 / 镜像 digest / commit 短哈希）。<strong>一键版</strong>：<code>kit/verify-switch.sh</code>（覆盖范围见正文 <a class="xref" href="VER-02.html">VER-02</a> 判定标准；LB 后端表必须人工）。</p>
+<div class="checklist"><ul><li><span class="box">☐</span><a class="xref" href="VER-02.html">VER-02</a>.1  服务管理器认为它在运行</li><li class="cont">systemd: is-active 输出 active ｜ K8s: Pod Running 且 READY 分子=分母</li><li><span class="box">☐</span><a class="xref" href="VER-02.html">VER-02</a>.2  正在响应的实例，版本对得上</li><li><span class="box">☐</span>用不可变标识（digest/构建号/哈希），不用 tag</li><li><span class="box">☐</span>查到的标识与本次部署逐字符相等</li><li><span class="box">☐</span>Web 交付：带 cache-busting 查一次 + 直连源站查一次，两次都对上</li><li><span class="box">☐</span><a class="xref" href="VER-02.html">VER-02</a>.3  旧实例已经清干净</li><li><span class="box">☐</span>无「父进程为 1 且早于本次部署」的进程残留</li><li><span class="box">☐</span>编排环境：旧版本副本无一处于 Running</li><li><span class="box">☐</span>负载均衡：运行时后端表（不是配置文件）中无旧实例地址</li><li><span class="box">☐</span><a class="xref" href="VER-02.html">VER-02</a>.4  它真的干过活</li><li><span class="box">☐</span>打了一次带唯一标识的真实业务请求</li><li><span class="box">☐</span>该标识在新实例日志中 grep 命中</li><li><span class="box">☐</span>采样覆盖  多节点分发场景：采样覆盖全部节点（或每分组有样本），</li><li class="cont">且横跨至少一个完整下发周期</li><li><span class="box">☐</span>判定输出  四项判定标量已粘贴进过程资产，VERDICT=SWITCHED 才进入 <a class="xref" href="VER-05.html">VER-05</a></li></ul></div>
+<p><strong>打分规则</strong>：全部为「是」→ 切换完成。任一为「否」或「没测」→ 按未完成处理，修复后<strong>重跑全部四项</strong>（不是只补挂掉的那条——见正文 <a class="xref" href="ROL-04.html">ROL-04</a>.3 回边规则）。</p>
+<p><strong>→ 正文</strong>：<a class="xref" href="VER-02.html">VER-02</a> 切换验证 ｜ 速查：<a class="xref" href="APPX-A.html">附录 A</a> · FX-SVC-01</p>
+</main>
+<nav class="pager"><a href="APPX-A.html">← APPX-A</a><a href="APPX-C.html">APPX-C →</a></nav>
+<footer>案例三档强制标注 · 引文写作当轮核实 · <a href="https://github.com/libaoming/fde-handbook">GitHub 源仓库</a>（发现分档冒充或引文失实，请提 issue——那是本手册的红线）</footer>
+</body></html>

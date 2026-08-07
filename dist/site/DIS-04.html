@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DIS-04 · 事故台账：失败怎么进流程才算被吸取 · FDE 手册</title>
+<link rel="stylesheet" href="assets/style.css"></head>
+<body><header class="top">
+<a class="home" href="index.html">《FDE 手册》</a><span class="crumb">第 3 部 · 验证纪律</span>
+</header>
+<main><h1 id="dis-04-事故台账失败怎么进流程才算被吸取">DIS-04 · 事故台账：失败怎么进流程才算被吸取</h1>
+<p><strong>目的</strong>　给「吸取教训」一个可判定的定义：失败被吸取 = 它的证伪过程被<strong>当时</strong>记下，且行动项<strong>变成了某个检查表条目或闸门</strong>。达不到这两条的复盘，无论会开得多深刻，留下的只是情绪记录。</p>
+<p><strong>前置条件</strong> - 无。本节从第一次失败开始适用——而第一次失败通常在勘察阶段就会到来。</p>
+<hr />
+<h2 id="规程">规程</h2>
+<h3 id="dis-04.1-记什么书面结构化有根因">DIS-04.1　记什么：书面、结构化、有根因</h3>
+<p>行业对这个体裁有成熟定义，Google SRE：“A postmortem is a written record of an incident, its impact, the actions taken to mitigate or resolve it, the root cause(s), and the follow-up actions to prevent the incident from recurring.” ——五要素：事故、影响、处置、根因、防复发行动。<strong>少了最后一项的记录是新闻，不是台账。</strong></p>
+<h3 id="dis-04.2-何时记当轮不指望事后对账">DIS-04.2　何时记：当轮，不指望事后对账</h3>
+<p>证据在事发当时最全，之后单调衰减：session 日志会灭失、运维动作不产生 commit、聊天记录会被淹没。<strong>台账条目在事发当轮写下</strong>，至迟当天—— 记不清的字段标 <code>⚠️ 待复核</code>，禁止事后补脑（溯源律在台账上的形态）。</p>
+<h3 id="dis-04.3-条目模板误判链是主体">DIS-04.3　条目模板：误判链是主体</h3>
+<p>台账条目六段，其中<strong>误判链是主体</strong>——你先以为是什么、为什么那条路错了，这正是翻车律要求写全的部分，也是条目对下一个读者的全部价值：</p>
+<div class="checklist"><ul><li><span class="box">☐</span>现象：观察到了什么（可粘贴的输出，不是转述）</li><li><span class="box">☐</span>误判链：先怀疑了什么 → 什么证据证伪了它（逐跳记录）</li><li><span class="box">☐</span>根因：最终确认的机理，附确认它的那条证据</li><li><span class="box">☐</span>处置：当场做了什么，哪些改动事后要回退（FX-NET-01 的教训）</li><li><span class="box">☐</span>行动项：防复发动作，每项有 owner 与期限</li><li><span class="box">☐</span>闸门化：行动项落到了哪条检查表/哪个脚本/哪道闸门（见 DIS-04.4）</li></ul></div>
+<h3 id="dis-04.4-闭环判据行动项要么闸门化要么显式关闭">DIS-04.4　闭环判据：行动项要么闸门化，要么显式关闭</h3>
+<p>行动项只有两个合法终态：</p>
+<ol type="1">
+<li><strong>闸门化</strong>——变成检查表条目、验收判据、lint 规则或验证脚本的一条断言。参照 Replit 对自家数据 agent 的描述：“The data agent checks whether a number can be trusted using row counts, metric definitions, and <strong>the failure modes that have burned us before</strong>; it returns the evidence with the answer.”—— <strong>闸门的内容来自烧过自己的事故，不来自想象</strong>；</li>
+<li><strong>显式关闭</strong>——写明为什么不做（成本、不再适用），签名留档。</li>
+</ol>
+<p>合法的中间态只有一种：<strong>期限内在办</strong>（条目模板里 owner 与期限俱在）。「挂着」指<strong>逾期仍未达终态</strong>的行动项——它与没有行动项，对下一次事故等效。</p>
+<p>闸门化时还有一条配套要求：<strong>闸门自身要被验证过</strong>（<a class="xref" href="DIS-02.html">DIS-02</a>.4）。公开案例 PM-09（GitLab 2017）展示了缺这一环的代价：备份失败本有告警邮件，但通知走的通道从未被验证（DMARC 拒收、无人知晓）——防线存在与防线有效之间隔着验证，写成行动项的闸门同样如此。</p>
+<h3 id="dis-04.5-无责边界">DIS-04.5　无责边界</h3>
+<p>“Blameless postmortems are a tenet of SRE culture.”——台账记录机理与证伪过程，不记录追责。但注意语境边界：<strong>无责是组织内文化，不豁免交付方对客户的合同责任</strong>；对客户的事故通报是另一份文档，口径由 <a class="xref" href="ROL-02.html">ROL-02</a> 的商务接口把关，两者不要混写。</p>
+<hr />
+<h2 id="常见误判">常见误判</h2>
+<p><strong>「复盘会开过了，教训吸取了」</strong>会议产生共识，不产生闸门。散会时如果没有 DIS-04.3 的条目和 DIS-04.4 的终态计划，这次失败的下一次出现只是时间问题。</p>
+<p><strong>「记了台账 = 吸取了教训」</strong>台账是原料。判据在 DIS-04.4：行动项闸门化率—— 翻开你的台账数一数有几条行动项处于「挂着」态，那就是你的复发敞口。</p>
+<p><strong>「小事故不值得记」</strong>闸门的内容来自事故（DIS-04.4），小事故是最便宜的闸门原料—— 它用最小的代价暴露同一类机理。等大事故来教学，学费不一样。</p>
+<p><strong>「先追清楚是谁的责任」</strong>追责与找根因用的是两套问题，混在一起两个都得不到：人在防御姿态下不会交出误判链，而误判链正是条目的主体（DIS-04.3）。</p>
+<hr />
+<h2 id="判定标准">判定标准</h2>
+<div class="checklist"><ul><li><span class="box">☐</span>每次事故当轮有条目，六段齐全，误判链逐跳可读</li><li><span class="box">☐</span>无逾期行动项：每项处于期限内在办，或已达终态（闸门化 / 显式关闭）</li><li><span class="box">☐</span>闸门化的行动项能指到具体检查表条目/脚本断言（编号可引用）</li><li><span class="box">☐</span>对客户的通报与内部台账分开成文</li></ul></div>
+<p>保守缺省：一条行动项拿不准要不要做 → 按显式关闭走流程（写下为什么），而不是留在挂着态——<strong>被写下来的「不做」可以被推翻，挂着的「再说」只会过期。</strong></p>
+<hr />
+<h2 id="案例证据">案例证据</h2>
+<blockquote>
+<h3 id="引证-google-srepostmortem-的定义与无责信条">引证 · Google SRE｜postmortem 的定义与无责信条</h3>
+<p>DIS-04.1/.5 引句出自 <em>Site Reliability Engineering</em>, Ch.15 “Postmortem Culture”： https://sre.google/sre-book/postmortem-culture/ （2026-08-07 逐句核实实存）。｜不可外推：「无责」针对组织内部追责语境，不能引申为对客户无合同责任。</p>
+</blockquote>
+<blockquote>
+<h3 id="引证-第三方声明replit闸门的内容来自事故">引证 · 第三方声明｜Replit：闸门的内容来自事故</h3>
+<p>DIS-04.4 引句出自 Replit “AI adoption starts with truth”： https://replit.com/blog/ai-adoption （2026-08-07 逐句核实实存）。｜不可外推：厂商对自建系统的自述，未公布检查项清单与覆盖率；引用的是「事故 → 闸门」的机制，不是其效果数据。</p>
+</blockquote>
+<hr />
+<h2 id="相关小节">相关小节</h2>
+<ul>
+<li><strong><a class="xref" href="DIS-01.html">DIS-01</a> 证据分级</strong>——「现象」段为什么必须是可粘贴输出</li>
+<li><strong><a class="xref" href="DIS-02.html">DIS-02</a> 三道焊缝</strong>——闸门化的目标形态（判定标量与系统闸门）</li>
+<li><strong><a class="xref" href="VER-02.html">VER-02</a> 案例 PM-09</strong>——失败通知通道未经验证的公开代价（GitLab 备份事故全文）</li>
+<li><strong><a class="xref" href="ROL-03.html">ROL-03</a> 交付物清单</strong>——台账属过程资产，随交付归档</li>
+<li><strong><a class="xref" href="APPX-C.html">附录 C</a> · C-03</strong>——台账条目模板的可拷版本</li>
+<li><strong><a class="xref" href="APPX-A.html">附录 A</a> · FX-AGT-01</strong>——AI 助手伪报场景的速查条目（其排查链可直接充当本节「误判链」段的素材）</li>
+<li><strong><a class="xref" href="APPX-A.html">附录 A</a> · FX-ORG-09（待写）</strong>——症状「复盘开过了，同类事故照旧发生」的速查入口</li>
+</ul>
+</main>
+<nav class="pager"><a href="DIS-03.html">← DIS-03</a><a href="APPX-A.html">APPX-A →</a></nav>
+<footer>案例三档强制标注 · 引文写作当轮核实 · <a href="https://github.com/libaoming/fde-handbook">GitHub 源仓库</a>（发现分档冒充或引文失实，请提 issue——那是本手册的红线）</footer>
+</body></html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ENG-02 · 成功标准：把「做好」翻译成可执行的验收判据 · FDE 手册</title>
+<link rel="stylesheet" href="assets/style.css"></head>
+<body><header class="top">
+<a class="home" href="index.html">《FDE 手册》</a><span class="crumb">第 2 部 · ENG 承接</span>
+</header>
+<main><h1 id="eng-02-成功标准把做好翻译成可执行的验收判据">ENG-02 · 成功标准：把「做好」翻译成可执行的验收判据</h1>
+<p><strong>目的</strong>　在动手之前，把 <a class="xref" href="ENG-01.html">ENG-01</a> 的赌注翻译成一组<strong>可机械执行</strong>的验收判据，并让双方签字冻结。交付里最贵的一类争议——「做完了」与「这不是我们要的」同时成立—— 不是沟通问题，是承接阶段没有付定义成本，把它推迟成了验收阶段的利息。</p>
+<p><strong>前置条件</strong> - <a class="xref" href="ENG-01.html">ENG-01</a> 关口已过：可证伪赌注成立、红线已排除 - 交付物清单已建（<a class="xref" href="ROL-03.html">ROL-03</a>）——判据要挂在清单条目上，不悬空</p>
+<hr />
+<h2 id="规程">规程</h2>
+<h3 id="eng-02.1-每条判据过三性检查">ENG-02.1　每条判据过三性检查</h3>
+<p>一条合格的验收判据同时满足三性：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>性质</th>
+<th>含义</th>
+<th>反例 → 改写</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>可观察</strong></td>
+<td>判据指向一个能看到的输出，不指向一种感受</td>
+<td>「响应质量高」→「固定输入集 200 条上，判定标量 PASS 率 ≥ 双方约定值」</td>
+</tr>
+<tr>
+<td><strong>可复现</strong></td>
+<td>换一个人、换一天执行，结论相同</td>
+<td>「演示时效果不错」→「验收脚本任何人可跑，输入集与判定口径入库」</td>
+</tr>
+<tr>
+<td><strong>有归属</strong></td>
+<td>谁执行、谁签字，落到人名</td>
+<td>「客户确认后」→「由验收表中指定的验收人执行并签字」（<a class="xref" href="ROL-02.html">ROL-02</a>.3）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>判据句式模板</strong>：<code>在〔固定输入/环境〕上执行〔命令/脚本〕，得到〔判定标量〕=〔阈值〕，由〔人名〕确认。</code>写不成这个句式的判据，回去继续拆——<strong>拆不动的部分不是判据，是愿望</strong>，移入「不承诺项」显式声明（<a class="xref" href="ROL-03.html">ROL-03</a>.3）。</p>
+<h3 id="eng-02.2-成功标准先于一切构建">ENG-02.2　成功标准先于一切构建</h3>
+<p>这不是本手册的洁癖，是厂商给自家用户的正式前置要求。Anthropic 的提示工程指南开篇即声明它假定你已具备：“1. A clear definition of the success criteria for your use case, 2. Some ways to empirically test against those criteria… If not, spend time establishing that first.”——<strong>连写提示词都要求先有成功标准与实证测试手段</strong>，整场交付更没有豁免。</p>
+<p>落到流程上：ENG-02 的判据定稿之前，BLD 不开工。先搭起来再定标准的项目，标准必然长成「现状的描述」（<a class="xref" href="ROL-03.html">ROL-03</a> 常见误判），而现状永远通过对自己的描述。</p>
+<h3 id="eng-02.3-每条判据指到一个验证动作">ENG-02.3　每条判据指到一个验证动作</h3>
+<p>判据不能停在纸面——每条必须映射到 VER 部（或第 3 部）的一个具体检查，否则验收当天没有人知道怎么执行它：</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>判据类型</th>
+<th>映射到</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>「新版本在服务真实流量」</td>
+<td><a class="xref" href="VER-02.html">VER-02</a> 四项检查（<code>VERDICT=SWITCHED</code>）</td>
+</tr>
+<tr>
+<td>「用户从他的网络位置可用」</td>
+<td><a class="xref" href="VER-03.html">VER-03</a> 可达性验证</td>
+</tr>
+<tr>
+<td>「输出质量达标」</td>
+<td>固定输入集 + 判定标量（<a class="xref" href="DIS-02.html">DIS-02</a>；golden 集的定义与归属见 <a class="xref" href="ROL-03.html">ROL-03</a>.1 验证资产）</td>
+</tr>
+<tr>
+<td>「AI 助手产出可信」</td>
+<td><a class="xref" href="DIS-03.html">DIS-03</a> 判定表（<code>EXECUTION_CONFIRMED</code>）</td>
+</tr>
+<tr>
+<td>「客户能独立运维」</td>
+<td>HND 移交判据（按 runbook 独立执行成功）</td>
+</tr>
+</tbody>
+</table>
+<p>映射不到任何检查的判据，两种处理：为它补一个可执行检查（进 kit/ 或<a class="xref" href="APPX-B.html">附录 B</a>），或降级为「非验收项」——<strong>不允许存在「验收时再想办法测」的判据</strong>。</p>
+<h3 id="eng-02.4-冻结签字登记变更">ENG-02.4　冻结、签字、登记变更</h3>
+<ul>
+<li>判据表放进交付计划（模板见<a class="xref" href="APPX-C.html">附录 C</a> · C-01），<strong>双方签字后冻结</strong>；</li>
+<li>此后增删改走显式变更并记录（同 <a class="xref" href="ROL-03.html">ROL-03</a>.3 的清单纪律）；</li>
+<li>验收只对「冻结版 + 变更记录」执行——<strong>对着记忆验收 = 对着各自的记忆吵架</strong>。</li>
+</ul>
+<hr />
+<h2 id="常见误判">常见误判</h2>
+<p><strong>「验收标准最后再谈，先干活」</strong>最后谈的标准只有两种下场：长成现状的描述（永远通过，客户不认），或长成客户临场的期望（永远不通过，你不认）。两种都比「现在就谈」贵。</p>
+<p><strong>「客户满意就是标准」</strong>「满意」不可观察、不可复现、无归属，三性全违。它是目标，不是判据—— 判据是那些你能指着说「这几条全绿，按约定即为满意」的东西。客户拒绝把满意翻译成判据时，回 <a class="xref" href="ENG-01.html">ENG-01</a>.3：这是「期望错位无法纠正」红线的早期形态。</p>
+<p><strong>「演示效果就是标准」</strong>演示是在最顺路径、最熟数据、你自己的操作下发生的——三个条件在验收现场一个都不成立。用演示锚定期望，等于给验收埋一个必然的落差。</p>
+<p><strong>「判据越多越安全」</strong>判据的成本在执行。五十条没人跑得完的判据 = 实际上没有判据，验收会退化成抽查与谈判。<strong>宁可十条每条都真的会被执行</strong>——覆盖不了的风险写进「不承诺项」，而不是稀释进判据表。</p>
+<hr />
+<h2 id="判定标准">判定标准</h2>
+<div class="checklist"><ul><li><span class="box">☐</span>每条判据通过三性检查（可观察/可复现/有归属），且符合判据句式</li><li><span class="box">☐</span>每条判据映射到 VER/DIS 的一个具体检查或 kit 脚本</li><li><span class="box">☐</span>拆不成判据的期望已移入「不承诺项」并显式告知客户</li><li><span class="box">☐</span>判据表双方签字冻结，变更机制已约定</li><li><span class="box">☐</span>判据总量控制在验收当天能全部执行完的规模</li></ul></div>
+<p>保守缺省：某条判据「应该测得了」但现在说不出怎么测 → 按映射缺失处理，定稿前补上或降级——<strong>验收手段的空白到了验收那天只会更大</strong>。</p>
+<hr />
+<h2 id="案例证据">案例证据</h2>
+<blockquote>
+<h3 id="引证-第三方声明anthropic成功标准与实证测试是前置条件">引证 · 第三方声明｜Anthropic：成功标准与实证测试是前置条件</h3>
+<p>ENG-02.2 引句出自 Anthropic《Claude Docs》Prompt engineering overview： https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/overview （2026-08-07 逐句核实实存）。</p>
+<p><strong>不可外推边界</strong>：原文语境是提示工程的前置假定，本节将其位阶引申到整场交付的前置——引申是本手册的主张，Anthropic 未对「交付流程」发言。</p>
+</blockquote>
+<blockquote>
+<h3 id="案例-合成示例教学场景非真实事故">案例 · 合成示例（教学场景，非真实事故）</h3>
+<p>验收会上，系统按判据表全数通过，客户负责人却说：「功能是都有了，但和我们当初想的不一样。」追溯发现：当初的「想」只存在于售前演示留下的印象里，从未被写成判据；而判据表是交付方在 BLD 中期单方面整理的，客户从未签字。双方都没有说谎——他们验收的是两份不同的合同，其中一份没有字。</p>
+<p>本例说明 ENG-02.4 为什么要求<strong>双方签字冻结</strong>：判据表的效力不来自它写得多好，来自它是两边同一份。</p>
+<p>⚠️ <strong>本例为本手册构造的教学场景，不是真实事故记录</strong>，不含任何真实读数。</p>
+</blockquote>
+<hr />
+<h2 id="相关小节">相关小节</h2>
+<ul>
+<li><strong><a class="xref" href="ENG-01.html">ENG-01</a> 承接判定</strong>——判据的母句（可证伪赌注）从那里来</li>
+<li><strong><a class="xref" href="ROL-03.html">ROL-03</a> 交付物清单</strong>——判据挂在清单条目的「合格判据」列</li>
+<li><strong><a class="xref" href="VER-05.html">VER-05</a> 验收与签收</strong>——判据表在验收日的执行规程</li>
+<li><strong><a class="xref" href="DIS-02.html">DIS-02</a> 三道焊缝</strong>——为什么判据要落成判定标量</li>
+<li><strong><a class="xref" href="APPX-C.html">附录 C</a> · C-01</strong>——判据表与交付计划模板</li>
+<li><strong><a class="xref" href="APPX-A.html">附录 A</a> · FX-ORG-06（待写）</strong>——症状「验收全过但客户说不是想要的」的速查入口</li>
+</ul>
+</main>
+<nav class="pager"><a href="ENG-01.html">← ENG-01</a><a href="SUR-01.html">SUR-01 →</a></nav>
+<footer>案例三档强制标注 · 引文写作当轮核实 · <a href="https://github.com/libaoming/fde-handbook">GitHub 源仓库</a>（发现分档冒充或引文失实，请提 issue——那是本手册的红线）</footer>
+</body></html>

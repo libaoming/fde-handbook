@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HND-01 · 移交：能力转移的验收 · FDE 手册</title>
+<link rel="stylesheet" href="assets/style.css"></head>
+<body><header class="top">
+<a class="home" href="index.html">《FDE 手册》</a><span class="crumb">第 2 部 · HND 移交</span>
+</header>
+<main><h1 id="hnd-01-移交能力转移的验收">HND-01 · 移交：能力转移的验收</h1>
+<p><strong>目的</strong>　把移交做成一场<strong>有判据的验收</strong>：客户方在你不碰键盘的情况下，把系统跑起来、修下去、纠错进去。移交的合格判据从头到尾只有一种形态—— <strong>对方独立做到了什么</strong>，而不是你交付了哪些文件（<a class="xref" href="ROL-03.html">ROL-03</a>.1 定下的原则，本节兑现它）。</p>
+<p><strong>前置条件</strong> - <a class="xref" href="VER-05.html">VER-05</a> 签收完成（验收 ≠ 移交，但移交以验收为前提） - 移交资产在交付物清单中逐项有 owner 与合格判据（<a class="xref" href="ROL-03.html">ROL-03</a>） - 客户侧承接角色实存——不存在时走 <a class="xref" href="ROL-04.html">ROL-04</a>.3 回边，回 ENG 干系人表补位，<strong>不要硬交</strong></p>
+<hr />
+<h2 id="规程">规程</h2>
+<h3 id="hnd-01.1-移交物分拣方法归你资产归客户">HND-01.1　移交物分拣：方法归你，资产归客户</h3>
+<p>按 <a class="xref" href="ROL-03.html">ROL-03</a>.2 的分界线逐项分拣，移交时这刀正式兑现：</p>
+<ul>
+<li><strong>客户资产类</strong>（数据语义、业务口径、强制过滤条件、累积纠错、环境配置）：全量移交，交到<strong>能维护它的人</strong>手里，并确认载体符合 HND-01.3；</li>
+<li><strong>方法类</strong>（工作流、检查表骨架、脚本框架）：按合同约定移交副本或保留—— 在这一步发现分类有争议的项，说明 <a class="xref" href="ROL-03.html">ROL-03</a> 阶段没标干净，<strong>当场按合同补议，不要含糊着交</strong>。</li>
+</ul>
+<h3 id="hnd-01.2-runbook-演练你在场手不碰键盘">HND-01.2　runbook 演练：你在场，手不碰键盘</h3>
+<p>每份 runbook 的合格判据：<strong>客户方指定的运维者按文档独立执行一次全流程且成功</strong>。执行时你在场答疑，但不碰键盘、不口头补步骤——每次你忍不住补的那句话，就是文档里缺的那一行，<strong>当场记下来补进文档，再跑一遍</strong>。</p>
+<p>覆盖底线（按交付实况裁剪）：日常启停、发布/回滚（含跑 <a class="xref" href="VER-02.html">VER-02</a> 判定）、告警响应（对照<a class="xref" href="APPX-A.html">附录 A</a> 的症状索引）、数据备份与恢复演练。</p>
+<h3 id="hnd-01.3-知识资产的载体可-diff可回滚可归因">HND-01.3　知识资产的载体：可 diff、可回滚、可归因</h3>
+<p>移交的知识（口径、规则、纠错记录）装进什么载体，决定了它交接后还能不能被审计。参照 Replit 对自家实践的描述：“A correction isn’t a saved memory; it’s a reviewed pull request. The failing case, the fix, and the rationale are committed together; the result is diffable, revertible, and attributable months later.” 以及其对载体选择的论证：“Truth in a repo isn’t just versioned; it’s traversable.”</p>
+<p><strong>判据</strong>：知识资产的载体至少满足三性——改动可对比（diff）、可回退、可归因到人与时间。</p>
+<blockquote>
+<p>⚠️ 边界与变形：Replit 是全员会用 git 的软件公司；客户的业务/数据团队多数不是。「让业务方提 PR」在多数现场不可行——<strong>变形方案的底线是有版本历史的载体</strong>（哪怕是带修订记录的在线文档），死线是拒绝「口口相传 + 群聊记录」作为知识载体。</p>
+</blockquote>
+<h3 id="hnd-01.4-纠错通道移交后错误怎么修进去">HND-01.4　纠错通道：移交后错误怎么修进去</h3>
+<p>移交前和客户共同确定：口径错了、规则要改时，<strong>谁提出 → 谁审 → 改进哪个载体 → 谁生效</strong>。理想参照仍是 Replit：“New truth enters the shared corpus through code review, not an auto-save prompt.”——进入正典的东西要经过一道人工审查。</p>
+<blockquote>
+<p>⚠️ 现实变形：客户团队通常没有 review 带宽（<a class="xref" href="ROL-02.html">ROL-02</a>.2 对照表）。可接受的最小形态：指定<strong>一个</strong>口径负责人（不是委员会），改动过其手并留记录。不可接受的形态：谁都能改、改了无记录——那不是纠错通道，是口径的腐烂加速器。</p>
+</blockquote>
+<h3 id="hnd-01.5-责任切换表与支持窗口">HND-01.5　责任切换表与支持窗口</h3>
+<p>一页纸写清并双方签字：</p>
+<div class="checklist"><ul><li><span class="box">☐</span>切换日：从哪天起，一线响应归客户</li><li><span class="box">☐</span>责任表：每类事件（故障/口径/账号/供应商）第一响应人与升级路径（人名，非部门）</li><li><span class="box">☐</span>支持窗口：交付方的支持期限、响应口径、窗口结束后的收费方式</li><li><span class="box">☐</span>遗留清单：已知未修事项与「不交付」项（<a class="xref" href="ROL-03.html">ROL-03</a>.3），逐条有归属</li></ul></div>
+<hr />
+<h2 id="常见误判">常见误判</h2>
+<p><strong>「培训做了 = 移交了」</strong>听课与执行隔着一整条肌肉记忆。判据是 HND-01.2 的演练——对方的手跑通过，才算数。</p>
+<p><strong>「文档全了 = 移交了」</strong>文件送达在 <a class="xref" href="ROL-03.html">ROL-03</a>.1 里被明确排除出合格判据。没有被客户的手执行过的文档，其完整性未经验证——写的人永远会跳过自己觉得显然的步骤。</p>
+<p><strong>「有问题随时找我」</strong>这句好意会腐蚀掉整个 HND：它让客户永远不必真正接手，也让你的支持成本永远无法关账。正确形态是 HND-01.5 的支持窗口——期限、口径、超期收费，白纸黑字。</p>
+<p><strong>「客户团队会像软件团队一样用 git」</strong>不会（HND-01.3 边界）。载体选型迁就对方的真实能力，守住「有版本历史」的底线即可—— 选一个对方不会用的完美载体，等于选择让知识回到群聊里去。</p>
+<hr />
+<h2 id="判定标准">判定标准</h2>
+<div class="checklist"><ul><li><span class="box">☐</span>移交物按方法/客户资产分拣完毕，无争议项</li><li><span class="box">☐</span>每份 runbook 有客户方独立执行成功的记录（日期 + 执行人）</li><li><span class="box">☐</span>知识资产载体满足三性（可 diff/可回滚/可归因），或已按变形方案落底线</li><li><span class="box">☐</span>纠错通道有指定负责人且走过至少一次纠错（真实纠错，或按 HND-01.2 手法演练一次）</li><li><span class="box">☐</span>责任切换表与支持窗口双方签字</li></ul></div>
+<p>保守缺省：某项「客户说他们会了」→ 按未验证处理，安排演练；移交是全书最后一道关口，<strong>在这里放水，前面所有判定标量的严格都白费。</strong></p>
+<hr />
+<h2 id="案例证据">案例证据</h2>
+<blockquote>
+<h3 id="引证-第三方声明replit纠错即评审载体即能力">引证 · 第三方声明｜Replit：纠错即评审、载体即能力</h3>
+<p>HND-01.3/.4 引句出自 Replit “AI adoption starts with truth”： https://replit.com/blog/ai-adoption （2026-08-07 逐句核实实存）。</p>
+<p><strong>不可外推边界</strong>：Replit 为软件公司自建自用——全员会 git、有 review 带宽、无合同期限；本节的「变形方案」正是为这三个前提在客户现场不成立而写。载体三性是本手册从其描述中提炼的判据，非原文表述。</p>
+</blockquote>
+<hr />
+<h2 id="相关小节">相关小节</h2>
+<ul>
+<li><strong><a class="xref" href="ROL-03.html">ROL-03</a> 交付物清单</strong>——移交资产的清单与合格判据从那里来</li>
+<li><strong><a class="xref" href="ROL-02.html">ROL-02</a> 相邻角色边界</strong>——「客户没有 review 带宽」的出处与登记表</li>
+<li><strong><a class="xref" href="VER-05.html">VER-05</a> 验收与签收</strong>——移交的前置关口（验收 ≠ 移交）</li>
+<li><strong><a class="xref" href="DIS-04.html">DIS-04</a> 事故台账</strong>——台账随过程资产移交，纠错通道是它在客户侧的延续</li>
+<li><strong><a class="xref" href="APPX-C.html">附录 C</a> · C-04</strong>——责任切换表模板</li>
+<li><strong><a class="xref" href="APPX-A.html">附录 A</a> · FX-ORG-08（待写）</strong>——症状「移交完三个月，客户又全推回来了」</li>
+</ul>
+</main>
+<nav class="pager"><a href="VER-05.html">← VER-05</a><a href="DIS-01.html">DIS-01 →</a></nav>
+<footer>案例三档强制标注 · 引文写作当轮核实 · <a href="https://github.com/libaoming/fde-handbook">GitHub 源仓库</a>（发现分档冒充或引文失实，请提 issue——那是本手册的红线）</footer>
+</body></html>

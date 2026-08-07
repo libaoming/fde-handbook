@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>附录 C · 模板库 · FDE 手册</title>
+<link rel="stylesheet" href="assets/style.css"></head>
+<body><header class="top">
+<a class="home" href="index.html">《FDE 手册》</a><span class="crumb">附录</span>
+</header>
+<main><h1 id="附录-c-模板库">附录 C · 模板库</h1>
+<blockquote>
+<p><strong>怎么用</strong>：每份模板整段拷走，替换〔〕占位符即可用。模板只保留骨架—— 字段的判据与填写纪律在对应正文节里，模板头部已标出处。做法依据 SRE Workbook 的 Example 文档附录：<strong>附录必须是能直接拷走用的文件。</strong></p>
+<p>⚠️ 汇编中：随正文成稿逐份追加。</p>
+</blockquote>
+<hr />
+<h2 id="c-01-交付计划骨架eng-关口产出">C-01 · 交付计划骨架（ENG 关口产出）</h2>
+<blockquote>
+<p>出处：<a class="xref" href="ENG-01.html">ENG-01</a>（赌注与红线）、<a class="xref" href="ENG-02.html">ENG-02</a>（判据）、<a class="xref" href="ROL-02.html">ROL-02</a>.4（登记表）、<a class="xref" href="ROL-03.html">ROL-03</a>（清单）</p>
+</blockquote>
+<pre><code># 交付计划 · 〔项目名〕
+版本：〔v1，冻结日期〕　变更记录：见文末
+
+## 1. 可证伪赌注（<a class="xref" href="ENG-01.html">ENG-01</a>.1）
+因为〔来自客户数据的事实 X〕，所以〔agent/系统应能做到 Y〕。
+集中度依据：〔数字 + 计算口径 + 数据来源〕
+
+## 2. 范围
+- 交付：〔…〕
+- 显式不交付（含承接方）：〔…〕（<a class="xref" href="ROL-03.html">ROL-03</a>.3：不许留空行）
+
+## 2a. 红线清单核对记录（<a class="xref" href="ENG-01.html">ENG-01</a>.3，签字前逐条核）
+| 红线 | 判定（否 / 已改范围解除） | 依据 |
+|---|---|---|
+| 成功标准无法定义 | | |
+| 关键数据出不了域 | | |
+| 非工程域死锁 | | |
+| 验收权不明 | | |
+| 赌注被证伪 | | |
+| 期望错位无法纠正 | | |
+
+## 3. 验收判据表（<a class="xref" href="ENG-02.html">ENG-02</a>，签字后冻结）
+| # | 判据（句式：在〔输入/环境〕上执行〔命令〕，得〔标量〕=〔阈值〕） | 映射检查 | 执行归属 |
+|---|---|---|---|
+| 1 | 〔…〕 | 〔<a class="xref" href="VER-02.html">VER-02</a> / <a class="xref" href="VER-03.html">VER-03</a> / <a class="xref" href="DIS-03.html">DIS-03</a> / …〕 | 〔人名〕 |
+
+## 4. 边界登记表（<a class="xref" href="ROL-02.html">ROL-02</a>.4）
+| 事项/交付物 | owner（人名） | 预计完成 | 升级路径 |
+|---|---|---|---|
+| 〔含全部非工程域事项：备案/审批/账号/合同〕 | | | |
+
+## 5. 里程碑与关口
+| 关口 | 退出条件 | 判定输出粘贴处 |
+|---|---|---|
+| ENG→SUR | 〔…〕 | 〔…〕 |
+
+签字：交付方〔　〕　客户方〔　〕　日期〔　〕
+## 变更记录
+| 日期 | 改了什么 | 谁提出 | 双方确认 |</code></pre>
+<hr />
+<h2 id="c-02-验收执行记录ver-05">C-02 · 验收执行记录（<a class="xref" href="VER-05.html">VER-05</a>）</h2>
+<blockquote>
+<p>出处：<a class="xref" href="VER-05.html">VER-05</a>.2 四字段、三态判定、保守缺省</p>
+</blockquote>
+<pre><code># 验收执行记录 · 〔项目名〕
+判据表版本：〔冻结版本号 + 变更记录截止日期〕　冻结签字确认：〔双方签字页所在处〕
+前置确认：VERDICT=SWITCHED〔粘贴〕｜可达性〔粘贴〕｜EXECUTION_CONFIRMED〔粘贴/不适用〕
+
+| # | 判据 | 执行人 | 命令与输出（原样粘贴） | 判定（通过/不通过/测不出） | 时间与环境 |
+|---|---|---|---|---|---|
+
+判定规则：测不出=不通过；不通过项走回边并重跑全部相关判据；无「暂计通过」。
+临场新增期望登记（不进入本次验收）：
+| 内容 | 提出人 | 转入变更流程日期 |
+
+验收结论：〔全部通过/未通过〕
+签字：验收人〔判据表指定人〕　日期〔　〕</code></pre>
+<hr />
+<h2 id="c-03-事故台账条目dis-04">C-03 · 事故台账条目（<a class="xref" href="DIS-04.html">DIS-04</a>）</h2>
+<blockquote>
+<p>出处：<a class="xref" href="DIS-04.html">DIS-04</a>.3 六段模板，误判链是主体；当轮写下，记不清标 ⚠️ 待复核</p>
+</blockquote>
+<pre><code># 台账 · 〔编号〕〔一句话现象〕
+日期：〔事发当日〕　记录时间：〔当轮/当天〕
+
+## 现象
+〔可粘贴的输出，不是转述〕
+
+## 误判链（主体）
+1. 先怀疑〔…〕→ 被〔证据〕证伪
+2. 再怀疑〔…〕→ 被〔证据〕证伪
+
+## 根因
+〔机理〕＋〔确认它的那条证据〕
+
+## 处置
+〔当场做了什么〕；需回退的临时改动：〔逐条〕
+
+## 行动项（合法终态只有两种）
+| 行动 | owner | 期限 | 状态（期限内在办 / 已达终态） |
+|---|---|---|---|
+
+## 闸门化落点（终态记录）
+| 行动项 | 落到哪条检查表/脚本断言（编号），或显式关闭原因 + 签名 |
+|---|---|</code></pre>
+<hr />
+<h2 id="c-04-责任切换表hnd-01.5">C-04 · 责任切换表（<a class="xref" href="HND-01.html">HND-01</a>.5）</h2>
+<blockquote>
+<p>出处：<a class="xref" href="HND-01.html">HND-01</a>.5；一页纸，双方签字</p>
+</blockquote>
+<pre><code># 责任切换表 · 〔项目名〕
+切换日：〔从该日起一线响应归客户〕
+
+| 事件类型 | 第一响应人（人名） | 升级路径 | 参照文档 |
+|---|---|---|---|
+| 服务故障 | | | 〔runbook + <a class="xref" href="APPX-A.html">附录 A</a> 对应条目〕 |
+| 口径/规则纠错 | 〔纠错通道负责人〕 | | 〔<a class="xref" href="HND-01.html">HND-01</a>.4 约定〕 |
+| 账号与权限 | | | |
+| 供应商与计费 | | | |
+
+支持窗口：交付方支持至〔日期〕，响应口径〔…〕，窗口后按〔…〕计费。
+遗留清单：
+| 已知未修/不交付项 | 归属 |
+|---|---|
+
+runbook 演练记录：〔执行人 + 日期 + 结果〕（无记录不得签字）
+签字：交付方〔　〕　客户方〔　〕</code></pre>
+</main>
+<nav class="pager"><a href="APPX-B.html">← APPX-B</a><span></span></nav>
+<footer>案例三档强制标注 · 引文写作当轮核实 · <a href="https://github.com/libaoming/fde-handbook">GitHub 源仓库</a>（发现分档冒充或引文失实，请提 issue——那是本手册的红线）</footer>
+</body></html>

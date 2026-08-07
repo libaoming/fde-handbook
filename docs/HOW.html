@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>第 0 部 · 怎么用这本手册 · FDE 手册</title>
+<link rel="stylesheet" href="assets/style.css"></head>
+<body><header class="top">
+<a class="home" href="index.html">《FDE 手册》</a><span class="crumb">第 0 部</span>
+</header>
+<main><h1 id="第-0-部-怎么用这本手册">第 0 部 · 怎么用这本手册</h1>
+<p>这是一本供查阅的手册，不是从头读到尾的书。用法只有三条。</p>
+<h2 id="两个入口">两个入口</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>你的问题</th>
+<th>入口</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>「我在交付的哪一步，该做什么」</td>
+<td><strong>主线</strong>：<a class="xref" href="ROL-04.html">ROL-04</a> 全景图 → 按阶段进第 2 部对应节</td>
+</tr>
+<tr>
+<td>「我遇到了这个症状，去哪查」</td>
+<td><strong>速查</strong>：<a class="xref" href="APPX-A.html">附录 A</a> 按症状索引，每条指向正文节</td>
+</tr>
+</tbody>
+</table>
+<p>第 1 部（这份工作）定义角色与交付物；第 3 部（验证纪律）不属于任何单一阶段，贯穿每个关口。头一次翻这本手册，读 <a class="xref" href="ROL-04.html">ROL-04</a> 一节就够上手。</p>
+<h2 id="编号体系">编号体系</h2>
+<p>任何检查项、速查条目都有一个不漂移的编号，供评审、工单、聊天引用：</p>
+<pre><code>阶段   ENG 承接 · SUR 勘察 · BLD 搭建 · DEP 上线 · VER 签收 · HND 移交
+节     <a class="xref" href="VER-02.html">VER-02</a>        检查项  <a class="xref" href="VER-02.html">VER-02</a>.3        速查  FX-SVC-01（<a class="xref" href="APPX-A.html">附录 A</a>）
+横切   ROL（角色）· DIS（验证纪律）· <a class="xref" href="APPX-B.html">附录 B</a>（检查表）· <a class="xref" href="APPX-C.html">附录 C</a>（模板）</code></pre>
+<h2 id="案例档位读者必须知道哪些是构造的">案例档位（读者必须知道哪些是构造的）</h2>
+<p>正文案例分三档，<strong>每处强制标注</strong>：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>档</th>
+<th>标注</th>
+<th>你能拿它做什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>公开事故复盘</td>
+<td>附原始 postmortem 链接与核实日期</td>
+<td>可自行查证、可引用</td>
+</tr>
+<tr>
+<td>合成示例</td>
+<td>显式标「合成示例（教学场景，非真实事故）」，不含伪造的时间戳/PID/哈希/日志原文</td>
+<td>理解机理，不当事实引用</td>
+</tr>
+<tr>
+<td>引证（第三方声明）</td>
+<td>附来源与<strong>不可外推边界</strong></td>
+<td>连同边界一起引用，不得越界外推</td>
+</tr>
+</tbody>
+</table>
+<p>区别不在案例谁写的，在读者知不知道它是构造的。发现分档冒充，请提 issue—— 那是这本手册的红线。</p>
+<h2 id="一条贯穿全书的缺省">一条贯穿全书的缺省</h2>
+<p><strong>拿不准时按更坏的情况处理</strong>：没测 = 未通过，没写 = 没做，沉默 = 未知。每张判定表都配这条兜底；理由见 <a class="xref" href="DIS-01.html">DIS-01</a>/<a class="xref" href="DIS-02.html">DIS-02</a>，业界出处（PagerDuty “Always Assume The Worst” 的类比借用）见 <a class="xref" href="VER-02.html">VER-02</a> 判定标准。</p>
+<p>另一条排版约定：<strong>引文内的着重（加粗）均为本手册所加</strong>，原文无强调标记。</p>
+</main>
+<nav class="pager"><span></span><a href="ROL-01.html">ROL-01 →</a></nav>
+<footer>案例三档强制标注 · 引文写作当轮核实 · <a href="https://github.com/libaoming/fde-handbook">GitHub 源仓库</a>（发现分档冒充或引文失实，请提 issue——那是本手册的红线）</footer>
+</body></html>

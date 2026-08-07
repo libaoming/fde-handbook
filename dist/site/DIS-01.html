@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DIS-01 · 证据分级：什么算证据，什么只是信号 · FDE 手册</title>
+<link rel="stylesheet" href="assets/style.css"></head>
+<body><header class="top">
+<a class="home" href="index.html">《FDE 手册》</a><span class="crumb">第 3 部 · 验证纪律</span>
+</header>
+<main><h1 id="dis-01-证据分级什么算证据什么只是信号">DIS-01 · 证据分级：什么算证据，什么只是信号</h1>
+<p><strong>目的</strong>　在签收任何一项工作之前，判断你手里拿到的东西<strong>够不够格当证据</strong>。本节给出一张分级表和一条可执行的升级路径：当手里只有低级别信号时，下一步该去取什么。</p>
+<p><strong>前置条件</strong> - 你有一个待确认的<strong>具体断言</strong>（「服务切过去了」「配置生效了」「bug 修好了」），而不是一个笼统的「差不多好了」 - 你知道这个断言<strong>由谁负责验证</strong>——你自己、客户、还是某个自动化闸门</p>
+<hr />
+<h2 id="规程">规程</h2>
+<h3 id="dis-01.1-把断言和证据分开写">DIS-01.1　把断言和证据分开写</h3>
+<p>先把要确认的事写成一句可判真假的话，再在它旁边写你<strong>实际拿到了什么</strong>。两者写在一起，绝大多数「证据不足」当场就现形。</p>
+<table>
+<thead>
+<tr>
+<th>断言</th>
+<th>我实际拿到的</th>
+<th>够格吗</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>新版本已经在服务</td>
+<td>页面能打开</td>
+<td>❌ 只证明有东西在响应</td>
+</tr>
+<tr>
+<td>新版本已经在服务</td>
+<td>版本端点返回本次构建号</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>配置已生效</td>
+<td>配置文件内容正确</td>
+<td>❌ 只证明期望值写对了</td>
+</tr>
+<tr>
+<td>配置已生效</td>
+<td>运行时接口回读出该值</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<h3 id="dis-01.2-按分级表定级">DIS-01.2　按分级表定级</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>级别</th>
+<th>定义</th>
+<th>能用来做什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>直接证据</strong></td>
+<td>被断言的对象<strong>自己</strong>产生的、当场可复现的输出（运行时状态回读、带版本标识的响应、业务日志里的真实事件）</td>
+<td>可据此签收</td>
+</tr>
+<tr>
+<td><strong>间接信号</strong></td>
+<td>与断言相关但<strong>不唯一指向它</strong>的现象（功能能用、页面能开、进程存在、没有告警）</td>
+<td>只能用于排除，不能用于确认</td>
+</tr>
+<tr>
+<td><strong>转述</strong></td>
+<td>人或工具<strong>声称</strong>发生过某事，但没有附上原始输出（「我部署完了」「脚本跑成功了」）</td>
+<td>一律降级为待验证</td>
+</tr>
+<tr>
+<td><strong>推断</strong></td>
+<td>从其他事实推导出来的结论，没有独立观测</td>
+<td>必须显式标注，不得当作已确认</td>
+</tr>
+</tbody>
+</table>
+<p><strong>判据：能把「这个现象」和「这个断言」之外的所有解释排除掉，才叫直接证据。</strong>排除不掉，它就是间接信号——不管它看起来多让人安心。</p>
+<h3 id="dis-01.3-对间接信号做一次还有什么能解释它">DIS-01.3　对间接信号做一次「还有什么能解释它」</h3>
+<p>拿到一个让你想签收的现象时，强制问一句：<strong>除了我希望的那个原因，还有什么能产生同样的现象？</strong></p>
+<p>「功能能用」的其他解释：旧版本还在服务、缓存还没过期、CDN 还是旧资源、负载均衡把你的请求发给了没更新的那批实例、你测的路径恰好没经过改动的部分。</p>
+<p><strong>只要还列得出第二种解释，它就不是证据。</strong></p>
+<h3 id="dis-01.4-缺证据时按升级路径去取">DIS-01.4　缺证据时，按升级路径去取</h3>
+<table>
+<thead>
+<tr>
+<th>手里只有</th>
+<th>下一步去取</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>功能能用</td>
+<td>版本标识（构建号 / 镜像摘要 / commit 哈希）</td>
+</tr>
+<tr>
+<td>进程存在</td>
+<td>它处理过真实业务的日志事件</td>
+</tr>
+<tr>
+<td>配置文件正确</td>
+<td>运行时回读该配置</td>
+</tr>
+<tr>
+<td>别人说做完了</td>
+<td>让对方贴出命令与原始输出</td>
+</tr>
+<tr>
+<td>单点探测通过</td>
+<td>多点、多次重复采样</td>
+</tr>
+<tr>
+<td>新环境验证通过</td>
+<td>在存量环境重做一次</td>
+</tr>
+</tbody>
+</table>
+<h3 id="dis-01.5-取不到证据时标注而不是假装">DIS-01.5　取不到证据时，标注而不是假装</h3>
+<p>有些事就是取不到直接证据——权限不够、日志已滚走、系统不暴露那个状态。这时正确的动作是<strong>把证据等级如实标注并交出去</strong>，而不是把间接信号写成结论。</p>
+<p>对外交付物里，一句「从服务器本机发起的请求正常」和一句「服务端正常」在会议上听起来差不多，在事故复盘时是天壤之别。<strong>写前者。</strong></p>
+<hr />
+<h2 id="常见误判">常见误判</h2>
+<p><strong>「多个间接信号加起来就成了证据」</strong>三个都不能唯一指向结论的现象，叠加之后仍然不能。它们可能同时被<strong>同一个</strong>错误解释覆盖—— 比如旧实例还在服务，会同时让「功能能用」「响应正常」「无报错」三条都成立。</p>
+<p><strong>「没有异常就是正常」</strong>沉默有两种来源：真的没事，和<strong>观测本身失效了</strong>。当监控与被监控系统共享依赖时，故障发生的那一刻验证手段会一起消失（见案例 PM-04）。<strong>沉默必须先排除第二种来源才能读作绿灯。</strong></p>
+<p><strong>「工具报告成功，所以成功了」</strong>工具报告的是它自己的执行路径，不是最终产物的状态。自动化任务的验收锚点应当是<strong>产物</strong>——文件存在、内容可用、可被恢复—— 而不是退出码，更不是「没收到失败通知」（见案例 PM-09）。</p>
+<p><strong>「这个数字很精确，所以可信」</strong>精确性描述的是表述形式，不是来源可靠性。带着退出码和字节数的报告，和一句含糊的「已完成」，在未经回读之前是同一个等级：转述。</p>
+<hr />
+<h2 id="判定标准">判定标准</h2>
+<p>签收任一断言前，逐条填这张表；<strong>任何一行落在「间接信号」及以下，不得签收</strong>：</p>
+<div class="checklist"><ul><li class="cont">CLAIM=&lt;要确认的断言，一句话&gt;</li><li class="cont">EVIDENCE=&lt;你实际拿到的东西&gt;</li><li class="cont">LEVEL=direct | indirect | reported | inferred</li><li class="cont">ALTERNATIVE_EXPLANATIONS=&lt;还能解释这个现象的其他原因，逗号分隔；none 表示已穷尽&gt;</li><li class="cont">VERDICT=ACCEPTED    # 仅当 LEVEL=direct 且 ALTERNATIVE_EXPLANATIONS=none</li></ul></div>
+<blockquote>
+<p><strong>保守缺省</strong>：<code>LEVEL</code> 拿不准时，<strong>按更低的级别记</strong>。证据等级只在拿到新观测后才允许上调，不允许因为「应该没问题」而上调。</p>
+</blockquote>
+<hr />
+<h2 id="案例证据">案例证据</h2>
+<blockquote>
+<h3 id="案例-pm-09-公开事故复盘gitlab2017-02-10">案例 PM-09 · 公开事故复盘｜GitLab，2017-02-10</h3>
+<p>数据库事故后需要恢复时，团队发现<strong>备份产物一直是空的</strong>。</p>
+<p>官方复盘原文：「The standard backup procedure uses <code>pg_dump</code> to perform a logical backup of the database. <strong>This procedure failed silently.</strong>」以及「Unfortunately DMARC was not enabled for the cronjob emails, resulting in them being rejected by the receiver. This means <strong>we were never aware of the backups failing, until it was too late.</strong>」</p>
+<p><strong>它同时打掉了两个间接信号</strong>：「任务在跑」不等于「备份存在」（脚本不检查产物），「没收到失败通知」不等于「没有失败」（告警走了一条会被静默丢弃的通道）。唯一够格的证据是 DIS-01.4 里那条——<strong>产物存在且可恢复</strong>，也就是真的拿备份还原一次。</p>
+<p>出处：https://about.gitlab.com/blog/2017/02/10/postmortem-of-database-outage-of-january-31/ ｜不可外推：这是 pg_dump 版本不匹配的具体故障，不能据此推广为「逻辑备份不可靠」。</p>
+</blockquote>
+<blockquote>
+<h3 id="案例-pm-04-公开事故复盘roblox2021报告-2022-01-20">案例 PM-04 · 公开事故复盘｜Roblox，2021（报告 2022-01-20）</h3>
+<p>官方复盘原文：「Critical monitoring systems that would have provided better visibility into the cause of the outage <strong>relied on affected systems</strong>, such as Consul. This combination severely hampered the triage process.」</p>
+<p><strong>它说明「没有异常」为什么不能直接读作正常</strong>：当观测链路与被观测系统共享依赖，故障发生时验证手段和故障一起消失，此时的沉默不携带任何信息。</p>
+<p>出处：https://about.roblox.com/newsroom/2021/10/roblox-return-to-service-10-28-10-31-2021 ｜不可外推：这是自建 Consul 集群的特定拓扑，不能论证「所有自托管监控都不可用」。</p>
+</blockquote>
+<hr />
+<h2 id="相关小节">相关小节</h2>
+<ul>
+<li><strong><a class="xref" href="DIS-02.html">DIS-02</a> 三道焊缝</strong>——知道了什么算证据之后，怎么让取证不依赖自觉</li>
+<li><strong><a class="xref" href="VER-02.html">VER-02</a> 切换验证</strong>——本节分级表在部署场景的具体化（四项检查各对应一类直接证据）</li>
+<li><strong><a class="xref" href="VER-03.html">VER-03</a> 可达性验证</strong>——「从哪个位置发起的请求正常」为什么必须连位置一起报</li>
+<li><strong><a class="xref" href="DIS-03.html">DIS-03</a> AI 助手产出验证</strong>——「转述」这一级在 AI 参与交付时为什么变得格外危险</li>
+<li><strong><a class="xref" href="APPX-B.html">附录 B</a>（本节条目待收录）</strong>——本节判定表的可打印版本</li>
+</ul>
+</main>
+<nav class="pager"><a href="HND-01.html">← HND-01</a><a href="DIS-02.html">DIS-02 →</a></nav>
+<footer>案例三档强制标注 · 引文写作当轮核实 · <a href="https://github.com/libaoming/fde-handbook">GitHub 源仓库</a>（发现分档冒充或引文失实，请提 issue——那是本手册的红线）</footer>
+</body></html>

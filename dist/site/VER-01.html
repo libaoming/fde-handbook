@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VER-01 · 验证前提：先确认你的验证手段可信 · FDE 手册</title>
+<link rel="stylesheet" href="assets/style.css"></head>
+<body><header class="top">
+<a class="home" href="index.html">《FDE 手册》</a><span class="crumb">第 2 部 · VER 签收</span>
+</header>
+<main><h1 id="ver-01-验证前提先确认你的验证手段可信">VER-01 · 验证前提：先确认你的验证手段可信</h1>
+<p><strong>目的</strong>　在相信任何绿灯之前，先审计绿灯本身。三个问题：你的观测手段与被观测系统<strong>共不共享依赖</strong>；你的探针测的<strong>是不是你以为的东西</strong>；「一切安静」到底是证据还是盲区。验证手段不可信时，后续所有验证（<a class="xref" href="VER-02.html">VER-02</a>~05）的结论都是空转。</p>
+<p><strong>前置条件</strong> - 知道本次交付用什么看系统：监控、告警、日志、健康检查各在哪、走什么链路（<a class="xref" href="SUR-01.html">SUR-01</a>.1 的产出）</p>
+<hr />
+<h2 id="规程">规程</h2>
+<h3 id="ver-01.1-独立性核查故障发生时报信的通道还活着吗">VER-01.1　独立性核查：故障发生时，报信的通道还活着吗</h3>
+<p>列出验证链路（监控采集、告警投递、日志存储、状态页）的依赖，与被验证系统的依赖<strong>做交集</strong>。交集里的每一项都是一个盲区制造者：它故障时，验证手段和故障一起消失，你得到的不是告警，是安静。</p>
+<p>两个公开事故把这个形态写得很清楚：</p>
+<ul>
+<li>Roblox 2021（2021-10-28～31，持续三天余的全站故障）：“Critical monitoring systems that would have provided better visibility into the cause of the outage relied on affected systems, such as Consul. This combination severely hampered the triage process.”</li>
+<li>AWS S3 2017：连状态页都受灾——“we were unable to update the individual services’ status on the AWS Service Health Dashboard (SHD) because of a dependency the SHD administration console has on Amazon S3.”</li>
+</ul>
+<p><strong>判据</strong>：假设被验证系统整体宕机，逐项问「这个观测通道还工作吗」。答案为否的通道，<strong>它的『安静』永远不能当证据用</strong>——在判定表里把它标出来。</p>
+<h3 id="ver-01.2-探针语义核查它测的是什么">VER-01.2　探针语义核查：它测的是什么</h3>
+<p>每个健康检查/探针写一行「它实际断言了什么」：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>探针</th>
+<th>它实际断言</th>
+<th>它<strong>不能</strong>断言</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>端口存活</td>
+<td>有进程在监听</td>
+<td>业务逻辑可用</td>
+</tr>
+<tr>
+<td>HTTP 200</td>
+<td>有东西返回了 200</td>
+<td>返回内容正确（PM-03 形态：200 + 空结果）</td>
+</tr>
+<tr>
+<td>进程存在</td>
+<td>进程在</td>
+<td>接活的是新版本（<a class="xref" href="VER-02.html">VER-02</a> 的全部理由）</td>
+</tr>
+<tr>
+<td>业务事件断言</td>
+<td>活真的被干了</td>
+<td>——这是唯一够格的终点探针（<a class="xref" href="VER-02.html">VER-02</a>.4）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>断言强度不够支撑判据的探针，不许出现在验收判据表里</strong>（<a class="xref" href="ENG-02.html">ENG-02</a>.3）。另：护栏与审计工具自身也要有验证——「护栏通过了」与「护栏没执行」在无验证时不可区分（机理见 <a class="xref" href="DIS-02.html">DIS-02</a>.4；公开形态见 <a class="xref" href="VER-03.html">VER-03</a> 案例 PM-07）。</p>
+<h3 id="ver-01.3-沉默判读给告警链路装心跳">VER-01.3　沉默判读：给告警链路装心跳</h3>
+<p>「没有告警」有两种含义：没有问题，或告警链路死了。区分手段只有一个：让告警链路<strong>定期发已知信号</strong>（心跳/演练告警），信号停了 = 链路死了。没有心跳的告警链路，其沉默一律按「未知」处理，不按「正常」处理—— 这是保守缺省在观测层的形态。</p>
+<h3 id="ver-01.4-验证资产入库">VER-01.4　验证资产入库</h3>
+<p>以上三项的产出（独立性清单、探针语义表、心跳配置）属于交付物清单的<strong>验证资产类</strong>（<a class="xref" href="ROL-03.html">ROL-03</a>.1）——它们要随交付移交，否则客户接手的是一批无人知道断言强度的绿灯。</p>
+<hr />
+<h2 id="常见误判">常见误判</h2>
+<p><strong>「监控没报警，所以没问题」</strong>先问 VER-01.1 的交集：报警链路和故障共不共享依赖。共享 → 沉默是盲区不是绿灯。 Roblox 的复盘措辞是 “severely hampered”——三天多的处置里有相当部分在跟盲区搏斗。</p>
+<p><strong>「健康检查全绿，所以服务健康」</strong>回 VER-01.2 的表：每个绿灯只断言它测的那一层。把端口存活读成业务可用，是把探针的断言强度私自升级——升级的部分没有任何东西背书。</p>
+<p><strong>「状态页/仪表盘是权威」</strong>状态页也是一个有依赖的系统（AWS SHD 案例）。权威的不是页面，是页面背后那条链路的独立性——核过才算数。</p>
+<hr />
+<h2 id="判定标准">判定标准</h2>
+<div class="checklist"><ul><li><span class="box">☐</span>验证链路与被验证系统的依赖交集已列出，交集项的「安静」已标注为不可作证</li><li><span class="box">☐</span>每个探针有「实际断言」一行，判据表中无断言强度不足的探针</li><li><span class="box">☐</span>告警链路有心跳，无心跳的链路其沉默按未知处理</li><li><span class="box">☐</span>三项产出已入验证资产清单（<a class="xref" href="ROL-03.html">ROL-03</a>）</li></ul></div>
+<hr />
+<h2 id="案例证据">案例证据</h2>
+<blockquote>
+<h3 id="案例-pm-04-公开事故复盘roblox2021">案例 PM-04 · 公开事故复盘｜Roblox，2021</h3>
+<p>为期三天余（2021-10-28～31）的全站故障中，用于定位故障的关键监控系统跑在出故障的 Consul 之上—— 引句见 VER-01.1（出处：https://about.roblox.com/newsroom/2021/10/roblox-return-to-service-10-28-10-31-2021 ， 2026-08-07 逐句核实）。｜不可外推：自建 Consul 集群的特定拓扑，不能推出「所有自托管监控不可用」。</p>
+</blockquote>
+<blockquote>
+<h3 id="案例-pm-10-公开事故复盘aws-s32017">案例 PM-10 · 公开事故复盘｜AWS S3，2017</h3>
+<p>S3 故障期间，官方状态页因依赖 S3 而无法更新状态——引句见 VER-01.1 （出处：https://aws.amazon.com/message/41926/ ，2026-08-07 逐句核实）。｜不可外推：特定于当时 SHD 管理控制台的依赖设计，AWS 复盘中已宣布整改。</p>
+</blockquote>
+<hr />
+<h2 id="相关小节">相关小节</h2>
+<ul>
+<li><strong><a class="xref" href="VER-02.html">VER-02</a> 切换验证</strong>——本节保证了绿灯可信，那节才开始用绿灯</li>
+<li><strong><a class="xref" href="VER-03.html">VER-03</a> 可达性验证</strong>——护栏自身失效的公开形态（PM-07）</li>
+<li><strong><a class="xref" href="DIS-01.html">DIS-01</a> 证据分级</strong>——探针断言强度是证据分级在观测层的应用</li>
+<li><strong><a class="xref" href="DIS-02.html">DIS-02</a> 三道焊缝</strong>——护栏必须有自己的验证</li>
+<li><strong><a class="xref" href="APPX-A.html">附录 A</a> · FX-SVC-03（待写）</strong>——症状「监控安静但用户报障」的速查入口</li>
+</ul>
+</main>
+<nav class="pager"><a href="DEP-01.html">← DEP-01</a><a href="VER-02.html">VER-02 →</a></nav>
+<footer>案例三档强制标注 · 引文写作当轮核实 · <a href="https://github.com/libaoming/fde-handbook">GitHub 源仓库</a>（发现分档冒充或引文失实，请提 issue——那是本手册的红线）</footer>
+</body></html>

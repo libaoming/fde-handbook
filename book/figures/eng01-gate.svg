@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 440" role="img" aria-label="承接判定流：客户诉求先改写成可证伪赌注，写不出数字就先算集中度；集中度算不出或很低走缩范围或拒绝；赌注成立后过红线清单，全否才过承接关口">
+<style>
+  :root{ --paper:#ffffff; --ink:#17181a; --muted:#6b6f76; --faint:#b9b9b3; --danger:#a8321f; }
+  @media (prefers-color-scheme: dark){
+    :root{ --paper:#131416; --ink:#e9eaec; --muted:#979ba2; --faint:#4a4d53; --danger:#e0785e; }
+  }
+  text{ font-family:"PingFang SC","Noto Sans CJK SC","Hiragino Sans GB",system-ui,sans-serif }
+  .bg{ fill:var(--paper) }
+  .node{ fill:none; stroke:var(--ink); stroke-width:1.5 }
+  .node-key{ stroke-width:3 }
+  .node-ghost{ stroke:var(--faint); stroke-dasharray:5 4 }
+  .lbl{ fill:var(--ink); font-size:14px; font-weight:600 }
+  .sub{ fill:var(--muted); font-size:11.5px }
+  .edge{ stroke:var(--ink); stroke-width:1.6; fill:none }
+  .edge-ghost{ stroke:var(--faint); stroke-width:1.4; fill:none; stroke-dasharray:6 5 }
+  .guide{ stroke:var(--faint); stroke-width:1; stroke-dasharray:3 4 }
+  .etxt{ fill:var(--muted); font-size:12px }
+  .etxt-ink{ fill:var(--ink); font-size:12px; font-weight:600 }
+  .ah{ fill:var(--ink) } .ahg{ fill:var(--faint) }
+</style>
+<defs>
+  <marker id="eg-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path class="ah" d="M0,0 L10,5 L0,10 z"/>
+  </marker>
+  <marker id="eg-ghost" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path class="ahg" d="M0,0 L10,5 L0,10 z"/>
+  </marker>
+</defs>
+<rect class="bg" x="0" y="0" width="1000" height="440"/>
+
+<!-- 主链 -->
+<rect class="node" x="30" y="70" width="180" height="66" rx="6"/>
+<text class="lbl" x="46" y="97">客户诉求</text>
+<text class="sub" x="46" y="118">通常是一个愿景句</text>
+
+<rect class="node" x="290" y="70" width="220" height="66" rx="6"/>
+<text class="lbl" x="306" y="97">① 改写成可证伪赌注</text>
+<text class="sub" x="306" y="118">因为数据 X → 应能做到 Y</text>
+
+<rect class="node" x="590" y="70" width="180" height="66" rx="6"/>
+<text class="lbl" x="606" y="97">③ 红线清单</text>
+<text class="sub" x="606" y="118">六条逐项核（ENG-01.3）</text>
+
+<rect class="node node-key" x="840" y="70" width="130" height="66" rx="6"/>
+<text class="lbl" x="856" y="97">承接关口</text>
+<text class="sub" x="856" y="118">进入 SUR</text>
+
+<path class="edge" d="M210,103 L284,103" marker-end="url(#eg-ink)"/>
+<path class="edge" d="M510,103 L584,103" marker-end="url(#eg-ink)"/>
+<text class="etxt-ink" x="522" y="92">赌注成立</text>
+<path class="edge" d="M770,103 L834,103" marker-end="url(#eg-ink)"/>
+<text class="etxt-ink" x="778" y="92">全否</text>
+
+<!-- 支路：写不出 X → 算集中度 -->
+<rect class="node" x="290" y="210" width="220" height="66" rx="6"/>
+<text class="lbl" x="306" y="237">② 先算集中度</text>
+<text class="sub" x="306" y="258">用客户自己的数据（ENG-01.2）</text>
+
+<path class="edge" d="M400,136 L400,204" marker-end="url(#eg-ink)"/>
+<text class="etxt" x="410" y="176">写不出 X</text>
+<path class="edge" d="M510,236 C560,232 560,150 512,120" marker-end="url(#eg-ink)"/>
+<text class="etxt" x="548" y="192">集中度高 → 回①补上 X</text>
+
+<!-- 出口：缩范围或拒绝 -->
+<rect class="node node-ghost" x="640" y="290" width="330" height="76" rx="6"/>
+<text class="lbl" x="658" y="318">改范围 / 拒绝</text>
+<text class="sub" x="658" y="340">缩到最集中的一块重新过流程；或明确不接——</text>
+<text class="sub" x="658" y="358">此刻拒绝的成本是全周期里最低的</text>
+
+<path class="edge-ghost" d="M510,258 C580,290 600,306 634,318" marker-end="url(#eg-ghost)"/>
+<text class="etxt" x="500" y="292">集中度低 / 算不出（本身即红线信号）</text>
+<path class="edge-ghost" d="M680,136 C690,190 700,240 740,284" marker-end="url(#eg-ghost)"/>
+<text class="etxt" x="700" y="212">任一红线命中且无法解除</text>
+
+<!-- 底注 -->
+<line class="guide" x1="30" y1="398" x2="970" y2="398"/>
+<text class="sub" x="30" y="424">红线是结构性无解（不随努力改善），困难不是红线——环境差、数据脏、排期紧属于困难，进 SUR 量化。</text>
+</svg>

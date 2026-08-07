@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FDE 手册 · AI 交付的现场手册</title>
+<link rel="stylesheet" href="assets/style.css"></head>
+<body><main class="index">
+<h1>FDE 手册</h1>
+<p class="tagline">市面上讲 FDE 的内容，大多在回答「这个岗位是什么、怎么入行」。<br>
+这本手册回答的是下一个问题：<strong>上了客户现场之后，照着什么干活。</strong></p>
+<p class="stance">立场一句话：<strong>AI 说做完了不算做完，判定标量说了才算。</strong></p>
+<div class="entries">
+<a class="entry" href="ROL-04.html"><h2>我在交付的哪一步？</h2><p>主线入口：六阶段与关口 →</p></a>
+<a class="entry" href="APPX-A.html"><h2>我遇到了这个症状</h2><p>速查入口：按症状索引，直达处置 →</p></a>
+</div>
+<figure class="fig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 520" role="img" aria-label="交付生命周期六阶段：承接、勘察、搭建、上线、签收、移交，阶段间是需要判定输出的关口；验证纪律贯穿全程；三条回边：勘察发现红线回承接、签收不过回搭建上线、移交无人可交回承接">
+<style>
+  :root{ --paper:#ffffff; --ink:#17181a; --muted:#6b6f76; --faint:#b9b9b3; --danger:#a8321f; }
+  @media (prefers-color-scheme: dark){
+    :root{ --paper:#131416; --ink:#e9eaec; --muted:#979ba2; --faint:#4a4d53; --danger:#e0785e; }
+  }
+  text{ font-family:"PingFang SC","Noto Sans CJK SC","Hiragino Sans GB",system-ui,sans-serif }
+  .bg{ fill:var(--paper) }
+  .node{ fill:none; stroke:var(--ink); stroke-width:1.5 }
+  .node-key{ stroke-width:3 }
+  .node-ghost{ stroke:var(--faint); stroke-dasharray:5 4 }
+  .lbl{ fill:var(--ink); font-size:14px; font-weight:600 }
+  .sub{ fill:var(--muted); font-size:11.5px }
+  .edge{ stroke:var(--ink); stroke-width:1.6; fill:none }
+  .edge-ghost{ stroke:var(--faint); stroke-width:1.4; fill:none; stroke-dasharray:6 5 }
+  .guide{ stroke:var(--faint); stroke-width:1; stroke-dasharray:3 4 }
+  .etxt{ fill:var(--muted); font-size:12px }
+  .etxt-ink{ fill:var(--ink); font-size:12px; font-weight:600 }
+  .lane{ fill:var(--muted); font-size:11px; letter-spacing:.18em }
+  .ah{ fill:var(--ink) } .ahg{ fill:var(--faint) }
+</style>
+<defs>
+  <marker id="lc-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path class="ah" d="M0,0 L10,5 L0,10 z"/>
+  </marker>
+  <marker id="lc-ghost" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path class="ahg" d="M0,0 L10,5 L0,10 z"/>
+  </marker>
+</defs>
+<rect class="bg" x="0" y="0" width="1000" height="520"/>
+
+<!-- 回边（上方三条弧） -->
+<path class="edge-ghost" d="M255,180 C240,110 110,110 100,174" marker-end="url(#lc-ghost)"/>
+<text class="etxt" x="120" y="118">发现红线 → 回承接重议</text>
+<path class="edge-ghost" d="M740,180 C720,80 400,80 385,174" marker-end="url(#lc-ghost)"/>
+<text class="etxt" x="455" y="88">签收不过 → 回搭建/上线，重跑全部相关判据</text>
+<path class="edge-ghost" d="M905,180 C930,40 90,36 70,174" marker-end="url(#lc-ghost)"/>
+<text class="etxt" x="330" y="46">无人可交 → 回承接补干系人</text>
+
+<!-- 六阶段 -->
+<rect class="node" x="30" y="186" width="130" height="66" rx="6"/>
+<text class="lbl" x="46" y="213">ENG 承接</text>
+<text class="sub" x="46" y="234">能不能接 · 判据</text>
+
+<rect class="node" x="192" y="186" width="130" height="66" rx="6"/>
+<text class="lbl" x="208" y="213">SUR 勘察</text>
+<text class="sub" x="208" y="234">环境 · 阻塞项</text>
+
+<rect class="node" x="354" y="186" width="130" height="66" rx="6"/>
+<text class="lbl" x="370" y="213">BLD 搭建</text>
+<text class="sub" x="370" y="234">最小可用链路</text>
+
+<rect class="node" x="516" y="186" width="130" height="66" rx="6"/>
+<text class="lbl" x="532" y="213">DEP 上线</text>
+<text class="sub" x="532" y="234">影响面 · 回退</text>
+
+<rect class="node node-key" x="678" y="186" width="130" height="66" rx="6"/>
+<text class="lbl" x="694" y="213">VER 签收</text>
+<text class="sub" x="694" y="234">证据链 · 重心</text>
+
+<rect class="node" x="840" y="186" width="130" height="66" rx="6"/>
+<text class="lbl" x="856" y="213">HND 移交</text>
+<text class="sub" x="856" y="234">能力转移</text>
+
+<!-- 阶段间关口箭头 -->
+<path class="edge" d="M160,219 L186,219" marker-end="url(#lc-ink)"/>
+<path class="edge" d="M322,219 L348,219" marker-end="url(#lc-ink)"/>
+<path class="edge" d="M484,219 L510,219" marker-end="url(#lc-ink)"/>
+<path class="edge" d="M646,219 L672,219" marker-end="url(#lc-ink)"/>
+<path class="edge" d="M808,219 L834,219" marker-end="url(#lc-ink)"/>
+
+<!-- 关口标注 -->
+<text class="etxt-ink" x="30" y="290">每道关口 = 上一阶段退出条件逐项核对 + 可粘贴的判定输出（不是「我觉得可以了」）</text>
+
+<!-- 验证纪律横切带 -->
+<rect class="node node-ghost" x="30" y="316" width="940" height="70" rx="6"/>
+<text class="lbl" x="48" y="344">第 3 部 · 验证纪律（DIS-01~04）</text>
+<text class="sub" x="48" y="366">证据分级 · 判定标量 · AI 助手产出验证 · 事故台账 —— 不属于任何单一阶段，作用在每一道关口上</text>
+<path class="edge-ghost" d="M173,316 L173,258"/>
+<path class="edge-ghost" d="M335,316 L335,258"/>
+<path class="edge-ghost" d="M497,316 L497,258"/>
+<path class="edge-ghost" d="M659,316 L659,258"/>
+<path class="edge-ghost" d="M821,316 L821,258"/>
+
+<!-- 底注 -->
+<line class="guide" x1="30" y1="418" x2="970" y2="418"/>
+<text class="sub" x="30" y="448">⚠️ 六阶段是本手册自建框架，不是行业标准（声明见 ROL-04）。它的价值是给关口、交付物、检查项</text>
+<text class="sub" x="30" y="468">一个不漂移的挂点；你的组织已有阶段划分时，把各节映射过去用——检查项不依赖阶段叫什么。</text>
+<text class="sub" x="30" y="496">虚线回边是常态而非例外；区别专业与否的不是「有没有回去」，而是回去时走不走关口（ROL-04.3）。</text>
+</svg>
+</figure>
+<div class="install"><p>给你的 coding agent 装上切换验真（fail-closed）：</p>
+<pre>npx skills add libaoming/fde-handbook</pre></div>
+<nav class="toc"><h3>第 0 部</h3><ul><li><a href="HOW.html">第 0 部 · 怎么用这本手册</a></li></ul><h3>第 1 部 · 这份工作</h3><ul><li><a href="ROL-01.html">ROL-01 · 角色定义：FDE 是什么、不是什么</a></li><li><a href="ROL-02.html">ROL-02 · 相邻角色边界：一件事归谁</a></li><li><a href="ROL-03.html">ROL-03 · 交付物清单：一次交付要留下什么</a></li><li><a href="ROL-04.html">ROL-04 · 全景图：六阶段与关口</a></li></ul><h3>第 2 部 · ENG 承接</h3><ul><li><a href="ENG-01.html">ENG-01 · 承接判定：这活能不能接</a></li><li><a href="ENG-02.html">ENG-02 · 成功标准：把「做好」翻译成可执行的验收判据</a></li></ul><h3>第 2 部 · SUR 勘察</h3><ul><li><a href="SUR-01.html">SUR-01 · 环境与语义勘察：把「客户说的」换成「验证过的」</a></li><li><a href="SUR-02.html">SUR-02 · 非工程域勘察：不在日志里的阻塞项</a></li></ul><h3>第 2 部 · BLD 搭建</h3><ul><li><a href="BLD-03.html">BLD-03 · 链路迁移：先列丢失能力清单</a></li><li><a href="BLD-04.html">BLD-04 · 模型行为约束：把要求落成结构与闸门</a></li></ul><h3>第 2 部 · DEP 上线</h3><ul><li><a href="DEP-01.html">DEP-01 · 部署与切换：影响清单、回退与渐进</a></li></ul><h3>第 2 部 · VER 签收</h3><ul><li><a href="VER-01.html">VER-01 · 验证前提：先确认你的验证手段可信</a></li><li><a href="VER-02.html">VER-02 · 切换验证：确认接活的是新版本</a></li><li><a href="VER-03.html">VER-03 · 可达性验证：确认用户那条路通</a></li><li><a href="VER-04.html">VER-04 · 故障定位：先加分辨率，再提假设</a></li><li><a href="VER-05.html">VER-05 · 验收与签收：判据表的执行日</a></li></ul><h3>第 2 部 · HND 移交</h3><ul><li><a href="HND-01.html">HND-01 · 移交：能力转移的验收</a></li></ul><h3>第 3 部 · 验证纪律</h3><ul><li><a href="DIS-01.html">DIS-01 · 证据分级：什么算证据，什么只是信号</a></li><li><a href="DIS-02.html">DIS-02 · 三道焊缝：把验证从自觉变成系统</a></li><li><a href="DIS-03.html">DIS-03 · AI 助手产出验证：确认它报告的执行真的发生过</a></li><li><a href="DIS-04.html">DIS-04 · 事故台账：失败怎么进流程才算被吸取</a></li></ul><h3>附录</h3><ul><li><a href="APPX-A.html">附录 A · 故障速查</a></li><li><a href="APPX-B.html">附录 B · 检查表汇编</a></li><li><a href="APPX-C.html">附录 C · 模板库</a></li></ul></nav>
+</main>
+<footer>案例三档强制标注 · 引文写作当轮核实 · <a href="https://github.com/libaoming/fde-handbook">GitHub 源仓库</a></footer>
+</body></html>

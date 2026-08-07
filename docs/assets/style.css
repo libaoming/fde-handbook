@@ -1,0 +1,118 @@
+/* FDE 手册阅读站 · 共享样式表（teach 式：全站唯一组件，先于一切页面） */
+:root{
+  --paper:#fffef9; --ink:#1a1a1c; --muted:#6b6f76; --faint:#d8d6cd;
+  --accent:#a8321f; --card:#f6f4ec; --code:#f0eee6; --link:#1a56a0;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --paper:#131416; --ink:#e9eaec; --muted:#979ba2; --faint:#3a3d43;
+         --accent:#e0785e; --card:#1c1e22; --code:#1f2126; --link:#7fb0e8; }
+}
+*{ box-sizing:border-box }
+html{ font-size:17px }
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:"Source Han Serif SC","Noto Serif CJK SC","Songti SC",Georgia,serif;
+  line-height:1.95; text-align:justify;
+}
+main{ max-width:46rem; margin:0 auto; padding:1.2rem 1.4rem 4rem }
+h1,h2,h3{ font-family:"PingFang SC","Noto Sans CJK SC",system-ui,sans-serif;
+  line-height:1.4; text-align:left }
+h1{ font-size:1.7rem; margin:1.6rem 0 .8rem; letter-spacing:.01em }
+h2{ font-size:1.25rem; margin:2.4rem 0 .6rem; padding-top:1rem;
+  border-top:1px solid var(--faint) }
+h3{ font-size:1.05rem; margin:1.8rem 0 .4rem }
+p{ margin:.7rem 0 }
+a{ color:var(--link); text-decoration:none }
+a:hover{ text-decoration:underline }
+a.xref{ border-bottom:1px dotted var(--link) }
+strong{ font-weight:700 }
+
+/* 顶栏 / 页脚 / 翻页 */
+header.top{ display:flex; gap:1rem; align-items:baseline; max-width:46rem;
+  margin:0 auto; padding:1rem 1.4rem 0 }
+header.top .home{ font-weight:700; font-family:"PingFang SC",system-ui,sans-serif }
+header.top .crumb{ color:var(--muted); font-size:.85rem }
+nav.pager{ display:flex; justify-content:space-between; max-width:46rem;
+  margin:0 auto; padding:1rem 1.4rem }
+footer{ max-width:46rem; margin:0 auto; padding:1rem 1.4rem 3rem;
+  color:var(--muted); font-size:.82rem; border-top:1px solid var(--faint) }
+
+/* 表格 */
+table{ border-collapse:collapse; width:100%; margin:1rem 0; font-size:.88rem;
+  font-family:"PingFang SC","Noto Sans CJK SC",system-ui,sans-serif; line-height:1.6 }
+th,td{ border:1px solid var(--faint); padding:.45rem .6rem; text-align:left;
+  vertical-align:top }
+th{ background:var(--card); font-weight:600 }
+@media (max-width:640px){ table{ display:block; overflow-x:auto } }
+
+/* 代码 */
+pre{ background:var(--code); padding: .8rem 1rem; overflow-x:auto;
+  border-radius:6px; font-size:.82rem; line-height:1.6 }
+code{ font-family:"SF Mono",Menlo,Consolas,monospace; font-size:.85em }
+p code, li code, td code{ background:var(--code); padding:.08em .3em; border-radius:4px }
+
+/* 案例证据框（blockquote 卡片化）*/
+blockquote{
+  margin:1.4rem 0; padding:.9rem 1.2rem; background:var(--card);
+  border-left:3px solid var(--accent); border-radius:0 6px 6px 0; font-size:.92rem;
+}
+blockquote h3:first-child{ margin-top:.2rem }
+blockquote p:first-child{ margin-top:.1rem }
+
+/* 勾选卡（```checklist 围栏）*/
+.checklist{ background:var(--card); border:1px solid var(--faint);
+  border-radius:8px; padding:.7rem 1rem; margin:1rem 0;
+  font-family:"PingFang SC","Noto Sans CJK SC",system-ui,sans-serif; font-size:.9rem }
+.checklist ul{ list-style:none; margin:0; padding:0 }
+.checklist li{ padding:.32rem 0; display:flex; gap:.55rem; line-height:1.65;
+  border-bottom:1px dashed var(--faint) }
+.checklist li:last-child{ border-bottom:none }
+.checklist .box{ color:var(--accent); flex:none }
+.checklist li.cont{ color:var(--muted); padding-left:1.5rem }
+
+/* 插图 */
+figure.fig{ margin:1.6rem 0 }
+figure.fig svg{ width:100%; height:auto }
+figcaption{ color:var(--muted); font-size:.82rem; margin-top:.3rem;
+  text-align:left; font-family:"PingFang SC",system-ui,sans-serif }
+
+/* 首页 */
+.index .tagline{ font-size:1.05rem }
+.index .stance{ color:var(--accent) }
+.entries{ display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin:1.4rem 0 }
+@media (max-width:640px){ .entries{ grid-template-columns:1fr } }
+.entry{ display:block; background:var(--card); border:1px solid var(--faint);
+  border-radius:10px; padding:1rem 1.2rem; color:var(--ink) }
+.entry:hover{ border-color:var(--accent); text-decoration:none }
+.entry h2{ border:none; margin:.1rem 0 .3rem; padding:0; font-size:1.1rem }
+.entry p{ color:var(--muted); margin:.2rem 0; font-size:.9rem }
+.install{ background:var(--card); border-radius:8px; padding: .8rem 1.2rem; margin:1.4rem 0 }
+.toc h3{ margin:1.4rem 0 .3rem }
+.toc ul{ margin:.2rem 0; padding-left:1.2rem }
+.toc li{ margin:.25rem 0 }
+
+/* 自测 quiz */
+.quiz{ background:var(--card); border:1px solid var(--faint); border-radius:10px;
+  padding:1rem 1.3rem; margin:2rem 0;
+  font-family:"PingFang SC","Noto Sans CJK SC",system-ui,sans-serif }
+.quiz h2{ border:none; padding:0; margin:.2rem 0 }
+.quiz-note{ color:var(--muted); font-size:.85rem }
+.quiz .q{ margin:1rem 0 }
+.quiz .q p{ font-weight:600; margin:.3rem 0 }
+.quiz .opt{ display:block; width:100%; text-align:left; margin:.3rem 0;
+  padding:.5rem .8rem; border:1px solid var(--faint); border-radius:6px;
+  background:var(--paper); color:var(--ink); cursor:pointer; font-size:.9rem }
+.quiz .opt:hover{ border-color:var(--link) }
+.quiz .opt.right{ border-color:#2c7a3f; font-weight:600 }
+.quiz .opt.wrong{ border-color:var(--accent); opacity:.75 }
+.quiz .why{ display:none; color:var(--muted); font-size:.85rem; margin:.4rem 0 0 }
+.quiz .q.answered .why{ display:block }
+
+/* 打印 */
+@media print{
+  header.top, nav.pager, footer, .quiz{ display:none }
+  body{ background:#fff; color:#000; font-size:11pt }
+  main{ max-width:100% }
+  a{ color:#000; text-decoration:none }
+  blockquote,.checklist{ break-inside:avoid }
+}

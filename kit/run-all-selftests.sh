@@ -26,6 +26,7 @@ TESTS=(
     "prompt-mode-lint::python3 kit/prompt-mode-lint.py --self-test"
     "soft-prior-lint::python3 kit/soft-prior-lint.py --self-test"
     "book-samples::bash kit/check-book-samples.sh"
+    "build-site::python3 kit/build-site.py"
 )
 
 pass=0; fail=0; missing=0

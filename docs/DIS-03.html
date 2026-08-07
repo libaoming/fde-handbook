@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DIS-03 · AI 助手产出验证：确认它报告的执行真的发生过 · FDE 手册</title>
+<link rel="stylesheet" href="assets/style.css"></head>
+<body><header class="top">
+<a class="home" href="index.html">《FDE 手册》</a><span class="crumb">第 3 部 · 验证纪律</span>
+</header>
+<main><h1 id="dis-03-ai-助手产出验证确认它报告的执行真的发生过">DIS-03 · AI 助手产出验证：确认它报告的执行真的发生过</h1>
+<p><strong>目的</strong>　当交付过程中有 AI 助手代你执行动作（跑命令、写文件、改配置、发部署）时，判断<strong>它报告的那次执行是否真的发生过</strong>。本节给出八项检查、一个可粘贴的判定输出，以及一道出口闸门与它的已知缺口。</p>
+<p><strong>它报告的执行，未必发生过。</strong> 这不是「它做错了」，也不是「它记错了」—— 是那次动作根本没有进入工具调用，而报告照常生成。</p>
+<p><strong>前置条件</strong> - 交付链路中确实有 AI 助手代为执行动作（本节不讨论人写人跑的场景，那部分见 <a class="xref" href="DIS-01.html">DIS-01</a>/<a class="xref" href="DIS-02.html">DIS-02</a>） - 你能访问<strong>该轮的原始调用记录</strong>（transcript，即工具逐条落盘的会话记录，常见格式为 jsonl——每行一条 JSON 的日志），或至少知道自己访问不到 - 你有一条<strong>不经助手转述</strong>的观察通道：自己的终端、CI 日志、对象存储控制台、客户侧截图 - 已知本轮助手声称完成的动作清单（哪些文件、哪些命令、哪些远端变更）</p>
+<hr />
+<h2 id="规程">规程</h2>
+<p>八项检查按顺序执行。<strong>任何一项不通过，本轮产出按未执行处理</strong>，正确动作是重跑那一条，不是追问助手。</p>
+<h3 id="dis-03.1-把声明拆成产物断言与过程断言">DIS-03.1　把声明拆成「产物断言」与「过程断言」</h3>
+<p>先把助手这一轮说过的每一句完成类陈述，分进两栏：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>栏</th>
+<th>形态</th>
+<th>能用什么验</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>产物断言</strong></td>
+<td>文件已写入 / 内容是 X / 服务已在运行 / 图已生成</td>
+<td><code>test -f</code>、校验和、独立通道回读</td>
+</tr>
+<tr>
+<td><strong>过程断言</strong></td>
+<td>命令跑过 / 退出码为 0 / 脚本执行了 / 测试全绿</td>
+<td><strong>只能翻原始调用记录</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>判据：产物为真，不证明过程为真。</strong> 文件可能是上一次运行留下的、可能由别的动作顺带产生、可能来自缓存或模板。这两栏用的是两套证据，不能互相顶替。</p>
+<p>分完之后先数一下右栏有几条——<strong>过程断言的条数，就是这一轮你需要翻记录核对的次数。</strong></p>
+<h3 id="dis-03.2-产物断言逐条走独立通道回读">DIS-03.2　产物断言：逐条走独立通道回读</h3>
+<p>不接受助手复述的回读结果。自己跑，或者让不经它转述的通道产出。</p>
+<p>这一条看似与 <a class="xref" href="DIS-02.html">DIS-02</a>.1 的第一档（回读）相同，实则不是。第一档假定回读由<strong>你</strong>执行；一旦执行者是助手，「回读」这个动作本身也被委托给了同一个可能伪报的主体，<strong>它转述的回读输出仍然只是转述</strong>（<a class="xref" href="DIS-01.html">DIS-01</a> 的第三级）。</p>
+<blockquote>
+<p>Claude Code 官方文档把这条要求写成了两句祈使句：「Have Claude show evidence rather than asserting success: <strong>the test output, the command it ran and what it returned</strong>, or a screenshot of the result.」「Always provide verification (tests, scripts, screenshots). <strong>If you can’t verify it, don’t ship it.</strong>」（让它出示证据而非宣称成功：测试输出、它跑了什么命令、返回了什么；验证不了的就别交付。）</p>
+<p>出处：Anthropic, <em>Claude Code Docs</em> — Best practices，https://code.claude.com/docs/en/best-practices ｜不可外推：这是 Claude Code 语境下的产品实践建议，不是对所有 LLM 产品行为的普遍描述。</p>
+</blockquote>
+<p><strong>通过判据</strong>：每一条产物断言，都有一份<strong>你能重放</strong>的观察输出与之对应。</p>
+<h3 id="dis-03.3-过程断言在本轮调用记录里逐条定位">DIS-03.3　过程断言：在本轮调用记录里逐条定位</h3>
+<p>对每一个执行结果标量——退出码、字节数、耗时、测试通过数、生成文件数—— 到本轮原始调用记录里找出产生它的那一次工具调用。</p>
+<p><strong>判据：该轮零次相应类型的工具调用，而文本里出现了执行结果标量，判定为伪报，不是「记错了」。</strong> 记错的前提是发生过；这里没有可记错的对象。</p>
+<p>三条落地要求：</p>
+<ol type="1">
+<li>核对的是<strong>本轮</strong>，不是整段会话。上一轮跑过同名命令，不构成本轮的证据；</li>
+<li>核对的是<strong>调用类型</strong>。写文件的调用不能背书「脚本执行了」这句话—— 写脚本与跑脚本是两次不同的调用；</li>
+<li>记录不可得时（平台不暴露 transcript），该项<strong>记为未验证</strong>，走保守缺省，不记为通过。</li>
+</ol>
+<blockquote>
+<p><strong>精确性在这里不是可信度，是伪装的成本。</strong> 带着退出码与字节数的技术报告，比一句含糊的「已完成」更容易被采信，而两者的生成难度并无差别—— 编一个 <code>rc=0</code> 不比编一句「好了」更费力。<a class="xref" href="DIS-01.html">DIS-01</a> 的分级表在这里必须严格执行：<strong>未经回读之前，二者同为「转述」级。</strong></p>
+</blockquote>
+<h3 id="dis-03.4-一致性证明必须由你重算">DIS-03.4　一致性证明必须由你重算</h3>
+<p>助手给出校验和、「两边 diff 为空」、「哈希一致」这类<strong>一致性证明</strong>时，自己重算一次。</p>
+<p><strong>判据：一个你无法重算的校验值不是证据，是一个字符串。</strong>它恰好是最容易被凭空生成的证据形态——长度对、字符集对、看起来毫无破绽，而验证成本对你来说只是一条命令。</p>
+<h3 id="dis-03.5-给环境定罪之前必须先出示那条异常输出的原文">DIS-03.5　给环境定罪之前，必须先出示那条异常输出的原文</h3>
+<p>当助手说出「命令时灵时不灵」「回显被污染」「这个环境不可信」「工具链失效」时，要求它贴出那条异常输出的<strong>原文</strong>，并在调用记录里定位到它。</p>
+<p><strong>判据：拿不出原文的故障声明，判定为想象</strong>，按 DIS-03.3 当作伪报处理。</p>
+<p>这一条是「完成声明前先回读」的对称面，两条必须并列使用：</p>
+<blockquote>
+<p><strong>完成声明前先回读</strong>，防的是谎报成功。<strong>故障声明前先取证</strong>，防的是谎报失败。</p>
+</blockquote>
+<p><strong>诿过环境的代价，比一次伪报大得多。</strong> 一次伪报只污染一个结论；而「环境不可信」是一个万能解释——一旦它进入上下文，<strong>回读发现的每一个矛盾都能被归给环境</strong>：文件不存在？回显被污染了。数字对不上？stdout 不可信。于是回读照常执行，却再也不能证伪任何东西—— <strong>你保留了回读的动作，丢掉了回读的功能。</strong></p>
+<p>这就是 <a class="xref" href="DIS-02.html">DIS-02</a>.2 第三条要求（回读结果与预期矛盾时先改自己的记录）的理由所在。矛盾的第一解释永远是「记录错了」，不是「观测坏了」。</p>
+<h3 id="dis-03.6-单条异常就地重跑不外推">DIS-03.6　单条异常就地重跑，不外推</h3>
+<p>一条命令没有输出、或输出不合预期时，正确动作是<strong>就地重跑那一条</strong>，观察本次结果。</p>
+<p><strong>判据：「这一条没跑成」与「整个工具链失效」之间没有推理通道。</strong></p>
+<p>外推的代价是双向的：它既为下一次伪报提供了现成解释，又会让<strong>后续所有真实读数被当作噪声丢弃</strong>—— 包括那条正好指向根因的读数。一旦某个通道被宣布为「不可信」，它之后吐出的正确答案也会被一并扔掉，而扔掉的过程看起来非常有纪律感。</p>
+<h3 id="dis-03.7-中断之后的第一条消息按未完成开局">DIS-03.7　中断之后的第一条消息，按未完成开局</h3>
+<p><strong>已知高发位</strong>：API 报错腰斩、连接中断、上下文压缩、以及用户催促（「继续」「写好了吗」「怎么没动静」）之后的<strong>第一条消息</strong>。</p>
+<p>机理：被打断的那一刻，「准备去做」在上下文里留下的痕迹，与「已经做完」的痕迹高度相似，恢复之后极易被读成后者。</p>
+<p>规程（三条，缺一不可）：</p>
+<ol type="1">
+<li>中断后的第一条消息里，<strong>禁止出现任何完成或结果陈述</strong>；</li>
+<li>上一轮的记忆一律降级为「待核」——不管当时看起来多确定；</li>
+<li>唯一允许的开场动作，是跑<strong>一条回读命令</strong>锚定当前磁盘/服务现状，再基于真实输出续跑。</li>
+</ol>
+<blockquote>
+<p>⚠️ <strong>本条的触发条件是经验规则，不是统计结论。</strong> 本手册未做跨会话的「中断点与伪报点相关性」统计，也不掌握公开数据。它作为<strong>低成本、低损失</strong>的保守规程给出：即使触发条件判断偏了，代价也只是多跑了一条读取命令。</p>
+</blockquote>
+<h3 id="dis-03.8-出口闸门以及它拦不住的那一半">DIS-03.8　出口闸门，以及它拦不住的那一半</h3>
+<p>前七条的强度上限是第一、二档（靠人记得、靠人看见）。要升到第三档，需要一道<strong>不依赖任何人配合</strong>的出口闸门——挂在会话收尾处的钩子（Stop hook，在助手准备结束本轮时自动触发的程序）是可行形态之一。</p>
+<p>两道最小闸：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>闸</th>
+<th>触发条件</th>
+<th>动作</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>闸 A</strong>（产物）</td>
+<td>末轮文本出现「已写 / 已落盘 / 已生成 / 已复制」+ 文件名</td>
+<td>对每个文件名逐个 <code>test -f</code>，缺失即拒绝收口</td>
+</tr>
+<tr>
+<td><strong>闸 B</strong>（过程）</td>
+<td>末轮出现 <code>EXIT:</code> / <code>rc=</code> / <code>exit code</code> 这类结果标量，而<strong>本轮零次 shell 调用</strong></td>
+<td>直接拦截</td>
+</tr>
+</tbody>
+</table>
+<p>闸 B 正是为本节这类形态设的：它不检查结论对不对，只检查<strong>结论有没有来源</strong>。</p>
+<p>为什么必须是闸门而不是写进指令：</p>
+<blockquote>
+<p>「Unlike CLAUDE.md instructions which are <strong>advisory</strong>, hooks are <strong>deterministic</strong> and guarantee the action happens.」（与 CLAUDE.md 指令的劝导性质不同，hook 是确定性的，能保证动作一定发生。）</p>
+<p>出处：同上，Claude Code Docs — Best practices ｜不可外推：描述的是 Claude Code 的 hook 机制，外推到其他产品时应表述为「同类确定性机制」。「指令即劝导」这一点与 <a class="xref" href="BLD-04.html">BLD-04</a> 是同一条：写给模型的约束是先验，不是闸门。</p>
+</blockquote>
+<p><strong>已知缺口（必须与闸门一起交付，否则闸门只提供安全感）</strong>：</p>
+<ol type="1">
+<li><strong>只拦轮尾的收口声明。</strong> 发生在对话中途的伪报——助手在一轮之内先报「已生成」、再继续做别的事——闸门看不到。<strong>它拦的是最后一句话，不是每一句话。</strong></li>
+<li><strong>靠关键词触发，绕得开。</strong> 「三张图都好了」不含闸 A 的关键词，「跑通了」不含闸 B 的标量形态。措辞一变即穿过。</li>
+<li><strong>拦不住「跑过但转述错了」。</strong> 命令确实执行过，闸 B 就放行；至于报出的读数与真实输出是否一致，它不比对。</li>
+<li><strong>闸门自身可能有 bug 而静默通过</strong>——它「通过」了，只是没执行（见 <a class="xref" href="DIS-02.html">DIS-02</a>.4 与案例 PM-07）。闸门必须有自己的验证。</li>
+</ol>
+<p><strong>判据：一道你不知道它漏什么的闸门，比没有闸门更危险。</strong>闸门是网底，不替代 DIS-03.2 与 DIS-03.3。</p>
+<hr />
+<h2 id="常见误判">常见误判</h2>
+<p><strong>「它给出了退出码，说明它真的跑了」</strong>这正是本节要打掉的第一条。执行结果标量是<strong>文本</strong>，与执行之间没有强制绑定关系。关于成因，一份公开研究把它归到训练与评估的激励结构上：语言模型「produc[e] plausible yet incorrect statements instead of admitting uncertainty」，因为「the training and evaluation procedures <strong>reward guessing over acknowledging uncertainty</strong>」（产出貌似合理却错误的陈述而不承认不确定；训练与评估流程奖励猜测而非奖励承认不确定）。出处：Kalai, Nachum, Vempala, Zhang, “Why Language Models Hallucinate”, arXiv:2509.04664， https://arxiv.org/abs/2509.04664 ｜不可外推：这是理论论证与激励结构分析，<strong>不是产品实测，也不构成模型间的对比结论</strong>，不能据此判断某个具体模型的伪报率高低。但对交付有一个直接推论：<strong>把它当作需要设计防线的常量，不是等待修复的缺陷。</strong></p>
+<p><strong>「文件在，所以那条命令跑过了」</strong>产物存在只证明产物存在。要让产物能回答过程问题，得让产物<strong>携带本次运行的唯一标识</strong>—— 内容里嵌构建号、输出里带本次输入的哈希、文件名带本次任务 ID。这与 <a class="xref" href="VER-02.html">VER-02</a>.2「版本标识逐字符相等」是同一个手法：<strong>用不可复用的标识把「这一次」钉住。</strong></p>
+<p><strong>「后面的分析很专业，所以前提没问题」</strong>最危险的一种。虚构的前提一旦进入上下文，后续推理会<strong>一直合理下去</strong>：「命令成功了却没有产物」是个好问题，围绕它给出的假设可能技术上完全成立，甚至可能顺手改对某个真实的缺陷——<strong>而那次改对，会被当成对虚假前提的进一步确认。</strong> Anthropic 的 agent 工程文档给出的对策是同一个方向：「it’s crucial for the agents to <strong>gain ‘ground truth’ from the environment at each step</strong> (such as tool call results or code execution) to assess its progress」，并提醒 agent 的自主性意味着「the potential for <strong>compounding errors</strong>」（每一步都必须从环境获取 ground truth；自主性带来错误复利的可能）。出处：Anthropic Engineering, “Building Effective AI Agents”， https://www.anthropic.com/engineering/building-effective-agents ｜不可外推：厂商工程口径，「compounding errors」是定性判断，不是量化结论。</p>
+<p><strong>「它自己承认过一次报错，说明它会自查」</strong>自查的价值取决于<strong>结论被归到哪里</strong>。同一次矛盾，可以被归成「在没有调用工具的情况下报告了结果」（模式，会改变后续行为），也可以被归成「那一步的反馈碰巧不对」（孤立事件，不改变任何东西）。后者形式上也是承认，<strong>但它不阻止下一次</strong>——尤其当归因方向指向外部时（DIS-03.5）。</p>
+<p><strong>「这是 AI 特有的新问题」</strong>不是。它只是把一个老问题的产生速率提高了。同一个结构在人类写的自动化里存在了几十年：任务在跑、退出码正常、没收到告警，而产物一直是空的（案例 PM-09）。<strong>验收锚点是产物，不是退出码，更不是「没收到告警」。</strong></p>
+<p><strong>「换个更强的模型就没有了」</strong>这是一个赌本节全部检查项都不必要的假设，而它无法在交付前被验证。按 <a class="xref" href="DIS-02.html">DIS-02</a>.5 选档：<strong>这类错误你只要栽过一次，它就已经不适合靠自觉。</strong></p>
+<hr />
+<h2 id="判定标准">判定标准</h2>
+<p>本轮结束、进入验收之前，逐项填下表。<strong>建议由脚本或闸门直接吐出，而不是由助手汇报</strong>—— 让被检查方汇报检查结果，是本节全部问题的源头。</p>
+<div class="checklist"><ul><li class="cont">ARTIFACT_CLAIMS=&lt;产物断言条数&gt;          # DIS-03.1</li><li class="cont">ARTIFACT_VERIFIED=&lt;独立通道回读通过条数&gt;  # DIS-03.2  必须 == ARTIFACT_CLAIMS</li><li class="cont">PROCESS_CLAIMS=&lt;过程断言条数&gt;            # DIS-03.1</li><li class="cont">PROCESS_TRACED=&lt;在本轮调用记录中定位到的条数&gt;  # DIS-03.3  必须 == PROCESS_CLAIMS</li><li class="cont">UNBACKED_SCALARS=0                      # 出现执行结果标量但无对应工具调用</li><li class="cont">UNRECOMPUTED_CHECKSUMS=0                # DIS-03.4  未由你重算的一致性证明</li><li class="cont">ENV_BLAME_WITHOUT_EVIDENCE=0            # DIS-03.5  未出示原文的环境指控</li><li class="cont">TRANSCRIPT_AVAILABLE=yes                # 调用记录是否可访问</li><li class="cont">VERDICT=EXECUTION_CONFIRMED</li></ul></div>
+<p>任一条不满足 → <code>VERDICT=EXECUTION_UNCONFIRMED</code>，<strong>本轮产出不得进入 <a class="xref" href="VER-05.html">VER-05</a> 验收</strong>。</p>
+<p><code>EXECUTION_UNCONFIRMED</code> 的处置动作是<strong>重跑那一条</strong>，不是追问助手。</p>
+<blockquote>
+<p><strong>追问不是验证手段。</strong> 让它「再确认一下」只会再生成一段文本，而这段文本与被质疑的那段出自同一个生成过程——<strong>同一个过程无法为自己作证。</strong>唯一有效的动作，是从一条不经它转述的通道取一次观测。</p>
+</blockquote>
+<blockquote>
+<p><strong>保守缺省</strong>：调用记录不可得、独立通道不可用、或助手的声明模糊到无法归栏（「基本弄好了」「应该没问题了」），一律按 <code>EXECUTION_UNCONFIRMED</code> 处理，把该动作当作<strong>未执行</strong>，重跑一遍。理由是成本不对称：<strong>重跑一条命令的代价是固定的，在一个虚假前提上继续推理的代价是复利的。</strong></p>
+</blockquote>
+<hr />
+<h2 id="案例证据">案例证据</h2>
+<blockquote>
+<h3 id="案例-pm-09-公开事故复盘gitlab2017-02-10">案例 PM-09 · 公开事故复盘｜GitLab，2017-02-10</h3>
+<p>数据库事故后需要恢复时，团队发现备份产物一直是空的。备份脚本天天在跑。</p>
+<p>官方复盘原文：「The standard backup procedure uses <code>pg_dump</code> to perform a logical backup of the database. <strong>This procedure failed silently.</strong>」以及「Unfortunately DMARC was not enabled for the cronjob emails, resulting in them being rejected by the receiver. This means <strong>we were never aware of the backups failing, until it was too late.</strong>」</p>
+<p><strong>本节引用它，是为了说明这个失败结构不是 AI 带来的。</strong> 这里没有任何模型参与：一个人类写的脚本，一条正常的执行路径，一套形式完整的告警通道—— 「任务在跑」被当成了「备份存在」，「没收到失败通知」被当成了「没有失败」。</p>
+<p>对本节的直接映射：<strong>验收锚点是产物，不是退出码，更不是「没收到告警」</strong>（DIS-03.1 的分栏）。 AI 助手改变的只是一件事——它让<strong>过程断言可以在零执行的情况下被生成出来</strong>，从而把这类失败的产生速率抬高了一个量级。<strong>结构没变，频率变了。</strong></p>
+<p>出处：https://about.gitlab.com/blog/2017/02/10/postmortem-of-database-outage-of-january-31/ ｜不可外推：这是 pg_dump 版本不匹配的具体故障，不能据此推广为「逻辑备份不可靠」，也不能反过来论证「AI 伪报与人类自动化静默失败的发生率相当」——本手册没有这个数据。</p>
+</blockquote>
+<blockquote>
+<h3 id="案例-合成示例教学场景非真实事故">案例 · 合成示例（教学场景，非真实事故）</h3>
+<p>一次较长的会话被连接中断打断。恢复后，助手的第一条消息报告：渲染脚本已生成并执行完毕，三个图片产物均正常，并附上了退出码与逐个文件的状态。</p>
+<p>随后的读取操作返回：<strong>文件不存在</strong>。</p>
+<p>这是一个干净的反证，唯一成立的推论是「脚本没有被执行」。但助手给出的推论是另一个：执行是成功的，只是<strong>回显被环境污染了</strong>，因此应当改用更可信的读取通道来判断。它据此提出了一个关于无头浏览器临时目录写权限的假设——<strong>这个假设在技术上完全成立，甚至可能真的是最终的缺陷所在。</strong></p>
+<p>三处要害： 1. 被污染的那个「回显」从未存在过——没有发起调用，就没有任何回显可被污染（DIS-03.3）； 2. 「读取通道比终端回显更可信」这句话<strong>本身是对的</strong>——一条正确的纪律，被用来包装了一个错误的理论（DIS-03.5）； 3. 后续那个专业、合理、甚至可能正确的假设，是建在一个不存在的执行结果之上的。<strong>它如果碰巧改对了什么，反而会把虚假前提坐实</strong>（见「常见误判」第三条）。</p>
+<p>⚠️ <strong>本例为本手册构造的教学场景，不是真实事故记录</strong>，不含任何真实读数—— 无时间戳、无退出码数值、无字节数、无日志原文。这不是排版洁癖：<strong>在一节专门讲「精确读数是伪装成本」的规程里，摆出编造的精确读数，等于当场演示本节要禁止的行为。</strong></p>
+</blockquote>
+<blockquote>
+<p><strong>关于本节的证据边界</strong>：本节各检查项来自实践中反复出现的形态，但本手册<strong>不以任何读者无法独立复核的会话日志作为证据</strong>—— 此类材料一律不进入本节。可核实的部分只有两类：上面标注了链接的公开事故复盘，以及标注了出处的厂商与学术文献。其余一律作为<strong>规程建议</strong>给出，请按你自己的环境验证后再采用。</p>
+</blockquote>
+<hr />
+<h2 id="相关小节">相关小节</h2>
+<ul>
+<li><strong><a class="xref" href="DIS-01.html">DIS-01</a> 证据分级</strong>——本节的上游；助手的执行报告默认落在「转述」级，而<strong>它转述的回读结果仍然是转述</strong></li>
+<li><strong><a class="xref" href="DIS-02.html">DIS-02</a> 三道焊缝</strong>——为什么在 AI 参与交付时第一档几乎必然失效：一档靠执行者的自觉，而这里执行者与被验证方是同一个</li>
+<li><strong><a class="xref" href="DIS-04.html">DIS-04</a> 事故台账</strong>——一次伪报怎么进流程才算被吸取；「同一模式第二次出现」是升到 DIS-03.8 闸门的触发信号</li>
+<li><strong><a class="xref" href="VER-02.html">VER-02</a> 切换验证</strong>——助手报告「已部署」之后，仍须完整跑一遍四项检查；本节的 <code>EXECUTION_CONFIRMED</code> 不替代 <code>SWITCHED</code></li>
+<li><strong><a class="xref" href="BLD-04.html">BLD-04</a> 模型行为约束</strong>——写给模型的是先验不是闸门，与 DIS-03.8 同源</li>
+<li><strong><a class="xref" href="APPX-A.html">附录 A</a> · AGT 域</strong>——症状「助手说做完了，但产物对不上」的速查入口</li>
+<li><strong><a class="xref" href="APPX-B.html">附录 B</a>（本节条目待收录）</strong>——本节八项检查与判定表的可打印版本</li>
+</ul>
+</main>
+<nav class="pager"><a href="DIS-02.html">← DIS-02</a><a href="DIS-04.html">DIS-04 →</a></nav>
+<footer>案例三档强制标注 · 引文写作当轮核实 · <a href="https://github.com/libaoming/fde-handbook">GitHub 源仓库</a>（发现分档冒充或引文失实，请提 issue——那是本手册的红线）</footer>
+</body></html>
