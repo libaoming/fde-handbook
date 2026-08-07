@@ -8,6 +8,27 @@
 > 🚧 **写作中。** 已发布 12 个规程节（第 1 部全部、第 2 部 5 节、第 3 部 3 节）、
 > 附录 A 故障速查（5 条完整条目）与 `kit/` 可跑脚本；其余章节陆续发布。
 
+## 一条命令，给你的 agent 装上切换验真
+
+```bash
+npx skills add libaoming/fde-handbook
+```
+
+装上 `fde-verify` 之后，你的 coding agent（Claude Code 等）在每次部署/切换后会自动跑
+本手册 VER-02 的四项检查，输出机器可判的判定标量——**任何一项没测出来都不会放行**
+（fail-closed）：
+
+```
+SERVICE_ACTIVE=yes
+VERSION_MATCH=yes
+STALE_INSTANCES=0
+BUSINESS_EVENT_SINCE_DEPLOY=yes
+VERDICT=SWITCHED
+```
+
+「服务显示 active、配置文件正确、页面能打开」都可能是假绿灯——接活的也许仍是
+上一版进程。这个 skill 就是本手册的立场：**AI 说做完了不算做完，判定标量说了才算。**
+
 ---
 
 ## 这本手册解决什么
