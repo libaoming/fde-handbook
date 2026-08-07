@@ -47,7 +47,7 @@ establishing that first."——**连写提示词都要求先有成功标准与�
 |---|---|
 | 「新版本在服务真实流量」 | VER-02 四项检查（`VERDICT=SWITCHED`） |
 | 「用户从他的网络位置可用」 | VER-03 可达性验证 |
-| 「输出质量达标」 | 固定输入集 + 判定标量（DIS-02；构建 golden 集见 DIS-03 相关） |
+| 「输出质量达标」 | 固定输入集 + 判定标量（DIS-02；golden 集的定义与归属见 ROL-03.1 验证资产） |
 | 「AI 助手产出可信」 | DIS-03 判定表（`EXECUTION_CONFIRMED`） |
 | 「客户能独立运维」 | HND 移交判据（按 runbook 独立执行成功） |
 

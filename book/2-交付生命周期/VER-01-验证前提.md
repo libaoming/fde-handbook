@@ -19,7 +19,7 @@
 
 两个公开事故把这个形态写得很清楚：
 
-- Roblox 2021（73 小时故障）："Critical monitoring systems that would have provided
+- Roblox 2021（2021-10-28～31，持续三天余的全站故障）："Critical monitoring systems that would have provided
   better visibility into the cause of the outage relied on affected systems, such as
   Consul. This combination severely hampered the triage process."
 - AWS S3 2017：连状态页都受灾——"we were unable to update the individual services'
@@ -63,7 +63,7 @@
 
 **「监控没报警，所以没问题」**
 先问 VER-01.1 的交集：报警链路和故障共不共享依赖。共享 → 沉默是盲区不是绿灯。
-Roblox 的复盘措辞是 "severely hampered"——73 小时里有相当部分在跟盲区搏斗。
+Roblox 的复盘措辞是 "severely hampered"——三天多的处置里有相当部分在跟盲区搏斗。
 
 **「健康检查全绿，所以服务健康」**
 回 VER-01.2 的表：每个绿灯只断言它测的那一层。把端口存活读成业务可用，
@@ -90,7 +90,8 @@ Roblox 的复盘措辞是 "severely hampered"——73 小时里有相当部分�
 
 > ### 案例 PM-04 · 公开事故复盘｜Roblox，2021
 >
-> 73 小时全站故障中，用于定位故障的关键监控系统跑在出故障的 Consul 之上——
+> 为期三天余（2021-10-28～31）的全站故障中，用于定位故障的关键监控系统
+> 跑在出故障的 Consul 之上——
 > 引句见 VER-01.1（出处：https://about.roblox.com/newsroom/2021/10/roblox-return-to-service-10-28-10-31-2021 ，
 > 2026-08-07 逐句核实）。
 > ｜不可外推：自建 Consul 集群的特定拓扑，不能推出「所有自托管监控不可用」。
