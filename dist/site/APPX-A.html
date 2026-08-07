@@ -14,11 +14,6 @@
 </blockquote>
 <h2 id="症状索引">症状索引</h2>
 <table>
-<colgroup>
-<col style="width: 33%" />
-<col style="width: 33%" />
-<col style="width: 33%" />
-</colgroup>
 <thead>
 <tr>
 <th>你观察到的现象</th>
@@ -94,7 +89,7 @@
 </tr>
 <tr>
 <td>什么都找你，角色被当成驻场咨询/售后</td>
-<td>FX-ORG-04（待写）</td>
+<td>FX-ORG-04</td>
 <td><a class="xref" href="ROL-01.html">ROL-01</a>、<a class="xref" href="ROL-02.html">ROL-02</a></td>
 </tr>
 <tr>
@@ -178,6 +173,14 @@
 <p><strong>Rollback</strong> - 不适用：本条是归属修复，无技术改动可回退。但若停摆期间有人为「绕开流程」做过技术改动（换域名、走临时通道），逐条评估回退——参照 FX-NET-01 的 Rollback 原则。</p>
 <p><strong>→ 正文</strong>：<a class="xref" href="ROL-02.html">ROL-02</a> 相邻角色边界 ｜ 相关：<a class="xref" href="ROL-03.html">ROL-03</a>、<a class="xref" href="ROL-04.html">ROL-04</a>、<a class="xref" href="VER-03.html">VER-03</a></p>
 <hr />
+<h2 id="fx-org-04-什么都找你角色被当成驻场咨询售后">FX-ORG-04 · 什么都找你，角色被当成驻场咨询/售后</h2>
+<p><strong>Symptoms</strong> - 客户遇到任何问题第一个想到你：产品缺陷、环境故障、口径疑问、别家系统的毛病，不分归属全部涌来 - 你的时间被这些事项占满，本次交付当前阶段的工作停滞或靠挤压推进 - 涌来的事项里，大量是「只要建议」或「装完之后的看护」，而不是把既有能力部署成客户结果</p>
+<p><strong>Pre-checks</strong>（确认是「角色被误用」，而不是「交付负载正常但排期失控」） 1. 抽最近涌来的事项，逐件过 <a class="xref" href="ROL-01.html">ROL-01</a> 判定标准两问：成功是否以「客户目标的达成」度量？工作主体是否是「部署/适配既有能力」？ 2. 两问皆是的占多数 → <strong>不是本条</strong>：这些本来就是 FDE 的活，属排期问题，按 <a class="xref" href="ROL-04.html">ROL-04</a> 的阶段正常推进。 3. 任一为否的占相当比例——只要建议不要系统、或以「装完/修完」为终点—— → <strong>命中本条</strong>：你被按驻场咨询或售后支持在用（<a class="xref" href="ROL-01.html">ROL-01</a> 常见误判列出的两种误用形态）。 4. 某件事说不清在不在范围内 → 范围以 ENG 阶段双方写下的成功标准为准，不以任何演示或口头承诺为准（<a class="xref" href="ROL-02.html">ROL-02</a> 常见误判）。</p>
+<p><strong>Resolution</strong> 1. 对每件两问任一为否的事项跑 <a class="xref" href="ROL-02.html">ROL-02</a>.3 归属三问：谁有权限改、谁在合同里背这项验收、合同结束后谁维护——三问一致指向的人就是 owner，把事项移交给他。三问答不出或互相矛盾的，是无主事项，转 FX-ORG-01 处置。 2. owner 必须是<strong>一个名字，不是一个部门</strong>，并请对方当场复述确认——沉默不是认领（<a class="xref" href="ROL-02.html">ROL-02</a> 常见误判）。 3. 按 <a class="xref" href="ROL-02.html">ROL-02</a>.4 把这些事项登记进边界登记表，补上预计完成时间与升级路径两个字段；非工程域事项照登不误——它们不产生任何技术信号，登记表是唯一防线。 4. 向客户讲清分界：FDE 的交付物是部署起来的运行系统，成功以客户目标的达成度量（<a class="xref" href="ROL-01.html">ROL-01</a>.1 三承重件）；把 FDE 当售后/实施外包用，丢的是「现场作为产品传感器」的那一半价值（<a class="xref" href="ROL-01.html">ROL-01</a> 常见误判）。 5. 源头是售前展示过的，取承诺清单，在 ENG 关口把「展示过的」与「承诺交付的」显式切开（<a class="xref" href="ROL-02.html">ROL-02</a>.1 第二行的用途）。</p>
+<p><strong>Post-checks</strong> - 新涌来的事项能用 <a class="xref" href="ROL-01.html">ROL-01</a> 两问一分为二：两问皆是的进 <a class="xref" href="ROL-04.html">ROL-04</a> 生命周期，任一为否的在登记表里有唯一 owner - 登记表过一遍 <a class="xref" href="ROL-02.html">ROL-02</a> 判定标准清单：每项唯一 owner、三问不一致的高危项已标出、非工程域事项有预计时长与升级路径 - 下一次同步会上，移交出去的事项由其 owner 报状态，而不是回流到你</p>
+<p><strong>Rollback</strong> - 不适用：本条是角色与归属修复，无技术改动可回退。已替别人辖区接下的存量事项不是「回退」而是「移交」——逐件走 Resolution 第 1、2 步定位 owner。</p>
+<p><strong>→ 正文</strong>：<a class="xref" href="ROL-01.html">ROL-01</a> 角色定义、<a class="xref" href="ROL-02.html">ROL-02</a> 相邻角色边界 ｜ 相关：<a class="xref" href="ROL-04.html">ROL-04</a>、<a class="xref" href="ENG-02.html">ENG-02</a></p>
+<hr />
 <h2 id="待写条目">待写条目</h2>
 <table>
 <colgroup>
@@ -232,11 +235,6 @@
 <td>FX-ORG-03</td>
 <td>说不清现在处于交付的哪一步</td>
 <td><a class="xref" href="ROL-04.html">ROL-04</a>（三问自检）</td>
-</tr>
-<tr>
-<td>FX-ORG-04</td>
-<td>什么都找你，角色被当成驻场咨询/售后</td>
-<td><a class="xref" href="ROL-01.html">ROL-01</a>（两问判定）、<a class="xref" href="ROL-02.html">ROL-02</a>（范围以 ENG 成功标准为准）</td>
 </tr>
 <tr>
 <td>FX-ORG-05</td>

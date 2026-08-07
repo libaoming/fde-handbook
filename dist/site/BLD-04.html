@@ -108,7 +108,7 @@
 <text class="etxt-ink" x="620" y="478">第 3–4 档 = 约束（只有第 4 档确定）</text>
 </svg>
 <figcaption>五档约束阶梯：第 0 档措辞、第 1 档上下文形状、第 2 档数据形状、第 3 档输出格式约束、第 4 档模型之外的闸门；第 0–2 档全部是建议，在模型内与训练先验竞争、无确定性，第 3–4 档才是约束且只有第 4 档确定；不可失败类要求（金额、承诺、对外发布、不可逆动作）必须落到第 4 档，落在第 2 档及以下判 ADVISORY_ONLY，不得进入部署</figcaption></figure>
-<p>五项检查全部通过，本节才算完成。<strong>任何一项不通过，该约束按「未生效」处理，不得进入 <a class="xref" href="DEP-01.html">DEP-01</a>。</strong></p>
+<p>五项检查全部通过，该约束才算 <code>CONSTRAINED</code>；未通过的按「未生效」处理。<strong>未生效的约束能不能进入 <a class="xref" href="DEP-01.html">DEP-01</a>，由节末判定标准按要求类别裁决——不可失败类一律不得。</strong></p>
 <h3 id="bld-04.1-先分清要它识别还是要它照做再决定给不给清单">BLD-04.1　先分清「要它识别」还是「要它照做」，再决定给不给清单</h3>
 <p>对每一份要放进上下文的清单、示例、候选集、枚举，先回答一个问题：<strong>如果模型把这一项原样吐出来，那是正确输出，还是编造？</strong></p>
 <table>
@@ -139,7 +139,7 @@
 </table>
 <p><strong>判据：需要它识别的，别给清单；需要它照做的，才给清单。</strong></p>
 <p>上下文里的任何候选集都同时是两样东西——识别的线索，和<strong>编造的原料</strong>。在信息不足时，模型会优先使用手边的原料。识别类需求应改由程序侧承担：语音识别侧的词表偏置（biasing，把候选词交给 ASR 而不是交给下游模型）、检索、或输出之后的模糊匹配与人工确认。</p>
-<p><strong>这一项排除的是</strong>：把参考资料当成了许可。<strong>它不能证明模型会遵守任何别的规则。</strong></p>
+<p><strong>这一项排除的是</strong>：把「给模型看的参考资料」变成「允许它照着说的许可」。<strong>它不能证明模型会遵守任何别的规则。</strong></p>
 <h3 id="bld-04.2-给出承认不知道的合法出路并写明话术">BLD-04.2　给出「承认不知道」的合法出路，并写明话术</h3>
 <p>一条出路必须同时包含三件东西，缺一不算：</p>
 <ol type="1">
@@ -147,6 +147,7 @@
 <li><strong>动作</strong>——反问 / 挂起 / 转人工 / 降级到固定话术</li>
 <li><strong>话术原句</strong>——直接给出要说的那句话，不要让模型自己想</li>
 </ol>
+<p>合格的触发条件长这样：「ASR 置信度低于阈值」「用户所述岗位不在已知岗位表内」「必填字段缺任一」——每条都能程序判定。「觉得不确定时」不行：没有任何程序或第二个人能对它做出一致判定。</p>
 <p><strong>判据：模型编造的直接成因，通常是「猜一个」的成本低于「承认不知道」。要做的是把后者的成本降下来，而不是禁止前者。</strong></p>
 <p>反向检查同样重要，且优先级更高：<strong>全文不得出现堵死出路的指令</strong>—— 「不要反问」「必须给出一个答案」「猜一个最接近的」「不准说不知道」。这类句子比「没写出路」严重，因为它是在主动命令模型编造。</p>
 <p>本项判据的机理与出处，见案例证据的「Why Language Models Hallucinate」引证框。</p>
@@ -299,9 +300,14 @@
 <hr />
 <h2 id="判定标准">判定标准</h2>
 <p>五项全部通过才输出 <code>CONSTRAINED</code>。建议让脚本吐判定标量，而不是让人通读提示词自己下结论（理由见 <a class="xref" href="DIS-02.html">DIS-02</a>）：</p>
-<div class="checklist"><ul><li class="cont">RECOGNITION_LIST_IN_CONTEXT=0     # BLD-04.1  识别类清单不得进上下文</li><li class="cont">ESCAPE_HATCH_DEFINED=yes          # BLD-04.2  触发条件+动作+话术，三者齐备</li><li class="cont">ANTI_ESCAPE_DIRECTIVE=0           # BLD-04.2  堵死出路的指令数，必须为 0</li><li class="cont">ENFORCEMENT_TIER=4                # BLD-04.3  该约束最终落在第几档</li><li class="cont">IMPLICIT_CONVENTION_REVIEWED=yes  # BLD-04.4  迁移时才要求；非迁移填 n/a</li><li class="cont">UNRESOLVED_PATCH_CONFLICTS=0      # BLD-04.5  仲裁者=模型 的冲突数</li><li class="cont">VERDICT=CONSTRAINED</li></ul></div>
-<p>任一项为否，或 <code>ENFORCEMENT_TIER&lt;=2</code> 而该要求属于<strong>不可失败</strong>的类别（涉及金额、承诺、对外发布、不可逆动作）→ <code>VERDICT=ADVISORY_ONLY</code>，<strong>不得进入 <a class="xref" href="DEP-01.html">DEP-01</a></strong>。</p>
-<p>参考实现：<code>kit/soft-prior-lint.py</code>，检四类风险并给出判定标量。真实输出字段为：</p>
+<div class="checklist"><ul><li class="cont">RECOGNITION_LIST_IN_CONTEXT=0     # BLD-04.1  识别类清单不得进上下文</li><li class="cont">ESCAPE_HATCH_DEFINED=yes          # BLD-04.2  触发条件+动作+话术，三者齐备</li><li class="cont">ANTI_ESCAPE_DIRECTIVE=0           # BLD-04.2  堵死出路的指令数，必须为 0</li><li class="cont">ENFORCEMENT_TIER=3 | 4            # BLD-04.3  最终落第几档（一般要求 ≥3、不可失败类 =4 才算约束）</li><li class="cont">IMPLICIT_CONVENTION_REVIEWED=yes  # BLD-04.4  迁移时才要求；非迁移填 n/a</li><li class="cont">UNRESOLVED_PATCH_CONFLICTS=0      # BLD-04.5  仲裁者=模型 的冲突数</li><li class="cont">VERDICT=CONSTRAINED</li></ul></div>
+<p>档位这一项的判定规则，按要求类别分两条线：</p>
+<ul>
+<li><strong>一般要求</strong>：<code>ENFORCEMENT_TIER&gt;=3</code> 且其余各项通过 → <code>VERDICT=CONSTRAINED</code>； <code>&lt;=2</code> 一律 <code>VERDICT=ADVISORY_ONLY</code>——0–2 档全部是建议（BLD-04.3 判据），没有例外。</li>
+<li><strong>不可失败类</strong>（涉及金额、承诺、对外发布、不可逆动作）：只有<strong>第 4 档</strong>算 <code>CONSTRAINED</code>——第 3 档的确定性「取决于是否由服务端强制」（BLD-04.3 表），对不可失败类不够，第 3 档及以下一律 <code>ADVISORY_ONLY</code>。</li>
+</ul>
+<p><code>ADVISORY_ONLY</code> 的处置同样分叉：不可失败类不得进入 <a class="xref" href="DEP-01.html">DEP-01</a>，必须升到第 4 档；其余要求可以带着 <code>ADVISORY_ONLY</code> 进入 <a class="xref" href="DEP-01.html">DEP-01</a>，但必须登记为已知风险，下游按「它可能不被遵守」设计（同下方保守缺省）。</p>
+<p>参考实现：<code>kit/soft-prior-lint.py</code>。分工要说清：上面 checklist 由<strong>人工评审</strong>逐项填写 ——<code>ENFORCEMENT_TIER</code>、补丁冲突数这类字段没有工具能自动产出；脚本只自动化四类风险的<strong>线索采集</strong>，它的输出字段与 checklist 不同：</p>
 <div class="checklist"><ul><li class="cont">FILE=&lt;被检文件&gt;</li><li class="cont">HIT_CANDIDATE_LIST=&lt;n&gt;      # 候选清单（可能被当成编造原料）</li><li class="cont">HIT_PUNCT_DIRECTIVE=&lt;n&gt;     # 要求用标点做控制（跨链路含义反转）</li><li class="cont">HIT_TURN_END_RISK=&lt;n&gt;       # 多条目播报语境中的句号（⚠️ 已知噪声较高）</li><li class="cont">HIT_NO_ESCAPE_HATCH=&lt;n&gt;     # 缺出路，或存在明令禁止承认无知的指令</li><li class="cont">TOTAL_HITS=&lt;n&gt;</li><li class="cont">VERDICT=OK | SOFT_PRIOR_RISK</li></ul></div>
 <p>退出码：<code>0</code>=OK，<code>1</code>=SOFT_PRIOR_RISK，<code>2</code>=用法错误。自测可复现：</p>
 <pre><code>$ python3 kit/soft-prior-lint.py --self-test
